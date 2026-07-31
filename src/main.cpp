@@ -1,3 +1,9 @@
+#include "Window.h"
 int main() {
-	return;
+	Window window(640, 480,"SkipsEngine");
+	while (!window.ShouldClose()) {
+		glClear(GL_COLOR_BUFFER_BIT);
+		window.SwapBuffers();
+		window.PollEvents();
+	}
 }
