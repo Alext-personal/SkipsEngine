@@ -1,3 +1,4 @@
+#pragma once
 #include <functional>
 enum class EventType {
 	WindowClose, WindowResize
@@ -18,11 +19,10 @@ public:
 class EventDispatcher {
 public:
 	EventDispatcher(Event& e) : m_event(e) {};
-	using EventFn = std::function<bool(Event&)>;
-	template<typename T>
-	bool Dispatch(const EventFn& func) {
-		if (m_event.GetEventType == T::GetStaticType()) {
-			m_event.handled |= func(static_cast<T*>(m_event));
+	template<typename T,typename F>
+	bool Dispatch(const F& func) {
+		if (m_event.GetEventType() == T::GetStaticType()) {
+			m_event.handled |= func(static_cast<T&>(m_event));
 			return true;
 		}
 		return false;

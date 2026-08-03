@@ -1,3 +1,4 @@
+#pragma once
 #include <memory>
 #include "Event.h"
 #include "WindowEvents.h"
@@ -9,8 +10,8 @@ public:
 
 	Application& Get() const { return *s_instance; }
 	void OnEvent(Event& e);
-	void OnWindowClose(WindowCloseEvent& e);
-	void OnWindowResize(WindowResizeEvent& e);
+	bool OnWindowClose(WindowCloseEvent& e);
+	bool OnWindowResize(WindowResizeEvent& e);
 	void Run();
 
 private:

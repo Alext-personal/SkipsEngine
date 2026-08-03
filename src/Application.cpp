@@ -1,28 +1,32 @@
 #include <iostream>
+#include <utility>
+#include "Helpers.h"
 #include "Application.h"
 Application* Application::s_instance = nullptr;
 Application::Application() {
 	if (s_instance == nullptr)
-		s_inbstance = this;
+		s_instance = this;
 	m_window = std::make_unique<Window>(640,480,"Skips-Engine");
-	m_window->SetCallbackFunction(Application::OnEvent);
+	m_window->SetCallbackFunction(TO_EVENT_FN(OnEvent));
 }
 void Application::Run() {
 	while (m_running) {
 		glClear(GL_COLOR_BUFFER_BIT);
 		m_window->SwapBuffers();
 		m_window->PollEvents();
-		std::cout << m_running << '\n';
 	}
 }
 void Application::OnEvent(Event& e) {
-	EventDispatcher dispatcher;
-	dispatcher.Dispatch<WindowCloseEvent>(OnWindowClose);
-	dispatcher.Dispatch<WindowResizeEvent>(OnWindowResize);
+	EventDispatcher dispatcher(e);
+	dispatcher.Dispatch<WindowCloseEvent>(TO_EVENT_FN(OnWindowClose));
+	dispatcher.Dispatch<WindowResizeEvent>(TO_EVENT_FN(OnWindowResize));
 }
-void Application::OnWindowClose(WindowCloseEvent& e) {
+bool Application::OnWindowClose(WindowCloseEvent& e) {
 	m_running = false;
+	return true;
 }
-void Application::OnWindowResize(WindowResizeEvent& e) {
+bool Application::OnWindowResize(WindowResizeEvent& e) {
 	glViewport(0, 0, e.GetWidth(), e.GetHeight());
+	std::cout << e.GetWidth() << "----" << e.GetHeight() << '\n';
+	return true;
 }
