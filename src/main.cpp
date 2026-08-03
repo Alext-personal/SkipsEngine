@@ -1,9 +1,5 @@
-#include "Window.h"
+#include "Application.h"
 int main() {
-	Window window(640, 480,"SkipsEngine");
-	while (!window.ShouldClose()) {
-		glClear(GL_COLOR_BUFFER_BIT);
-		window.SwapBuffers();
-		window.PollEvents();
-	}
+	std::unique_ptr<Application> app = std::make_unique<Application>();
+	app->Run();
 }
