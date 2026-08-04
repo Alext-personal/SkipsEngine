@@ -2,6 +2,7 @@
 #include <glad/glad.h>
 #include "Window.h"
 #include "WindowEvents.h"
+#include "InputEvents.h"
 Window::Window(unsigned int width, unsigned int height, const char * name) {
 	if (!glfwInit()) {
 		throw std::runtime_error("Error at GLFW initialisation");
@@ -41,6 +42,60 @@ Window::Window(unsigned int width, unsigned int height, const char * name) {
 		WindowResizeEvent event(width,height);
 		data.width = width;
 		data.height = height;
+		data.EventCallback(event);
+		});
+	glfwSetKeyCallback(m_window, [](GLFWwindow* window, int key, int scancode, int action, int mods) {
+		WindowData data = *(WindowData*)glfwGetWindowUserPointer(window);
+		KeyCode _key = static_cast<KeyCode>(key);
+		switch (action)
+		{
+			case GLFW_PRESS:
+			{
+				KeyPressEvent event(_key, false);
+				data.EventCallback(event);
+				break;
+			}
+			case GLFW_RELEASE:
+			{
+				KeyReleaseEvent event(_key);
+				data.EventCallback(event);
+				break;
+			}
+			case GLFW_REPEAT:
+			{
+				KeyPressEvent event(_key, true);
+				data.EventCallback(event);
+				break;
+			}
+		}
+		});
+	glfwSetCursorPosCallback(m_window, [](GLFWwindow* window, double xpos, double ypos) {
+		WindowData data = *(WindowData*)glfwGetWindowUserPointer(window);
+		MouseMoveEvent event(xpos, ypos);
+		data.EventCallback(event);
+		});
+	glfwSetMouseButtonCallback(m_window, [](GLFWwindow* window, int button, int action, int mods) {
+		WindowData data = *(WindowData*)glfwGetWindowUserPointer(window);
+		MouseCode _button = static_cast<MouseCode>(button);
+		switch (action)
+		{
+			case GLFW_PRESS:
+			{
+				MouseButtonPressEvent event(_button);
+				data.EventCallback(event);
+				break;
+			}
+			case GLFW_RELEASE:
+			{
+				MouseButtonReleaseEvent event(_button);
+				data.EventCallback(event);
+				break;
+			}
+		}
+	});
+	glfwSetScrollCallback(m_window, [](GLFWwindow* window, double xoffset, double yoffset) {
+		WindowData data = *(WindowData*)glfwGetWindowUserPointer(window);
+		MouseScrollEvent event(xoffset, yoffset);
 		data.EventCallback(event);
 		});
 }

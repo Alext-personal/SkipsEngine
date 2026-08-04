@@ -3,15 +3,18 @@
 #include "Helpers.h"
 #include "Application.h"
 Application* Application::s_instance = nullptr;
-Application::Application() {
-	if (s_instance == nullptr)
-		s_instance = this;
-	m_window = std::make_unique<Window>(640,480,"Skips-Engine");
+Application::Application() : m_window(std::make_unique<Window>(640, 480, "Skips-Engine")) {
+	if (s_instance != nullptr)
+	{
+		Log::ERROR("MULTIPLE APPLICATIONS, SHUTTING DOWN");
+		throw std::runtime_error("App not a singleton");
+	}
+	s_instance = this;
 	m_window->SetCallbackFunction(TO_EVENT_FN(OnEvent));
-	LOG_INFO("App Created");
+	Log::INFO("App Created");
 }
 void Application::Run() {
-	LOG_INFO("App Started");
+	Log::INFO("App Started");
 	while (m_running) {
 		glClear(GL_COLOR_BUFFER_BIT);
 		m_window->SwapBuffers();
@@ -22,6 +25,7 @@ void Application::OnEvent(Event& e) {
 	EventDispatcher dispatcher(e);
 	dispatcher.Dispatch<WindowCloseEvent>(TO_EVENT_FN(OnWindowClose));
 	dispatcher.Dispatch<WindowResizeEvent>(TO_EVENT_FN(OnWindowResize));
+	m_input.OnEvent(e);
 }
 bool Application::OnWindowClose(WindowCloseEvent& e) {
 	m_running = false;

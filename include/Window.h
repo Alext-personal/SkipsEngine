@@ -16,7 +16,7 @@ public:
 
 	int GetWidth() const { return m_data.width; }
 	int GetHeight() const { return m_data.height; }
-	void* GetNativeWindow() const { return m_window; }
+	GLFWwindow* GetNativeWindow() const { return m_window; }
 
 	void SetCallbackFunction(EventCallbackFn func) { m_data.EventCallback = func; }
 

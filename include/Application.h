@@ -1,5 +1,6 @@
 #pragma once
 #include <memory>
+#include "Input.h"
 #include "Event.h"
 #include "WindowEvents.h"
 #include "Window.h"
@@ -18,5 +19,6 @@ private:
 	static Application* s_instance;
 
 	std::unique_ptr<Window> m_window;
+	Input m_input{};
 	bool m_running = true;
 };

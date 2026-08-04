@@ -1,20 +1,22 @@
 #pragma once
 #include <functional>
-enum class EventType {
+#include "Log.h"
+enum EventType {
 	WindowClose, WindowResize,
-	KeyPress,KeyRelease
+	KeyPress,KeyRelease,
+	MouseMove,MouseButtonPress,MouseButtonRelease,MouseScroll
 };
 enum EventCategory {
-	MouseEvent = 1,
-	KeyEvent = 1<<2,
-	WindowEvent = 1<<3
+	MouseEvent = 1<<0,
+	KeyEvent = 1<<1,
+	WindowEvent = 1<<2
 };
 #define EVENT_CLASS_TYPE(type)\
 	static EventType GetStaticType(){return EventType::type;}\
 	virtual EventType GetEventType() const override {return GetStaticType();}\
 	virtual const char * GetName() const override {return #type;}
 #define EVENT_CLASS_CATEGORY(category)\
-	virtual int GetEventCategory() const override {return category};
+	virtual int GetEventCategory() const override {return category;}
 
 class Event {
 public:
@@ -25,13 +27,13 @@ public:
 	virtual int GetEventCategory() const = 0;
 	virtual const char* GetName() const = 0;
 
-	bool IsInCategory(EventCategory category) { return GetEventCategory & category; }
+	bool IsInCategory(EventCategory category) { return GetEventCategory() & category; }
 };
 class EventDispatcher {
 public:
 	EventDispatcher(Event& e) : m_event(e) {};
 	template<typename T,typename F>
-	bool DispatchByType(const F& func) {
+	bool Dispatch(const F& func) {
 		if (m_event.GetEventType() == T::GetStaticType()) {
 			m_event.handled |= func(static_cast<T&>(m_event));
 			return true;
