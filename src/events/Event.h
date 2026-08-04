@@ -1,6 +1,6 @@
 #pragma once
 #include <functional>
-#include "Log.h"
+#include "core/Log.h"
 enum EventType {
 	WindowClose, WindowResize,
 	KeyPress,KeyRelease,

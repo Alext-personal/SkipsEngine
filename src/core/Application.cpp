@@ -1,7 +1,7 @@
 
-#include "Log.h"
-#include "Helpers.h"
-#include "Application.h"
+#include "core/Log.h"
+#include "core/Helpers.h"
+#include "core/Application.h"
 Application* Application::s_instance = nullptr;
 Application::Application() : m_window(std::make_unique<Window>(640, 480, "Skips-Engine")) {
 	if (s_instance != nullptr)

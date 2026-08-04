@@ -1,5 +1,5 @@
 #pragma once
-#include "Event.h"
+#include "events/Event.h"
 class WindowCloseEvent : public Event {
 public:
 	WindowCloseEvent() = default;

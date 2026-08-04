@@ -1,6 +1,16 @@
-#include "Helpers.h"
-#include "Log.h"
-#include "Input.h"
+#include "core/Helpers.h"
+#include "core/Log.h"
+#include "input/Input.h"
+
+Input* Input::s_instance = nullptr;
+Input::Input() { 
+    if (s_instance != nullptr)
+    {
+        Log::ERROR("INPUT INSTANCE NOT SINGULAR");
+        throw std::runtime_error("Duplicate input singleton");
+    }
+    s_instance = this; 
+};
 void Input::OnEvent(Event& e)
 {
     EventDispatcher dispatcher(e);
@@ -28,6 +38,7 @@ bool Input::HandleKeyRelease(KeyReleaseEvent& e)
 bool Input::HandleButtonPress(MouseButtonPressEvent& e)
 {
     m_mouse.pressedButtons[e.GetButton()] = true;
+    Log::INFO(e.GetButton(), " Was Pressed");
     return true;
 }
 

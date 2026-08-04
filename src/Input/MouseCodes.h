@@ -1,6 +1,6 @@
 #pragma once
 #include <cstdint>
-		enum MouseCode : uint8_t
+		enum MouseCode : uint16_t
 		{
 			// From glfw3.h
 			Button0 = 0,

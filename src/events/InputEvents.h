@@ -1,7 +1,7 @@
 #pragma once
-#include "Event.h"
-#include "KeyCodes.h"
-#include "MouseCodes.h"
+#include "events/Event.h"
+#include "input/KeyCodes.h"
+#include "input/MouseCodes.h"
 
 // Key Events
 class KeyPressEvent : public Event {

@@ -1,8 +1,8 @@
 #include <iostream>
 #include <glad/glad.h>
-#include "Window.h"
-#include "WindowEvents.h"
-#include "InputEvents.h"
+#include "core/Window.h"
+#include "events/WindowEvents.h"
+#include "events/InputEvents.h"
 Window::Window(unsigned int width, unsigned int height, const char * name) {
 	if (!glfwInit()) {
 		throw std::runtime_error("Error at GLFW initialisation");

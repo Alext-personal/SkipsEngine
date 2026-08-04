@@ -24,13 +24,13 @@ target_link_libraries(engine PRIVATE
 )
 file(GLOB_RECURSE MY_SOURCES CONFIGURE_DEPENDS 
 	"${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp"
-	"${CMAKE_CURRENT_SOURCE_DIR}/include/*.h"
+	"${CMAKE_CURRENT_SOURCE_DIR}/src/*.h"
 )
 target_sources(engine PRIVATE 
 	${MY_SOURCES}
 )
 
-target_include_directories(engine PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include/")
+target_include_directories(engine PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/")
 #vcpkg libraries
 target_link_libraries(engine PRIVATE 
 
