@@ -1,6 +1,5 @@
 
 #include "Log.h"
-#include <utility>
 #include "Helpers.h"
 #include "Application.h"
 Application* Application::s_instance = nullptr;
@@ -20,7 +19,6 @@ void Application::Run() {
 	}
 }
 void Application::OnEvent(Event& e) {
-	LOG_INFO(e.GetName());
 	EventDispatcher dispatcher(e);
 	dispatcher.Dispatch<WindowCloseEvent>(TO_EVENT_FN(OnWindowClose));
 	dispatcher.Dispatch<WindowResizeEvent>(TO_EVENT_FN(OnWindowResize));
