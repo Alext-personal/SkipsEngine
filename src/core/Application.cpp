@@ -3,11 +3,11 @@
 #include "core/Helpers.h"
 #include "core/Application.h"
 Application* Application::s_instance = nullptr;
-Application::Application() : m_window(std::make_unique<Window>(640, 480, "Skips-Engine")) {
+Application::Application() : m_window(std::make_unique<Window>(640, 480, "Skips-Engine")),m_renderer(std::make_unique<Renderer>())
+{
 	if (s_instance != nullptr)
 	{
 		Log::ERROR("MULTIPLE APPLICATIONS, SHUTTING DOWN");
-		throw std::runtime_error("App not a singleton");
 	}
 	s_instance = this;
 	m_window->SetCallbackFunction(TO_EVENT_FN(OnEvent));

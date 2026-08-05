@@ -4,6 +4,7 @@
 #include "events/Event.h"
 #include "events/WindowEvents.h"
 #include "core/Window.h"
+#include "render/Renderer.h"
 class Application {
 public:
 	Application();
@@ -19,6 +20,7 @@ private:
 	static Application* s_instance;
 
 	std::unique_ptr<Window> m_window;
+	std::unique_ptr<Renderer> m_renderer;
 	Input m_input;
 	bool m_running = true;
 };

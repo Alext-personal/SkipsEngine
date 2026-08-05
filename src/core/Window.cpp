@@ -1,25 +1,18 @@
 #include <iostream>
-#include <glad/glad.h>
 #include "core/Window.h"
 #include "events/WindowEvents.h"
 #include "events/InputEvents.h"
 Window::Window(unsigned int width, unsigned int height, const char * name) {
 	if (!glfwInit()) {
-		throw std::runtime_error("Error at GLFW initialisation");
+		Log::ERROR("Error at GLFW initialisation");
 	}
 	m_window = glfwCreateWindow(width, height, name, NULL, NULL);
 
 	if (!m_window) {
 		glfwTerminate();
-		throw std::runtime_error("Error at window creation");
+		Log::ERROR("Error at window creation");
 	}
 	glfwMakeContextCurrent(m_window);
-	
-	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
-	{
-		glfwTerminate();
-		throw std::runtime_error("Error at glad initialisation");
-	}
 	//WindowData
 
 	m_data.title = name;

@@ -7,7 +7,6 @@ Input::Input() {
     if (s_instance != nullptr)
     {
         Log::ERROR("INPUT INSTANCE NOT SINGULAR");
-        throw std::runtime_error("Duplicate input singleton");
     }
     s_instance = this; 
 };

@@ -1,6 +1,8 @@
 #pragma once
 #include <iostream>
 #include <chrono>
+#include <string>
+#include <source_location>
 class Log {
 public:
 	inline static const char* White{ "\033[0m" };
@@ -14,10 +16,13 @@ public:
 	}
 	template <typename... Args>
 	static void ERROR(const Args&... args) {
+		std::source_location location = std::source_location::current();
+		std::stringstream ss;
 		std::cerr << Red << "[ERROR] " << White;
 		Log_Time(std::cerr);
-		(std::cerr << ... << args);
-		std::cerr << "\n";
+		(ss << ... << args);
+		std::cerr <<ss.str() << " [FILE] : " <<location.file_name()<< " [LINE] : "<<location.line()<< "\n";
+		throw std::runtime_error(ss.str());
 	}
 	template <typename... Args>
 	static void WARNING(const Args&... args) {
