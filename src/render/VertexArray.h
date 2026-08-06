@@ -2,11 +2,13 @@
 #include "VertexBuffer.h"
 class VertexArray {
 public:
-	VertexArray(VertexBuffer vbo,VertexLayout layout);
+	VertexArray();
 	~VertexArray();
+
+	void AddVertexBuffer(VertexBuffer buffer, VertexLayout layout);
+
 	void Bind() const;
 	void UnBind() const;
-	GLuint GetID() const { return m_ID; }
 private:
-	GLuint m_ID{};
+	uint32_t m_ID{};
 };

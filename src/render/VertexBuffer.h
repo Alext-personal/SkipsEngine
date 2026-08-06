@@ -5,7 +5,7 @@
 enum class AttributeDataType {
 	None = 0, Float, Float2, Float3, Float4, Mat3 , Mat4, Int, Int2, Int3, Int4, Bool // mat3 = 9 floats, mat4 = 16 floats
 };
-static size_t GetSizeByType(AttributeDataType type) {
+static uint32_t GetSizeByType(AttributeDataType type) {
 	switch (type) {
 	case AttributeDataType::Float: return 4;
 	case AttributeDataType::Float2: return 4*2;
@@ -17,8 +17,8 @@ static size_t GetSizeByType(AttributeDataType type) {
 	case AttributeDataType::Int3: return 4 * 3;
 	case AttributeDataType::Int4: return 4 * 4;
 
-	case AttributeDataType::Mat3: return 4 * 3 * 3; 
-	case AttributeDataType::Mat4: return 4 * 4 * 4;
+	case AttributeDataType::Mat3: return 3; 
+	case AttributeDataType::Mat4: return 4;
 
 	case AttributeDataType::Bool: return 1;
 	default:
@@ -27,11 +27,34 @@ static size_t GetSizeByType(AttributeDataType type) {
 }
 struct VertexBufferAttribute {
 	AttributeDataType type;
-	size_t size;
+	uint32_t size;
 	bool normalized;
 	size_t offset;
 
-	VertexBufferAttribute(AttributeDataType _type, bool _normalized = 0) : type(_type), size(GetSizeByType(_type)){}
+	VertexBufferAttribute(AttributeDataType _type, bool _normalized = 0) 
+	  : type(_type), size(GetSizeByType(_type)),
+		normalized(_normalized),offset(0){}
+
+	uint32_t GetCountByType() const {
+		switch (type) {
+		case AttributeDataType::Float: return 1;
+		case AttributeDataType::Float2: return 2;
+		case AttributeDataType::Float3: return 3;
+		case AttributeDataType::Float4: return 4;
+
+		case AttributeDataType::Int: return 1;
+		case AttributeDataType::Int2: return 2;
+		case AttributeDataType::Int3: return 3;
+		case AttributeDataType::Int4: return 4;
+
+		case AttributeDataType::Mat3: return 9;
+		case AttributeDataType::Mat4: return 16;
+
+		case AttributeDataType::Bool: return 1;
+		default:
+			Log::ERROR("Invalid Type");
+		}
+	}
 };
 class VertexLayout {
 public:
@@ -41,10 +64,11 @@ public:
 		m_attributes.push_back(a);
 		m_updateAttributes();
 	}
-	size_t GetStride() const { return m_stride; }
+	uint32_t GetStride() const { return m_stride; }
+	const std::vector<VertexBufferAttribute>& GetAttributes() const { return m_attributes; }
 private:
 	std::vector<VertexBufferAttribute> m_attributes{};
-	size_t m_stride{};
+	uint32_t m_stride{};
 
 	void m_updateAttributes() {
 		size_t _offset = 0;
@@ -52,19 +76,18 @@ private:
 		for (auto& a : m_attributes) {
 			a.offset = _offset;
 			_offset += a.size;
+			m_stride += a.size;
 		}
-		m_stride = _offset;
 	}
 };
 
 class VertexBuffer {
 public:
-	VertexBuffer(const void* data,size_t size);
+	VertexBuffer(const void* data, uint32_t size);
 	~VertexBuffer();
 	void Bind() const;
 	void UnBind() const;
 
-	GLuint GetID() const { return m_ID; }
 private:
-	GLuint m_ID{};
+	uint32_t m_ID{};
 };
