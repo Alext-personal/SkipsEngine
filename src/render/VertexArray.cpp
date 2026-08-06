@@ -16,17 +16,17 @@ static GLenum AttributeDataTypeToGLenum(AttributeDataType type) {
 
 	case AttributeDataType::Bool: return GL_UNSIGNED_BYTE;
 	default:
-		Log::ERROR("Invalid Type");
+		Log::ERROR("Invalid Type");  //throws
 	}
 }
 VertexArray::VertexArray() {
 	glGenVertexArrays(1, &m_ID);
-	glBindVertexArray(m_ID);
 }
 VertexArray::~VertexArray() {
 	glDeleteVertexArrays(1, &m_ID);
 }
-void VertexArray::AddVertexBuffer(VertexBuffer buffer, VertexLayout layout) {
+void VertexArray::AddVertexBuffer(const VertexBuffer& buffer, const VertexLayout& layout) {
+	Bind();
 	buffer.Bind();
 	uint32_t index = 0;
 	for (const auto& attribute : layout.GetAttributes())

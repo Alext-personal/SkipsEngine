@@ -2,8 +2,9 @@
 #include "core/Log.h"
 #include "core/Helpers.h"
 #include "core/Application.h"
+#include "render/Renderer.h"
 Application* Application::s_instance = nullptr;
-Application::Application() : m_window(std::make_unique<Window>(640, 480, "Skips-Engine")),m_renderer(std::make_unique<Renderer>())
+Application::Application() : m_window(std::make_unique<Window>(640, 480, "Skips-Engine"))
 {
 	if (s_instance != nullptr)
 	{
@@ -11,12 +12,28 @@ Application::Application() : m_window(std::make_unique<Window>(640, 480, "Skips-
 	}
 	s_instance = this;
 	m_window->SetCallbackFunction(TO_EVENT_FN(OnEvent));
+	Renderer::Init();
 	Log::INFO("App Created");
 }
 void Application::Run() {
 	Log::INFO("App Started");
 	while (m_running) {
-		glClear(GL_COLOR_BUFFER_BIT);
+
+		Renderer::PreDraw();
+		std::vector<GLfloat> data{
+			-0.8f,-0.8f,0.0f,
+			0.8f,-0.8f,0.0f,
+			0.0f,0.8f,0.0f
+		};
+		VertexArray vao;
+		VertexLayout layout;
+		Shader vertex(GL_VERTEX_SHADER, "#version 330 core\nlayout(location = 0) in vec4 position; void main() { gl_Position = position; }");
+		Shader fragment(GL_FRAGMENT_SHADER, "#version 330 core\nout vec4 color;void main(){color = vec4(1.0f,0.5f,0.0f,1.0f);}");
+		ShaderProgram shader(vertex,fragment);
+		layout.Add(AttributeDataType::Float3);
+		VertexBuffer vbo(data.data(), data.size() * sizeof(GLfloat));
+		vao.AddVertexBuffer(vbo, layout);
+		Renderer::Draw(vao, shader);
 		m_window->SwapBuffers();
 		m_window->PollEvents();
 	}
@@ -32,6 +49,6 @@ bool Application::OnWindowClose(WindowCloseEvent& e) {
 	return true;
 }
 bool Application::OnWindowResize(WindowResizeEvent& e) {
-	glViewport(0, 0, e.GetWidth(), e.GetHeight());
+	Renderer::OnWindowResize(e.GetWidth(), e.GetHeight());
 	return true;
 }

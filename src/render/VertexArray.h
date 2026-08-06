@@ -5,7 +5,7 @@ public:
 	VertexArray();
 	~VertexArray();
 
-	void AddVertexBuffer(VertexBuffer buffer, VertexLayout layout);
+	void AddVertexBuffer(const VertexBuffer& buffer, const VertexLayout& layout);
 
 	void Bind() const;
 	void UnBind() const;
