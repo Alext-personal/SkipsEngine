@@ -5,7 +5,7 @@
 
 void Renderer::Init() {
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
-		Log::ERROR("Error at glad initialisation");
+		LOG_ERROR("Error at glad initialisation");
 }
 void Renderer::PreDraw() {
 	glDisable(GL_DEPTH_TEST); 

@@ -8,7 +8,7 @@ Application::Application() : m_window(std::make_unique<Window>(640, 480, "Skips-
 {
 	if (s_instance != nullptr)
 	{
-		Log::ERROR("MULTIPLE APPLICATIONS, SHUTTING DOWN");
+		LOG_ERROR("MULTIPLE APPLICATIONS, SHUTTING DOWN");
 	}
 	s_instance = this;
 	m_window->SetCallbackFunction(TO_EVENT_FN(OnEvent));
@@ -17,22 +17,23 @@ Application::Application() : m_window(std::make_unique<Window>(640, 480, "Skips-
 }
 void Application::Run() {
 	Log::INFO("App Started");
-	while (m_running) {
-
-		Renderer::PreDraw();
-		std::vector<GLfloat> data{
+	std::vector<GLfloat> data{
 			-0.8f,-0.8f,0.0f,
 			0.8f,-0.8f,0.0f,
 			0.0f,0.8f,0.0f
-		};
-		VertexArray vao;
-		VertexLayout layout;
-		Shader vertex(GL_VERTEX_SHADER, "#version 330 core\nlayout(location = 0) in vec4 position; void main() { gl_Position = position; }");
-		Shader fragment(GL_FRAGMENT_SHADER, "#version 330 core\nout vec4 color;void main(){color = vec4(1.0f,0.5f,0.0f,1.0f);}");
-		ShaderProgram shader(vertex,fragment);
-		layout.Add(AttributeDataType::Float3);
-		VertexBuffer vbo(data.data(), data.size() * sizeof(GLfloat));
-		vao.AddVertexBuffer(vbo, layout);
+	};
+	VertexArray vao;
+	VertexLayout layout;
+	Shader vertex(GL_VERTEX_SHADER, "assets/shaders/Vertex.glsl");
+	Shader fragment(GL_FRAGMENT_SHADER, "assets/shaders/Fragment.glsl");
+	ShaderProgram shader(vertex, fragment);
+	layout.Add(AttributeDataType::Float3);
+	VertexBuffer vbo(data.data(), data.size() * sizeof(GLfloat));
+	vao.AddVertexBuffer(vbo, layout);
+	while (m_running) {
+
+		Renderer::PreDraw();
+		
 		Renderer::Draw(vao, shader);
 		m_window->SwapBuffers();
 		m_window->PollEvents();

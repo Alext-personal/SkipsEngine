@@ -22,7 +22,7 @@ static uint32_t GetSizeByType(AttributeDataType type) {
 
 	case AttributeDataType::Bool: return 1;
 	default:
-		Log::ERROR("Invalid Type");
+		LOG_ERROR("Invalid Type");
 	}
 }
 struct VertexBufferAttribute {
@@ -52,7 +52,7 @@ struct VertexBufferAttribute {
 
 		case AttributeDataType::Bool: return 1;
 		default:
-			Log::ERROR("Invalid Type");
+			LOG_ERROR("Invalid Type");
 		}
 	}
 };

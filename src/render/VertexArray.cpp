@@ -16,7 +16,7 @@ static GLenum AttributeDataTypeToGLenum(AttributeDataType type) {
 
 	case AttributeDataType::Bool: return GL_UNSIGNED_BYTE;
 	default:
-		Log::ERROR("Invalid Type");  //throws
+		LOG_ERROR("Invalid Type");  //throws
 	}
 }
 VertexArray::VertexArray() {

@@ -6,7 +6,7 @@ Input* Input::s_instance = nullptr;
 Input::Input() { 
     if (s_instance != nullptr)
     {
-        Log::ERROR("INPUT INSTANCE NOT SINGULAR");
+        LOG_ERROR("INPUT INSTANCE NOT SINGULAR");
     }
     s_instance = this; 
 };

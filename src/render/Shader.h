@@ -1,11 +1,12 @@
 #pragma once
+#include "core/Helpers.h"
 #include <glad/glad.h>
 #include <string>
 #include <vector>
 #include "core/Log.h"
 class Shader {
 public:
-	Shader(GLenum type, const std::string& filepath);
+	Shader(GLenum type, const std::filesystem::path& filepath);
 	~Shader();
 	uint32_t GetID() const { return m_shaderID; }
 private:

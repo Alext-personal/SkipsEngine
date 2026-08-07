@@ -15,15 +15,18 @@ public:
 		out << "[" << localTime << "] : " << " ";
 	}
 	template <typename... Args>
-	static void ERROR(const Args&... args) {
-		std::source_location location = std::source_location::current();
-		std::stringstream ss;
+	static void ERROR(const std::source_location& location,const Args&... args) {
+		std::cerr << Red << "[FILE] : " << White << location.file_name() << "\n";
+		std::cerr << Red << "[LINE] : " << White << location.line() << "\n";
 		std::cerr << Red << "[ERROR] " << White;
 		Log_Time(std::cerr);
+		std::stringstream ss;
 		(ss << ... << args);
-		std::cerr <<ss.str() << " [FILE] : " <<location.file_name()<< " [LINE] : "<<location.line()<< "\n";
+		std::cerr << ss.str() << "\n";
 		throw std::runtime_error(ss.str());
+		
 	}
+
 	template <typename... Args>
 	static void WARNING(const Args&... args) {
 		std::cerr << Yellow << "[WARNING] " << White;
@@ -39,3 +42,5 @@ public:
 		std::cout << "\n";
 	}
 };
+#define LOG_ERROR(...) \
+	Log::ERROR(std::source_location::current(), __VA_ARGS__)
