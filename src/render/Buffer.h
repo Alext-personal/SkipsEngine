@@ -1,9 +1,9 @@
 #pragma once
 #include <glad/glad.h>
 #include <vector>
-#include "core/Log.h"
+#include "Core/Log.h"
 enum class AttributeDataType {
-	None = 0, Float, Float2, Float3, Float4, Mat3 , Mat4, Int, Int2, Int3, Int4, Bool // mat3 = 9 floats, mat4 = 16 floats
+	None = 0, Float, Float2, Float3, Float4,Int, Int2, Int3, Int4, Bool 
 };
 static uint32_t GetSizeByType(AttributeDataType type) {
 	switch (type) {
@@ -17,12 +17,7 @@ static uint32_t GetSizeByType(AttributeDataType type) {
 	case AttributeDataType::Int3: return 4 * 3;
 	case AttributeDataType::Int4: return 4 * 4;
 
-	case AttributeDataType::Mat3: return 3; 
-	case AttributeDataType::Mat4: return 4;
-
 	case AttributeDataType::Bool: return 1;
-	default:
-		LOG_ERROR("Invalid Type");
 	}
 }
 struct VertexBufferAttribute {
@@ -46,9 +41,6 @@ struct VertexBufferAttribute {
 		case AttributeDataType::Int2: return 2;
 		case AttributeDataType::Int3: return 3;
 		case AttributeDataType::Int4: return 4;
-
-		case AttributeDataType::Mat3: return 9;
-		case AttributeDataType::Mat4: return 16;
 
 		case AttributeDataType::Bool: return 1;
 		default:
@@ -83,11 +75,20 @@ private:
 
 class VertexBuffer {
 public:
-	VertexBuffer(const void* data, uint32_t size);
+	VertexBuffer(const std::vector<float>& data);
 	~VertexBuffer();
 	void Bind() const;
 	void UnBind() const;
 
+private:
+	uint32_t m_ID{};
+};
+class ElementBuffer {
+public:
+	ElementBuffer(const std::vector<uint32_t>& data);
+	~ElementBuffer();
+	void Bind() const;
+	void UnBind() const;
 private:
 	uint32_t m_ID{};
 };

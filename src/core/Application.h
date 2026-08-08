@@ -1,9 +1,9 @@
 #pragma once
 #include <memory>
-#include "input/Input.h"
-#include "events/Event.h"
-#include "events/WindowEvents.h"
-#include "core/Window.h"
+#include "Input/Input.h"
+#include "Events/Event.h"
+#include "Events/WindowEvents.h"
+#include "Core/Window.h"
 class Application {
 public:
 	Application();

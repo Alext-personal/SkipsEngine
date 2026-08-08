@@ -1,6 +1,6 @@
-#include "core/Helpers.h"
-#include "core/Log.h"
-#include "input/Input.h"
+#include "Core/Helpers.h"
+#include "Core/Log.h"
+#include "Input/Input.h"
 
 Input* Input::s_instance = nullptr;
 Input::Input() { 
@@ -32,6 +32,9 @@ bool Input::HandleKeyRelease(KeyReleaseEvent& e)
 {
     m_keysPressed[e.GetKey()] = false;
     return true;
+}
+void Input::OnFrameEnd() {
+    Input::GetInstance().m_previousKeys = Input::GetInstance().m_keysPressed;
 }
 
 bool Input::HandleButtonPress(MouseButtonPressEvent& e)

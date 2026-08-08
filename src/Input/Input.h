@@ -1,11 +1,12 @@
 #pragma once
-#include "events/InputEvents.h"
+#include "Events/InputEvents.h"
 #include <array>
 class Input {
 public:
 	Input();
 	~Input() = default;
 	void OnEvent(Event &e);
+	static void OnFrameEnd();
 	static Input& GetInstance() { return *s_instance; }
 
 	//handlers
@@ -23,11 +24,13 @@ public:
 	static double GetScrollX() { return GetInstance().m_mouse.xoffset; }
 	static double GetScrollY() { return GetInstance().m_mouse.yoffset; }
 	static bool IsKeyPressed(const KeyCode keycode) { return  GetInstance().m_keysPressed[keycode]; }
+	static bool IsKeyTapped(const KeyCode keycode) { return !GetInstance().m_previousKeys[keycode] && GetInstance().m_keysPressed[keycode]; }
 	static bool IsMouseButtonPressed(const MouseCode mousecode) { return  GetInstance().m_mouse.pressedButtons[mousecode]; }
 
 private:
 	static Input* s_instance;
 	std::array<bool,350> m_keysPressed{};
+	std::array<bool, 350> m_previousKeys{};
 	struct Mouse {
 		double xpos, ypos;
 		double xoffset, yoffset;

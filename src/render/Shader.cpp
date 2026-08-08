@@ -1,4 +1,4 @@
-#include "render/Shader.h"
+#include "Render/Shader.h"
 Shader::Shader(GLenum type, const std::filesystem::path& filepath) {
 	std::string shaderSourceCode = DumpFileToString(filepath);
 	const char* srcCodeChar = shaderSourceCode.c_str();
@@ -43,7 +43,7 @@ ShaderProgram::ShaderProgram(const Shader& vertex, const Shader& fragment) {
 
 			LOG_ERROR("Program failed to link :\n", log);
 		}
-	}
+	} 
 }
 void ShaderProgram::Bind() const {
 	glUseProgram(m_programID);

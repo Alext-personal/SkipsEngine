@@ -1,8 +1,9 @@
 
-#include "core/Log.h"
-#include "core/Helpers.h"
-#include "core/Application.h"
-#include "render/Renderer.h"
+#include "Core/Log.h"
+#include "Core/Helpers.h"
+#include "Core/Application.h"
+#include "Render/Renderer.h"
+#include "Render/Primitives/Primitives.h"
 Application* Application::s_instance = nullptr;
 Application::Application() : m_window(std::make_unique<Window>(640, 480, "Skips-Engine"))
 {
@@ -17,24 +18,21 @@ Application::Application() : m_window(std::make_unique<Window>(640, 480, "Skips-
 }
 void Application::Run() {
 	Log::INFO("App Started");
-	std::vector<GLfloat> data{
-			-0.8f,-0.8f,0.0f,
-			0.8f,-0.8f,0.0f,
-			0.0f,0.8f,0.0f
-	};
-	VertexArray vao;
-	VertexLayout layout;
 	Shader vertex(GL_VERTEX_SHADER, "assets/shaders/Vertex.glsl");
 	Shader fragment(GL_FRAGMENT_SHADER, "assets/shaders/Fragment.glsl");
 	ShaderProgram shader(vertex, fragment);
-	layout.Add(AttributeDataType::Float3);
-	VertexBuffer vbo(data.data(), data.size() * sizeof(GLfloat));
-	vao.AddVertexBuffer(vbo, layout);
+	Mesh renderedMesh(Primitives::Square());
+	bool wireframe = true;//testing
 	while (m_running) {
 
 		Renderer::PreDraw();
-		
-		Renderer::Draw(vao, shader);
+		if (Input::IsKeyTapped(KeyCode::Escape)) {
+			Renderer::SetWireFrameMode(wireframe);
+			wireframe = !wireframe;
+			//Log::WARNING("wireframe set: ", wireframe);
+		}
+		Renderer::Draw(renderedMesh, shader);
+		Input::OnFrameEnd();
 		m_window->SwapBuffers();
 		m_window->PollEvents();
 	}

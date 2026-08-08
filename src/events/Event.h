@@ -1,6 +1,11 @@
 #pragma once
 #include <functional>
-#include "core/Log.h"
+#include "Core/Log.h"
+#define TO_EVENT_FN(fn) \
+    [this](auto&&... args) -> decltype(auto)\
+    { \
+        return this->fn(std::forward<decltype(args)>(args)...); \
+    }
 enum EventType {
 	WindowClose, WindowResize,
 	KeyPress,KeyRelease,

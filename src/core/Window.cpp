@@ -1,7 +1,7 @@
 #include <iostream>
-#include "core/Window.h"
-#include "events/WindowEvents.h"
-#include "events/InputEvents.h"
+#include "Core/Window.h"
+#include "Events/WindowEvents.h"
+#include "Events/InputEvents.h"
 Window::Window(unsigned int width, unsigned int height, const char * name) {
 	if (!glfwInit()) {
 		LOG_ERROR("Error at GLFW initialisation");

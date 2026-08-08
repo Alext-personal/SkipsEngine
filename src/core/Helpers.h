@@ -2,14 +2,12 @@
 #include <utility>
 #include <filesystem>
 #include <fstream>
-#define TO_EVENT_FN(fn) \
-    [this](auto&&... args) -> decltype(auto)\
-    { \
-        return this->fn(std::forward<decltype(args)>(args)...); \
-    }
-static std::string DumpFileToString(const std::filesystem::path& filepath) {
+#include "Core/Log.h"
+inline std::string DumpFileToString(const std::filesystem::path& filepath) {
     std::stringstream ss;
     std::ifstream file(filepath);
+    if (!file)
+        LOG_ERROR("Failed to open file: ", filepath);
     ss << file.rdbuf();
     return ss.str();
 }

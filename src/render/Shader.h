@@ -1,9 +1,9 @@
 #pragma once
-#include "core/Helpers.h"
+#include "Core/Helpers.h"
 #include <glad/glad.h>
 #include <string>
 #include <vector>
-#include "core/Log.h"
+#include "Core/Log.h"
 class Shader {
 public:
 	Shader(GLenum type, const std::filesystem::path& filepath);

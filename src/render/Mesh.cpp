@@ -1,0 +1,16 @@
+#include "Render/Mesh.h"
+Mesh::Mesh(const MeshData& meshdata) :m_subMeshes(meshdata.subMeshes) {
+	m_indexCount = meshdata.indices.size();
+	uint32_t index{};
+	for (const auto& vertexbuffer : meshdata.bufferData) {
+		m_vbos.push_back(std::make_unique<VertexBuffer>(vertexbuffer.data));
+		m_vao.AddVertexBuffer(*m_vbos[index++],vertexbuffer.layout);
+	}
+	if (!meshdata.indices.empty())
+	{
+		m_ebo = std::make_unique<ElementBuffer>(meshdata.indices);
+		m_vao.SetElementBuffer(*m_ebo);
+		Log::INFO("DID ELEMENT BUFFER SHIT");
+	}
+	m_vertexCount = meshdata.bufferData[0].data.size() * sizeof(float) / meshdata.bufferData[0].layout.GetStride();
+}
