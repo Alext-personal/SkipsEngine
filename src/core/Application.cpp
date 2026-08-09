@@ -4,6 +4,8 @@
 #include "Core/Application.h"
 #include "Render/Renderer.h"
 #include "Render/Primitives/Primitives.h"
+#include <glm/glm.hpp>// TEMP
+#include <glm/gtc/matrix_transform.hpp> // TEMP
 Application* Application::s_instance = nullptr;
 Application::Application() : m_window(std::make_unique<Window>(640, 480, "Skips-Engine"))
 {
@@ -21,15 +23,17 @@ void Application::Run() {
 	Shader vertex(GL_VERTEX_SHADER, "assets/shaders/Vertex.glsl");
 	Shader fragment(GL_FRAGMENT_SHADER, "assets/shaders/Fragment.glsl");
 	ShaderProgram shader(vertex, fragment);
-	Mesh renderedMesh(Primitives::Square());
-	bool wireframe = true;//testing
+	Mesh renderedMesh(Primitives::Cube());
+	glm::mat4 model = glm::rotate(glm::mat4(1.0f), glm::radians(45.0f), glm::vec3(1.0f, 1.0f, 0)); // testing
+	shader.SetUniformMatrix4("modelMatrix", model); //testing
+	bool wireframe = true; //testing
 	while (m_running) {
 
 		Renderer::PreDraw();
 		if (Input::IsKeyTapped(KeyCode::Escape)) {
 			Renderer::SetWireFrameMode(wireframe);
 			wireframe = !wireframe;
-			//Log::WARNING("wireframe set: ", wireframe);
+			Log::WARNING("wireframe set: ", wireframe);
 		}
 		Renderer::Draw(renderedMesh, shader);
 		Input::OnFrameEnd();

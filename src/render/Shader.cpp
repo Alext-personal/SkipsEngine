@@ -1,4 +1,6 @@
 #include "Render/Shader.h"
+#include <glm/glm.hpp>
+#include <glm/gtc/type_ptr.hpp>
 Shader::Shader(GLenum type, const std::filesystem::path& filepath) {
 	std::string shaderSourceCode = DumpFileToString(filepath);
 	const char* srcCodeChar = shaderSourceCode.c_str();
@@ -44,6 +46,10 @@ ShaderProgram::ShaderProgram(const Shader& vertex, const Shader& fragment) {
 			LOG_ERROR("Program failed to link :\n", log);
 		}
 	} 
+}
+void ShaderProgram::SetUniformMatrix4(const std::string& name,const glm::mat4& matrix) {
+	Bind();
+	glUniformMatrix4fv(glGetUniformLocation(m_programID, name.c_str()), 1, 0,glm::value_ptr(matrix));
 }
 void ShaderProgram::Bind() const {
 	glUseProgram(m_programID);

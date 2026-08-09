@@ -1,15 +1,12 @@
 #include "Render/Renderer.h"
 #include "Core/Log.h"
 #include <GLFW/glfw3.h>
-
-
 void Renderer::Init() {
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
 		LOG_ERROR("Error at glad initialisation");
 }
 void Renderer::PreDraw() {
-	glDisable(GL_DEPTH_TEST); 
-	glDisable(GL_CULL_FACE);
+	glEnable(GL_DEPTH_TEST);
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
