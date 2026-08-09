@@ -6,6 +6,7 @@
 #include "Render/Primitives/Primitives.h"
 #include <glm/glm.hpp>// TEMP
 #include <glm/gtc/matrix_transform.hpp> // TEMP
+#include "Ecs/EntityRegistry.h" //temp
 Application* Application::s_instance = nullptr;
 Application::Application() : m_window(std::make_unique<Window>(640, 480, "Skips-Engine"))
 {
@@ -24,8 +25,10 @@ void Application::Run() {
 	Shader fragment(GL_FRAGMENT_SHADER, "assets/shaders/Fragment.glsl");
 	ShaderProgram shader(vertex, fragment);
 	Mesh renderedMesh(Primitives::Cube());
-	glm::mat4 model = glm::rotate(glm::mat4(1.0f), glm::radians(45.0f), glm::vec3(1.0f, 1.0f, 0)); // testing
-	shader.SetUniformMatrix4("modelMatrix", model); //testing
+	EntityRegistry ECS;
+	uint32_t entity = ECS.CreateEntity();
+	Transform& transform = ECS.AddComponent<Transform>(entity);
+	glm::mat4 model(1.0f);
 	bool wireframe = true; //testing
 	while (m_running) {
 
@@ -35,6 +38,16 @@ void Application::Run() {
 			wireframe = !wireframe;
 			Log::WARNING("wireframe set: ", wireframe);
 		}
+		if (Input::IsKeyPressed(KeyCode::W))
+		{
+			transform.Scale.x += 0.1f;
+		}
+		if (Input::IsKeyPressed(KeyCode::S))
+		{
+			transform.Scale.x += 0.1f;
+		}
+		model = glm::scale(glm::mat4(1.0f), transform.Scale);
+		shader.SetUniformMatrix4("modelMatrix", model); //testing
 		Renderer::Draw(renderedMesh, shader);
 		Input::OnFrameEnd();
 		m_window->SwapBuffers();
