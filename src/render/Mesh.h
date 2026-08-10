@@ -14,6 +14,9 @@ struct MeshData { // for loading meshes
 	std::vector<VertexBufferData> bufferData{};
 	std::vector<uint32_t> indices{};
 	std::vector<SubMesh> subMeshes{}; //separate by material
+	MeshData() {
+		bufferData.emplace_back();
+	}
 };
 class Mesh {
 public:

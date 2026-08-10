@@ -16,7 +16,7 @@ Shader::Shader(GLenum type, const std::filesystem::path& filepath) {
 			glGetShaderiv(m_shaderID, GL_INFO_LOG_LENGTH, &logLength);
 			char log[1024];
 			glGetShaderInfoLog(m_shaderID, logLength, &logLength, log);
-			LOG_ERROR("Shader failed to compile \n: ", filepath, log);
+			LOG_WARNING("Shader failed to compile \n: ", filepath, log);
 		}
 	}
 }
@@ -43,7 +43,7 @@ ShaderProgram::ShaderProgram(const Shader& vertex, const Shader& fragment) {
 			char log[1024];
 			glGetProgramInfoLog(m_programID, logLength,&logLength ,log);
 
-			LOG_ERROR("Program failed to link :\n", log);
+			LOG_WARNING("Program failed to link :\n", log);
 		}
 	} 
 }

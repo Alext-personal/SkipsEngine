@@ -7,7 +7,7 @@ inline std::string DumpFileToString(const std::filesystem::path& filepath) {
     std::stringstream ss;
     std::ifstream file(filepath);
     if (!file)
-        LOG_ERROR("Failed to open file: ", filepath);
+        LOG_WARNING("Failed to open file: ", filepath);
     ss << file.rdbuf();
     return ss.str();
 }

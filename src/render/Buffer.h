@@ -43,8 +43,6 @@ struct VertexBufferAttribute {
 		case AttributeDataType::Int4: return 4;
 
 		case AttributeDataType::Bool: return 1;
-		default:
-			LOG_ERROR("Invalid Type");
 		}
 	}
 };

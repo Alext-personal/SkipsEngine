@@ -28,11 +28,14 @@ public:
 	}
 
 	template <typename... Args>
-	static void WARNING(const Args&... args) {
+	static void WARNING(const std::source_location& location,const Args&... args) {
+		std::cerr << Yellow << "[FILE] : " << White << location.file_name() << "\n";
+		std::cerr << Yellow << "[LINE] : " << White << location.line() << "\n";
 		std::cerr << Yellow << "[WARNING] " << White;
 		Log_Time(std::cerr);
-		(std::cerr << ... << args);
-		std::cerr << "\n";
+		std::stringstream ss;
+		(ss << ... << args);
+		std::cerr << ss.str() << "\n";
 	}
 	template <typename... Args>
 	static void INFO(const Args&... args) {
@@ -44,3 +47,5 @@ public:
 };
 #define LOG_ERROR(...) \
 	Log::ERROR(std::source_location::current(), __VA_ARGS__)
+#define LOG_WARNING(...) \
+	Log::WARNING(std::source_location::current(), __VA_ARGS__)

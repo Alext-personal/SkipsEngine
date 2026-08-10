@@ -1,4 +1,4 @@
-
+#include "Assets/ModelLoader.h"
 #include "Core/Log.h"
 #include "Core/Helpers.h"
 #include "Core/Application.h"
@@ -24,29 +24,28 @@ void Application::Run() {
 	Shader vertex(GL_VERTEX_SHADER, "assets/shaders/Vertex.glsl");
 	Shader fragment(GL_FRAGMENT_SHADER, "assets/shaders/Fragment.glsl");
 	ShaderProgram shader(vertex, fragment);
-	Mesh renderedMesh(Primitives::Cube());
+	Mesh renderedMesh(ModelLoader::LoadModel("assets/models/Car.obj"));
 	EntityRegistry ECS;
 	uint32_t entity = ECS.CreateEntity();
 	Transform& transform = ECS.AddComponent<Transform>(entity);
+	transform.Scale = glm::vec3(.25f, .25f, .25f);
+	transform.Rotation = glm::vec3(45.0f, 0.0f, 0.0f);
 	glm::mat4 model(1.0f);
+	model = glm::scale(model, transform.Scale);
 	bool wireframe = true; //testing
+	float lastTime = 0.0f;
 	while (m_running) {
-
+		float currentTime = glfwGetTime();
+		float timeStep = currentTime - lastTime;
+		lastTime = currentTime;
 		Renderer::PreDraw();
 		if (Input::IsKeyTapped(KeyCode::Escape)) {
 			Renderer::SetWireFrameMode(wireframe);
 			wireframe = !wireframe;
-			Log::WARNING("wireframe set: ", wireframe);
+			LOG_WARNING("wireframe set: ", wireframe);
 		}
-		if (Input::IsKeyPressed(KeyCode::W))
-		{
-			transform.Scale.x += 0.1f;
-		}
-		if (Input::IsKeyPressed(KeyCode::S))
-		{
-			transform.Scale.x += 0.1f;
-		}
-		model = glm::scale(glm::mat4(1.0f), transform.Scale);
+		transform.Rotation.x = 1.0f * timeStep;
+		model = glm::rotate(model, transform.Rotation.x, glm::vec3(0, 1, 0));
 		shader.SetUniformMatrix4("modelMatrix", model); //testing
 		Renderer::Draw(renderedMesh, shader);
 		Input::OnFrameEnd();
