@@ -5,12 +5,12 @@ void Renderer::Init() {
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
 		LOG_ERROR("Error at glad initialisation");
 }
-void Renderer::PreDraw() {
+void Renderer::BeginFrame() {
 	glEnable(GL_DEPTH_TEST);
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
-void Renderer::Draw(const Mesh& mesh, const ShaderProgram& shader){
+void Renderer::Draw(const Mesh& mesh, const Shader& shader){
 	mesh.GetVAO().Bind();
 	shader.Bind();
 	if (!mesh.HasEBO()) {
@@ -25,6 +25,12 @@ void Renderer::Draw(const Mesh& mesh, const ShaderProgram& shader){
 			glDrawElements(GL_TRIANGLES, mesh.GetIndexCount(), GL_UNSIGNED_INT, nullptr);
 	}
 		
+}
+void Renderer::DrawScene(EntityRegistry& ecs)  {
+	for (auto& [transform, meshRenderer] : ecs.Get<Transform, MeshRenderer>()) {
+		meshRenderer.shader->SetUniformMatrix4("modelMatrix", transform.GetMatrix());
+		Renderer::Draw(*meshRenderer.mesh, *meshRenderer.shader);
+	}
 }
 void Renderer::SetWireFrameMode(bool enabled) {
 	if (enabled)

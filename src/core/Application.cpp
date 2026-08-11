@@ -21,33 +21,31 @@ Application::Application() : m_window(std::make_unique<Window>(640, 480, "Skips-
 }
 void Application::Run() {
 	Log::INFO("App Started");
-	Shader vertex(GL_VERTEX_SHADER, "assets/shaders/Vertex.glsl");
-	Shader fragment(GL_FRAGMENT_SHADER, "assets/shaders/Fragment.glsl");
-	ShaderProgram shader(vertex, fragment);
-	Mesh renderedMesh(ModelLoader::LoadModel("assets/models/Car.obj"));
 	EntityRegistry ECS;
 	uint32_t entity = ECS.CreateEntity();
 	Transform& transform = ECS.AddComponent<Transform>(entity);
-	transform.Scale = glm::vec3(.25f, .25f, .25f);
-	transform.Rotation = glm::vec3(45.0f, 0.0f, 0.0f);
-	glm::mat4 model(1.0f);
-	model = glm::scale(model, transform.Scale);
+	transform.scale = { .25f,.25f,.25f };
+	MeshRenderer& mrenderer = ECS.AddComponent<MeshRenderer>(entity);
+	//mrenderer.LoadMesh("assets/models/Car.obj");
+	mrenderer.LoadMesh(PrimitiveType::Cube);
 	bool wireframe = true; //testing
 	float lastTime = 0.0f;
 	while (m_running) {
+		Renderer::BeginFrame();
 		float currentTime = glfwGetTime();
 		float timeStep = currentTime - lastTime;
 		lastTime = currentTime;
-		Renderer::PreDraw();
 		if (Input::IsKeyTapped(KeyCode::Escape)) {
 			Renderer::SetWireFrameMode(wireframe);
 			wireframe = !wireframe;
 			LOG_WARNING("wireframe set: ", wireframe);
 		}
-		transform.Rotation.x = 1.0f * timeStep;
-		model = glm::rotate(model, transform.Rotation.x, glm::vec3(0, 1, 0));
-		shader.SetUniformMatrix4("modelMatrix", model); //testing
-		Renderer::Draw(renderedMesh, shader);
+		transform.rotation.y += 50.0f * timeStep;
+
+
+
+
+		Renderer::DrawScene(ECS); //m_activescene
 		Input::OnFrameEnd();
 		m_window->SwapBuffers();
 		m_window->PollEvents();

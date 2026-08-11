@@ -77,7 +77,6 @@ public:
 	~VertexBuffer();
 	void Bind() const;
 	void UnBind() const;
-
 private:
 	uint32_t m_ID{};
 };

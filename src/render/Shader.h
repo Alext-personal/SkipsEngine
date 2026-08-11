@@ -5,21 +5,22 @@
 #include <glm/mat4x4.hpp>
 #include "Core/Log.h"
 #include "Core/Helpers.h"
+enum class ShaderType {
+	None,Vertex,Fragment
+};
 class Shader {
 public:
-	Shader(GLenum type, const std::filesystem::path& filepath);
+	Shader(const std::filesystem::path& filepath);
 	~Shader();
+	void SetUniformMatrix4(const std::string& name, const glm::mat4& matrix);
+	void Bind() const;
 	uint32_t GetID() const { return m_shaderID; }
 private:
 	uint32_t m_shaderID{};
-};
-class ShaderProgram {
-public:
-	ShaderProgram(const Shader& vertex,const Shader& fragment);
-	void AttachShader(const Shader& shader);
-	void SetUniformMatrix4(const std::string& name,const glm::mat4& matrix);
-	void Bind() const;
-	uint32_t GetID() const { return m_programID; }
-private:
-	uint32_t m_programID{};
+	struct ShaderCode {
+		std::string src;
+		ShaderType type;
+	};
+	static std::vector<ShaderCode> SeparateShaders(const std::filesystem::path& filepath);
+	void CreateCompileAndLinkShaders(std::vector<ShaderCode>& shaders, const std::filesystem::path& filepath);
 };

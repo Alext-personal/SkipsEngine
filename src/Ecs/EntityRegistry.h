@@ -10,12 +10,12 @@
 	class ComponentRegistry : public IRegistry {
 	public:
 		std::vector<T> components;
-		std::vector<uint32_t> sparse;
-		std::vector<uint32_t> denseEntities;
+		std::vector<uint32_t> sparse; // sparse[entity] = where in components we can find entity's component 
+		std::vector<uint32_t> denseEntities; // denseEntities[componentIndex] = entity that owns it
 		void RemoveComponent(const uint32_t entity) override {
 			const uint32_t index = sparse[entity];
 			denseEntities[index] = denseEntities.back();
-			components[index] = components.back();
+			components[index] = std::move(components.back());
 
 			const uint32_t movedComponent = denseEntities[index];
 			sparse[movedComponent] = sparse[index];
@@ -29,18 +29,19 @@
 	class EntityRegistry {
 	public:
 		uint32_t CreateEntity() {
+			uint32_t eID;
 			if (m_deletedEntities.empty()) {
-				uint32_t eID = m_lastEntityID++;
+				eID = m_lastEntityID++;
 				m_entities.push_back(eID);
-				return eID;
 			}
 			else
 			{
-				uint32_t eID = m_deletedEntities.back();
+				eID = m_deletedEntities.back();
 				m_deletedEntities.pop_back();
 				m_entities.push_back(eID);
-				return eID;
 			}
+			AddComponent<Transform>(eID); // entity has mandatory transform
+			return eID;
 		}
 		void DeleteEntity(uint32_t entity){
 			std::apply([&](auto&&... args) {
@@ -73,6 +74,27 @@
 			const uint32_t index = storage.sparse[entity];
 			return storage.components[index];
 		}
+		template <typename T,typename Q>
+		std::vector<std::pair<T&, Q&>> Get()  {
+			auto& TStorage = GetComponentStorage<T>();
+			auto& QStorage = GetComponentStorage<Q>();
+			uint32_t TSize = TStorage.components.size();
+			uint32_t QSize = QStorage.components.size();
+			std::vector<std::pair<T&, Q&>> returnedComponents{};
+			if(TSize <= QSize) // search the smallest container, and pick the ones that also have T
+				for (uint32_t index = 0; index < TSize; ++index) {
+					uint32_t entity = TStorage.denseEntities[index];
+					if (QStorage.sparse[entity] != NO_COMPONENT)
+						returnedComponents.emplace_back(TStorage.components[index], QStorage.components[QStorage.sparse[entity]]);
+				}
+			else
+				for (uint32_t index = 0; index < QSize; ++index) {
+					uint32_t entity = QStorage.denseEntities[index];
+					if (TStorage.sparse[entity] != NO_COMPONENT)
+						returnedComponents.emplace_back(TStorage.components[TStorage.sparse[entity]], QStorage.components[index]);
+				}
+			return returnedComponents;
+		}
 		template <typename T>
 		void RemoveComponent(const uint32_t entity) {
 			auto& storage = GetComponentStorage<T>();
@@ -93,7 +115,8 @@
 		uint32_t m_lastEntityID{};
 		std::vector<uint32_t> m_deletedEntities{};
 		std::vector<uint32_t> m_entities{};
-		std::tuple <ComponentRegistry<Transform>
+		std::tuple <ComponentRegistry<Transform>,
+					ComponentRegistry<MeshRenderer>
 		>m_storages{};
 	private:
 		template <typename T>

@@ -1,7 +1,33 @@
 #pragma once
 #include "Render/Mesh.h"
+enum class PrimitiveType {
+    Triangle,Quad,Cube
+};
+inline std::string PrimitiveTypeToString(PrimitiveType type) {
+    switch (type)
+    {
+    case PrimitiveType::Triangle:
+        return "Triangle";
+    case PrimitiveType::Quad:
+        return "Quad";
+    case PrimitiveType::Cube:
+        return "Cube";
+    }
+}
 class Primitives {
 public:
+    static MeshData LoadPrimitiveByType(PrimitiveType type) {
+        switch (type)
+        {
+        case PrimitiveType::Triangle:
+            return Triangle();
+        case PrimitiveType::Quad:
+            return Quad();
+        case PrimitiveType::Cube:
+            return Cube();
+        }
+    }
+private:
 	static MeshData Triangle() {
 		MeshData triangleData{};
 		triangleData.bufferData.emplace_back();
@@ -15,22 +41,22 @@ public:
 		triangleData.bufferData[0].layout.Add(AttributeDataType::Float3);
 		return triangleData;
 	}
-	static MeshData Square() {
-		MeshData squaredata{};
-		squaredata.bufferData.emplace_back();
-		squaredata.bufferData[0].data = {
+	static MeshData Quad() {
+		MeshData quadData{};
+        quadData.bufferData.emplace_back();
+        quadData.bufferData[0].data = {
 			// Position 
 			-0.8f, -0.8f, 0.0f,
 			 0.8f, -0.8f, 0.0f,
 			 -0.8f,  0.8f, 0.0f,
 			 0.8f, 0.8f, 0.0f
 		};
-		squaredata.indices = {
+        quadData.indices = {
 			0,1,2,
 			1,3,2
 		};
-		squaredata.bufferData[0].layout.Add(AttributeDataType::Float3);
-		return squaredata;
+        quadData.bufferData[0].layout.Add(AttributeDataType::Float3);
+		return quadData;
 	} 
     static MeshData Cube()
     {

@@ -26,7 +26,6 @@ public:
 	uint32_t GetIndexCount() const { return m_indexCount; }
 	bool HasEBO() const {return m_ebo != nullptr; }
 	const std::vector<SubMesh>& GetSubMeshes() const { return m_subMeshes; }
-	~Mesh() = default;
 private:
 	uint32_t m_vertexCount{};
 	uint32_t m_indexCount{};
