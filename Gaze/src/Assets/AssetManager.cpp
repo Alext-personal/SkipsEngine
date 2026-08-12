@@ -13,7 +13,7 @@ std::shared_ptr<Shader> AssetManager::GetShader(const std::filesystem::path& fil
 	}
 }
 std::shared_ptr<Shader> AssetManager::GetShader() {
-	return GetShader("assets/shaders/DefaultShader.shader");
+	return GetShader("Gaze/assets/shaders/DefaultShader.shader");
 }
 std::shared_ptr<Mesh> AssetManager::GetMesh(const std::filesystem::path& filepath) {
 	try {

@@ -2,7 +2,7 @@
 #include "Render/VertexArray.h"
 #include "Render/Shader.h"
 #include "Render/Mesh.h"
-#include "Ecs/EntityRegistry.h"
+#include "Scene/EntityRegistry.h"
 class Renderer {
 public:
 	static void Init();

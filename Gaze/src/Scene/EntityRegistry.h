@@ -1,6 +1,6 @@
 	#pragma once
 	#include <vector>
-	#include "Ecs/Component.h"
+	#include "Scene/Component.h"
 	#define NO_COMPONENT UINT32_MAX
 	struct IRegistry {
 		virtual ~IRegistry() = default;

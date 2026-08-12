@@ -6,7 +6,7 @@
 #include "Render/Primitives/Primitives.h"
 #include <glm/glm.hpp>// TEMP
 #include <glm/gtc/matrix_transform.hpp> // TEMP
-#include "Ecs/EntityRegistry.h" //temp
+#include "Scene/EntityRegistry.h" //temp
 Application* Application::s_instance = nullptr;
 Application::Application() : m_window(std::make_unique<Window>(640, 480, "Skips-Engine"))
 {
@@ -26,7 +26,7 @@ void Application::Run() {
 	Transform& transform = ECS.AddComponent<Transform>(entity);
 	transform.scale = { .25f,.25f,.25f };
 	MeshRenderer& mrenderer = ECS.AddComponent<MeshRenderer>(entity);
-	//mrenderer.LoadMesh("assets/models/Car.obj");
+	//mrenderer.LoadMesh("Gaze/assets/models/Car.obj");
 	mrenderer.LoadMesh(PrimitiveType::Cube);
 	bool wireframe = true; //testing
 	float lastTime = 0.0f;
