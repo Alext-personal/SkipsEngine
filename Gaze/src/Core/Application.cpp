@@ -4,11 +4,10 @@
 #include "Core/Application.h"
 #include "Render/Renderer.h"
 #include "Render/Primitives/Primitives.h"
-#include <glm/glm.hpp>// TEMP
-#include <glm/gtc/matrix_transform.hpp> // TEMP
 #include "Scene/EntityRegistry.h" //temp
+#include "Render/EditorCamera.h" //temp
 Application* Application::s_instance = nullptr;
-Application::Application() : m_window(std::make_unique<Window>(640, 480, "Skips-Engine"))
+Application::Application() : m_window(std::make_unique<Window>(1920, 1080, "Skips-Engine"))
 {
 	if (s_instance != nullptr)
 	{
@@ -26,8 +25,8 @@ void Application::Run() {
 	Transform& transform = ECS.AddComponent<Transform>(entity);
 	transform.scale = { .25f,.25f,.25f };
 	MeshRenderer& mrenderer = ECS.AddComponent<MeshRenderer>(entity);
-	//mrenderer.LoadMesh("Gaze/assets/models/Car.obj");
-	mrenderer.LoadMesh(PrimitiveType::Cube);
+	mrenderer.LoadMesh("Gaze/assets/models/Car.obj");
+	//mrenderer.LoadMesh(PrimitiveType::Cube);
 	bool wireframe = true; //testing
 	float lastTime = 0.0f;
 	while (m_running) {
@@ -40,13 +39,10 @@ void Application::Run() {
 			wireframe = !wireframe;
 			LOG_WARNING("wireframe set: ", wireframe);
 		}
-		transform.rotation.y += 50.0f * timeStep;
-
-
-
-
+		//transform.rotation.y += 50.0f * timeStep;
+		EditorCamera::OnUpdate(timeStep); // temp
 		Renderer::DrawScene(ECS); //m_activescene
-		Input::OnFrameEnd();
+		m_input.OnFrameEnd();
 		m_window->SwapBuffers();
 		m_window->PollEvents();
 	}
@@ -62,6 +58,7 @@ bool Application::OnWindowClose(WindowCloseEvent& e) {
 	return true;
 }
 bool Application::OnWindowResize(WindowResizeEvent& e) {
-	Renderer::OnWindowResize(e.GetWidth(), e.GetHeight());
+	Renderer::OnWindowResize(0,0,e.GetWidth(), e.GetHeight());
+	EditorCamera::OnWindowResize(e.GetWidth(),e.GetHeight());
 	return true;
 }

@@ -22,6 +22,7 @@ Window::Window(unsigned int width, unsigned int height, const char * name) {
 
 	glfwSetWindowUserPointer(m_window, &m_data);
 	SetVSync(m_data.vsync);
+	glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
 	//callbacks
 

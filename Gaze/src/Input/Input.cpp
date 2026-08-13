@@ -34,7 +34,10 @@ bool Input::HandleKeyRelease(KeyReleaseEvent& e)
     return true;
 }
 void Input::OnFrameEnd() {
-    Input::GetInstance().m_previousKeys = Input::GetInstance().m_keysPressed;
+    m_previousKeys = m_keysPressed;
+    m_mouse.moved = false;
+    m_mouse.xdelta = 0;
+    m_mouse.ydelta = 0;
 }
 
 bool Input::HandleButtonPress(MouseButtonPressEvent& e)
@@ -59,7 +62,19 @@ bool Input::HandleMouseScroll(MouseScrollEvent& e)
 
 bool Input::HandleMouseMove(MouseMoveEvent& e)
 {
-    m_mouse.xpos = e.GetMouseX();
-    m_mouse.ypos = e.GetMouseY();
+    float x = e.GetMouseX();
+    float y = e.GetMouseY();
+    if (m_mouse.firstLook) // first iteration
+    {
+        m_mouse.xpos = x;
+        m_mouse.ypos = y;
+        m_mouse.firstLook = false;
+        return true;
+    }
+    m_mouse.xdelta += x - m_mouse.xpos;
+    m_mouse.ydelta += m_mouse.ypos-y;
+    m_mouse.moved = true;
+    m_mouse.xpos = x;
+    m_mouse.ypos = y;
     return true;
 }

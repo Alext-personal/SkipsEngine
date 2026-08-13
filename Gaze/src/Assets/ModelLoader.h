@@ -73,10 +73,12 @@ public:
 					++indexCount;
 				}
 			}
-			loadedData.subMeshes.push_back({ currentOffset,indexCount });
+			loadedData.subMeshes.push_back({ indexCount,currentOffset });
+			Log::INFO("subMesh offset : ", currentOffset, " subMesh Count: ", indexCount);
 			currentOffset += indexCount;
 			currentVertexOffset += mesh->mNumVertices;
 		}
+
 		return loadedData;
 			
 	}

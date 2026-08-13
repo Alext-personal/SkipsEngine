@@ -1,5 +1,6 @@
 #include "Render/Renderer.h"
 #include "Core/Log.h"
+#include "Render/EditorCamera.h"
 #include <GLFW/glfw3.h>
 void Renderer::Init() {
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
@@ -19,7 +20,7 @@ void Renderer::Draw(const Mesh& mesh, const Shader& shader){
 	else {
 		if(!mesh.GetSubMeshes().empty())
 			for (const auto& submesh : mesh.GetSubMeshes()) {
-			glDrawElements(GL_TRIANGLES, submesh.indexCount, GL_UNSIGNED_INT, (void*)(submesh.indexOffset * sizeof(uint32_t)));
+				glDrawElements(GL_TRIANGLES, submesh.indexCount, GL_UNSIGNED_INT, (void*)(submesh.indexOffset * sizeof(uint32_t)));
 			}
 		else
 			glDrawElements(GL_TRIANGLES, mesh.GetIndexCount(), GL_UNSIGNED_INT, nullptr);
@@ -29,6 +30,8 @@ void Renderer::Draw(const Mesh& mesh, const Shader& shader){
 void Renderer::DrawScene(EntityRegistry& ecs)  {
 	for (auto& [transform, meshRenderer] : ecs.Get<Transform, MeshRenderer>()) {
 		meshRenderer.shader->SetUniformMatrix4("modelMatrix", transform.GetMatrix());
+		meshRenderer.shader->SetUniformMatrix4("projectionMatrix", EditorCamera::GetProjectionMatrix());
+		meshRenderer.shader->SetUniformMatrix4("viewMatrix", EditorCamera::GetViewMatrix());
 		Renderer::Draw(*meshRenderer.mesh, *meshRenderer.shader);
 	}
 }
@@ -38,6 +41,6 @@ void Renderer::SetWireFrameMode(bool enabled) {
 	else
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 }
-void Renderer::OnWindowResize(uint32_t width, uint32_t height) {
-	glViewport(0, 0, width, height);
+void Renderer::OnWindowResize(uint32_t x,uint32_t y,uint32_t width, uint32_t height) {
+	glViewport(x, y, width, height);
 }

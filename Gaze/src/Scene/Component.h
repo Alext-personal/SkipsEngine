@@ -2,6 +2,7 @@
 #include <glm/glm.hpp>
 #include <glm/vec3.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/quaternion.hpp>
 #include "Render/Mesh.h"
 #include "Assets/AssetManager.h"
 struct Transform {
@@ -9,13 +10,23 @@ struct Transform {
 	glm::vec3 rotation{ 0.0f };
 	glm::vec3 scale{ 1.0f };
 
-	glm::mat4 GetMatrix() {
+	glm::quat GetQuaternion() const {
+		return glm::quat(glm::radians(rotation));
+	}
+	glm::vec3 GetForward() const {
+		return GetQuaternion() * glm::vec3(0.0f, 0.0f, -1.0f);
+	}
+	glm::vec3 GetUp() const {
+		return GetQuaternion() * glm::vec3(0.0f, 1.0f, 0.0f);
+	}
+	glm::vec3 GetRight() const {
+		return GetQuaternion() * glm::vec3(1.0f, 0.0f, 0.0f);
+	}
+	glm::mat4 GetMatrix() const {
 		glm::mat4 model(1.0f);
 		model = glm::translate(model, translation);
 
-		model = glm::rotate(model, glm::radians(rotation.x), { 1, 0, 0 });
-		model = glm::rotate(model, glm::radians(rotation.y), { 0, 1, 0 });
-		model = glm::rotate(model, glm::radians(rotation.z), { 0, 0, 1 });
+		model *= glm::mat4_cast(GetQuaternion());
 
 		model = glm::scale(model, scale);
 
@@ -36,4 +47,33 @@ struct MeshRenderer {
 		mesh = AssetManager::GetMesh(type);
 	}
 	
+};
+struct OrthographicCameraComponent {
+	float fustrumLeft;
+	float fustrumRight;
+	float fustrumBottom;
+	float fustrumTop;
+	float nearPlane;
+	float farPlane;
+	OrthographicCameraComponent(float left, float right, float bottom, float top, float near, float far) :
+		fustrumLeft(left), fustrumRight(right), fustrumBottom(bottom), fustrumTop(top), nearPlane(near), farPlane(far){}
+	glm::mat4 GetProjectionMatrix() {
+		return glm::ortho(fustrumLeft, fustrumRight, fustrumBottom, fustrumTop, nearPlane, farPlane);
+	}
+	glm::mat4 GetViewMatrix(const Transform& transform) {
+		return glm::lookAt(transform.translation, transform.translation + transform.GetForward(), transform.GetUp());
+	}
+};
+struct PerspectiveCameraComponent {
+	float fov;
+	float aspectRatio;
+	float nearPlane;
+	float farPlane;
+	PerspectiveCameraComponent(float _fov,float _aspectRatio,float _nearPlane, float _farPlane):fov(_fov),aspectRatio(_aspectRatio),nearPlane(_nearPlane),farPlane(_farPlane){}
+	glm::mat4 GetProjectionMatrix() {
+		return glm::perspective(glm::radians(fov),aspectRatio, nearPlane, farPlane);
+	}
+	glm::mat4 GetViewMatrix(const Transform& transform) {
+		return glm::lookAt(transform.translation, transform.translation + transform.GetForward(), transform.GetUp());
+	}
 };

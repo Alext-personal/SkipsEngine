@@ -4,10 +4,12 @@
 layout(location = 0) in vec3 position; 
 out vec3 v_position;
 uniform mat4 modelMatrix;
+uniform mat4 projectionMatrix;
+uniform mat4 viewMatrix;
 void main() 
 { 
 	v_position = position;
-	gl_Position = modelMatrix * vec4(position,1.0f);
+	gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(position,1.0f);
 }
 
 #type Fragment
