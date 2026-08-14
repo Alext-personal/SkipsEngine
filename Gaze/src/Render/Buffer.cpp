@@ -1,32 +1,26 @@
 #include "Render/Buffer.h"
 VertexBuffer::VertexBuffer(const std::vector<float>& data) {
-	glGenBuffers(1, &m_ID);
-	Bind();
-	glBufferData(GL_ARRAY_BUFFER, data.size()*sizeof(float), data.data(), GL_STATIC_DRAW);
-	UnBind();
-}
-void VertexBuffer::Bind() const {
-	glBindBuffer(GL_ARRAY_BUFFER, m_ID);
-}
-void VertexBuffer::UnBind() const {
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glCreateBuffers(1, &m_ID);
+	glNamedBufferData(m_ID, data.size() * sizeof(float), data.data(), GL_STATIC_DRAW);
 }
 VertexBuffer::~VertexBuffer() {
 	glDeleteBuffers(1, &m_ID);
 }
-
 ElementBuffer::ElementBuffer(const std::vector<uint32_t>& data) {
-	glGenBuffers(1, &m_ID);
-	Bind();
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, data.size() * sizeof(uint32_t), data.data(), GL_STATIC_DRAW);
-	UnBind();
-}
-void ElementBuffer::Bind() const {
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ID);
-}
-void ElementBuffer::UnBind() const {
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	glCreateBuffers(1, &m_ID);
+	glNamedBufferData(m_ID, data.size() * sizeof(float), data.data(), GL_STATIC_DRAW);
 }
 ElementBuffer::~ElementBuffer() {
 	glDeleteBuffers(1, &m_ID);
+}
+UniformBuffer::UniformBuffer(uint32_t size, uint32_t binding) {
+	glCreateBuffers(1, &m_ID);
+	glNamedBufferData(m_ID, size, nullptr, GL_DYNAMIC_DRAW);
+	glBindBufferBase(GL_UNIFORM_BUFFER, binding, m_ID);
+}
+UniformBuffer::~UniformBuffer() {
+	glDeleteBuffers(1, &m_ID);
+}
+void UniformBuffer::SetData(const void* data, uint32_t size,uint32_t offset) {
+	glNamedBufferSubData(m_ID, offset, size, data);
 }

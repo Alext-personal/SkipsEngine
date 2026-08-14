@@ -3,6 +3,9 @@ Mesh::Mesh(const MeshData& meshdata) :m_subMeshes(meshdata.subMeshes) {
 	m_indexCount = meshdata.indices.size();
 	uint32_t index{};
 	for (const auto& vertexbuffer : meshdata.bufferData) {
+		Log::INFO("buffer data size : ", vertexbuffer.data.size(), " buffer layout stride : ", vertexbuffer.layout.GetStride());
+		if(vertexbuffer.layout.GetStride() != 0 )
+			m_vertexCount += vertexbuffer.data.size() * sizeof(float) / vertexbuffer.layout.GetStride();
 		m_vbos.push_back(std::make_unique<VertexBuffer>(vertexbuffer.data));
 		m_vao.AddVertexBuffer(*m_vbos[index++],vertexbuffer.layout);
 	}
@@ -12,5 +15,4 @@ Mesh::Mesh(const MeshData& meshdata) :m_subMeshes(meshdata.subMeshes) {
 		m_vao.SetElementBuffer(*m_ebo);
 		Log::INFO("DID ELEMENT BUFFER SHIT");
 	}
-	m_vertexCount = meshdata.bufferData[0].data.size() * sizeof(float) / meshdata.bufferData[0].layout.GetStride();
 }

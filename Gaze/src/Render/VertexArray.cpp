@@ -15,42 +15,39 @@ static GLenum AttributeDataTypeToGLenum(AttributeDataType type) {
 	}
 }
 VertexArray::VertexArray() : m_lastAttributeIndex(0) {
-	glGenVertexArrays(1, &m_ID);
+	glCreateVertexArrays(1, &m_ID);
 }
 VertexArray::~VertexArray() {
 	glDeleteVertexArrays(1, &m_ID);
 }
 void VertexArray::AddVertexBuffer(const VertexBuffer& buffer, const VertexLayout& layout) {
-	Bind();
-	buffer.Bind();
+	uint32_t bindingIndex = m_lastAttributeIndex;
+	glVertexArrayVertexBuffer(m_ID, bindingIndex, buffer.GetID(), 0, layout.GetStride());
 	for (const auto& attribute : layout.GetAttributes())
 	{
-		glEnableVertexAttribArray(m_lastAttributeIndex);
+		glEnableVertexArrayAttrib(m_ID,m_lastAttributeIndex);
 		if (AttributeDataTypeToGLenum(attribute.type) == GL_FLOAT) {
-			glVertexAttribPointer(m_lastAttributeIndex,
+			glVertexArrayAttribFormat(m_ID,
+								m_lastAttributeIndex,
 								attribute.GetCountByType(),
 								AttributeDataTypeToGLenum(attribute.type),
 								attribute.normalized,
-								layout.GetStride(),
-								(void*)attribute.offset);
+								attribute.offset);
 		}
 		else {
-			glVertexAttribIPointer(m_lastAttributeIndex,
+			glVertexArrayAttribIFormat(m_ID,
+								m_lastAttributeIndex,
 								attribute.GetCountByType(),
 								AttributeDataTypeToGLenum(attribute.type),
-								layout.GetStride(),
-								(void*)attribute.offset);
+								attribute.offset);
 		}
-
+		glVertexArrayAttribBinding(m_ID, m_lastAttributeIndex, bindingIndex);
 		++m_lastAttributeIndex;
 	}
-	buffer.UnBind();
-	UnBind();
+
 }
 void VertexArray::SetElementBuffer(const ElementBuffer& buffer) {
-	Bind();
-	buffer.Bind();
-	UnBind();
+	glVertexArrayElementBuffer(m_ID, buffer.GetID());
 }
 void VertexArray::Bind() const {
 	glBindVertexArray(m_ID);

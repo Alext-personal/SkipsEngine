@@ -12,4 +12,5 @@ public:
 	static void DrawScene(EntityRegistry& ecs); // change to scene later
 	static void SetWireFrameMode(bool enabled);
 private:
+	inline static std::unique_ptr<UniformBuffer> s_uniformBuffer = nullptr;
 };

@@ -6,14 +6,18 @@
 #include <assimp/scene.h>           
 #include <assimp/postprocess.h> 
 #include "Render/Mesh.h"
+#include "Core/Helpers.h"
 class ModelLoader {
 public:
 	static MeshData LoadModel(const std::filesystem::path& filepath) {
+		auto start = GetTime();
 		Assimp::Importer importer;
 		const aiScene* scene = importer.ReadFile(filepath.string(),
 			aiProcess_Triangulate |
 			aiProcess_GenNormals  |
 			aiProcess_GenUVCoords);
+		auto t1 = GetTime();
+		Log::INFO("ASSIMP TOOK : ", t1 - start);
 		if (scene == nullptr || scene->mNumMeshes == 0) {
 			LOG_WARNING("Failed to import model");
 			MeshData nullData;
@@ -78,7 +82,8 @@ public:
 			currentOffset += indexCount;
 			currentVertexOffset += mesh->mNumVertices;
 		}
-
+		auto end = GetTime();
+		Log::INFO("Mesh loader took : ", end - start);
 		return loadedData;
 			
 	}

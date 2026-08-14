@@ -75,8 +75,7 @@ class VertexBuffer {
 public:
 	VertexBuffer(const std::vector<float>& data);
 	~VertexBuffer();
-	void Bind() const;
-	void UnBind() const;
+	uint32_t GetID() const { return m_ID; }
 private:
 	uint32_t m_ID{};
 };
@@ -84,8 +83,15 @@ class ElementBuffer {
 public:
 	ElementBuffer(const std::vector<uint32_t>& data);
 	~ElementBuffer();
-	void Bind() const;
-	void UnBind() const;
+	uint32_t GetID() const { return m_ID; }
+private:
+	uint32_t m_ID{};
+};
+class UniformBuffer {
+public:
+	UniformBuffer(uint32_t size,uint32_t binding);
+	~UniformBuffer();
+	void SetData(const void* data, uint32_t size, uint32_t offset);
 private:
 	uint32_t m_ID{};
 };

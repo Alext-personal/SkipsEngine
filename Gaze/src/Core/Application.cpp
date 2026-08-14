@@ -21,12 +21,23 @@ Application::Application() : m_window(std::make_unique<Window>(1920, 1080, "Skip
 void Application::Run() {
 	Log::INFO("App Started");
 	EntityRegistry ECS;
+
 	uint32_t entity = ECS.CreateEntity();
 	Transform& transform = ECS.AddComponent<Transform>(entity);
-	transform.scale = { .25f,.25f,.25f };
 	MeshRenderer& mrenderer = ECS.AddComponent<MeshRenderer>(entity);
+	transform.scale = { .25f,.25f,.25f };
 	mrenderer.LoadMesh("Gaze/assets/models/Car.obj");
-	//mrenderer.LoadMesh(PrimitiveType::Cube);
+
+	uint32_t entity2 = ECS.CreateEntity();
+	Transform& transform2 = ECS.AddComponent<Transform>(entity2);
+	MeshRenderer& mrenderer2 = ECS.AddComponent<MeshRenderer>(entity2);
+	transform2.scale = { .5f,.5f,.5f };
+	transform2.translation = { 1.0f,1.0f,1.0f };
+	mrenderer2.LoadMesh(PrimitiveType::Cube);
+
+	auto start = GetTime();
+	auto t1 = GetTime();
+	Log::INFO("Mesh loading took : ", t1 - start);
 	bool wireframe = true; //testing
 	float lastTime = 0.0f;
 	while (m_running) {

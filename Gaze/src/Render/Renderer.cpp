@@ -2,9 +2,15 @@
 #include "Core/Log.h"
 #include "Render/EditorCamera.h"
 #include <GLFW/glfw3.h>
+struct CameraUniformPass {
+	glm::mat4 proj;
+	glm::mat4 view;
+	CameraUniformPass(glm::mat4 p, glm::mat4 v) :proj(p), view(v){}
+};
 void Renderer::Init() {
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
 		LOG_ERROR("Error at glad initialisation");
+	s_uniformBuffer = std::make_unique<UniformBuffer>(sizeof(CameraUniformPass), 0);
 }
 void Renderer::BeginFrame() {
 	glEnable(GL_DEPTH_TEST);
@@ -28,10 +34,10 @@ void Renderer::Draw(const Mesh& mesh, const Shader& shader){
 		
 }
 void Renderer::DrawScene(EntityRegistry& ecs)  {
+	CameraUniformPass pass(EditorCamera::GetProjectionMatrix(), EditorCamera::GetViewMatrix());
+	s_uniformBuffer->SetData(&pass, sizeof(pass), 0);
 	for (auto& [transform, meshRenderer] : ecs.Get<Transform, MeshRenderer>()) {
 		meshRenderer.shader->SetUniformMatrix4("modelMatrix", transform.GetMatrix());
-		meshRenderer.shader->SetUniformMatrix4("projectionMatrix", EditorCamera::GetProjectionMatrix());
-		meshRenderer.shader->SetUniformMatrix4("viewMatrix", EditorCamera::GetViewMatrix());
 		Renderer::Draw(*meshRenderer.mesh, *meshRenderer.shader);
 	}
 }

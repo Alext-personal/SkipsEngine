@@ -30,7 +30,6 @@ public:
 private:
 	static MeshData Triangle() {
 		MeshData triangleData{};
-		triangleData.bufferData.emplace_back();
 		triangleData.bufferData[0].data = {
 			// Position              // Color
 			-0.8f, -0.8f, 0.0f,      1.0f, 0.0f, 0.0f, // Red
@@ -43,7 +42,6 @@ private:
 	}
 	static MeshData Quad() {
 		MeshData quadData{};
-        quadData.bufferData.emplace_back();
         quadData.bufferData[0].data = {
 			// Position 
 			-0.8f, -0.8f, 0.0f,
@@ -61,8 +59,6 @@ private:
     static MeshData Cube()
     {
         MeshData cubeData{};
-        cubeData.bufferData.emplace_back();
-
         cubeData.bufferData[0].data = {
             // Position               // Color
 
