@@ -17,9 +17,9 @@ public:
 			aiProcess_GenNormals  |
 			aiProcess_GenUVCoords);
 		auto t1 = GetTime();
-		Log::INFO("ASSIMP TOOK : ", t1 - start);
+		LOG_INFO("ASSIMP TOOK: ${} ", t1 - start);
 		if (scene == nullptr || scene->mNumMeshes == 0) {
-			LOG_WARNING("Failed to import model");
+			LOG_ERROR("Failed to import model");
 			MeshData nullData;
 			return nullData;
 		}
@@ -78,12 +78,12 @@ public:
 				}
 			}
 			loadedData.subMeshes.push_back({ indexCount,currentOffset });
-			Log::INFO("subMesh offset : ", currentOffset, " subMesh Count: ", indexCount);
+			LOG_INFO("subMesh offset: ${} subMesh Count: ${} ", currentOffset, indexCount);
 			currentOffset += indexCount;
 			currentVertexOffset += mesh->mNumVertices;
 		}
 		auto end = GetTime();
-		Log::INFO("Mesh loader took : ", end - start);
+		LOG_INFO("Mesh loader took: ${} ", end - start);
 		return loadedData;
 			
 	}

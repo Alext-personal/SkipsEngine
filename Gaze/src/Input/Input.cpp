@@ -6,7 +6,7 @@ Input* Input::s_instance = nullptr;
 Input::Input() { 
     if (s_instance != nullptr)
     {
-        LOG_ERROR("INPUT INSTANCE NOT SINGULAR");
+        ENGINE_ASSERT(0,"INPUT INSTANCE NOT SINGULAR");
     }
     s_instance = this; 
 };
@@ -24,7 +24,7 @@ void Input::OnEvent(Event& e)
 bool Input::HandleKeyPress(KeyPressEvent& e)
 {
     m_keysPressed[e.GetKey()] = true;
-    Log::INFO(e.GetKey(), " Was Pressed");
+    LOG_INFO("${} Was Pressed",e.GetKey());
     return true;
 }
 
@@ -43,7 +43,7 @@ void Input::OnFrameEnd() {
 bool Input::HandleButtonPress(MouseButtonPressEvent& e)
 {
     m_mouse.pressedButtons[e.GetButton()] = true;
-    Log::INFO(e.GetButton(), " Was Pressed");
+    LOG_INFO("${} Was Pressed",e.GetButton());
     return true;
 }
 

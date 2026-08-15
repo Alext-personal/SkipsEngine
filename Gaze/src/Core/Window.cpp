@@ -4,13 +4,13 @@
 #include "Events/InputEvents.h"
 Window::Window(unsigned int width, unsigned int height, const char * name) {
 	if (!glfwInit()) {
-		LOG_ERROR("Error at GLFW initialisation");
+		ENGINE_ASSERT(0,"Error at GLFW initialisation");
 	}
 	m_window = glfwCreateWindow(width, height, name, NULL, NULL);
 
 	if (!m_window) {
 		glfwTerminate();
-		LOG_ERROR("Error at window creation");
+		ENGINE_ASSERT(0,"Error at window creation");
 	}
 	glfwMakeContextCurrent(m_window);
 	//WindowData

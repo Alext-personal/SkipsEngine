@@ -4,6 +4,7 @@
 #include "Events/Event.h"
 #include "Events/WindowEvents.h"
 #include "Core/Window.h"
+#include "Scene/Scene.h"
 class Application {
 public:
 	Application();
@@ -21,4 +22,5 @@ private:
 	std::unique_ptr<Window> m_window;
 	Input m_input;
 	bool m_running = true;
+	Scene m_activeScene{}; //TEMPORARY !!!!!!!!!
 };

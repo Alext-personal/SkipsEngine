@@ -64,16 +64,3 @@ struct OrthographicCameraComponent {
 		return glm::lookAt(transform.translation, transform.translation + transform.GetForward(), transform.GetUp());
 	}
 };
-struct PerspectiveCameraComponent {
-	float fov;
-	float aspectRatio;
-	float nearPlane;
-	float farPlane;
-	PerspectiveCameraComponent(float _fov,float _aspectRatio,float _nearPlane, float _farPlane):fov(_fov),aspectRatio(_aspectRatio),nearPlane(_nearPlane),farPlane(_farPlane){}
-	glm::mat4 GetProjectionMatrix() {
-		return glm::perspective(glm::radians(fov),aspectRatio, nearPlane, farPlane);
-	}
-	glm::mat4 GetViewMatrix(const Transform& transform) {
-		return glm::lookAt(transform.translation, transform.translation + transform.GetForward(), transform.GetUp());
-	}
-};

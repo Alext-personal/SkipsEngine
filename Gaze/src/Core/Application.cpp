@@ -4,40 +4,25 @@
 #include "Core/Application.h"
 #include "Render/Renderer.h"
 #include "Render/Primitives/Primitives.h"
-#include "Scene/EntityRegistry.h" //temp
 #include "Render/EditorCamera.h" //temp
 Application* Application::s_instance = nullptr;
-Application::Application() : m_window(std::make_unique<Window>(1920, 1080, "Skips-Engine"))
+Application::Application() : m_window(std::make_unique<Window>(1920, 1080, "Skips-Engine")), m_activeScene{}
 {
 	if (s_instance != nullptr)
 	{
-		LOG_ERROR("MULTIPLE APPLICATIONS, SHUTTING DOWN");
+		ENGINE_ASSERT(0,"MULTIPLE APPLICATIONS, SHUTTING DOWN");
 	}
 	s_instance = this;
 	m_window->SetCallbackFunction(TO_EVENT_FN(OnEvent));
 	Renderer::Init();
-	Log::INFO("App Created");
+	m_activeScene.AddEntity();//temp
+	LOG_INFO("App Created");
 }
 void Application::Run() {
-	Log::INFO("App Started");
-	EntityRegistry ECS;
-
-	uint32_t entity = ECS.CreateEntity();
-	Transform& transform = ECS.AddComponent<Transform>(entity);
-	MeshRenderer& mrenderer = ECS.AddComponent<MeshRenderer>(entity);
-	transform.scale = { .25f,.25f,.25f };
-	mrenderer.LoadMesh("Gaze/assets/models/Car.obj");
-
-	uint32_t entity2 = ECS.CreateEntity();
-	Transform& transform2 = ECS.AddComponent<Transform>(entity2);
-	MeshRenderer& mrenderer2 = ECS.AddComponent<MeshRenderer>(entity2);
-	transform2.scale = { .5f,.5f,.5f };
-	transform2.translation = { 1.0f,1.0f,1.0f };
-	mrenderer2.LoadMesh(PrimitiveType::Cube);
-
+	LOG_INFO("App Started");
 	auto start = GetTime();
 	auto t1 = GetTime();
-	Log::INFO("Mesh loading took : ", t1 - start);
+	LOG_INFO("Mesh loading took: ${} ", t1 - start);
 	bool wireframe = true; //testing
 	float lastTime = 0.0f;
 	while (m_running) {
@@ -45,14 +30,14 @@ void Application::Run() {
 		float currentTime = glfwGetTime();
 		float timeStep = currentTime - lastTime;
 		lastTime = currentTime;
-		if (Input::IsKeyTapped(KeyCode::Escape)) {
+		if (Input::IsKeyTapped(KeyCode::Escape)) { // to be moved to editor 
 			Renderer::SetWireFrameMode(wireframe);
 			wireframe = !wireframe;
-			LOG_WARNING("wireframe set: ", wireframe);
+			LOG_WARNING("wireframe set: ${} ", wireframe);
 		}
 		//transform.rotation.y += 50.0f * timeStep;
-		EditorCamera::OnUpdate(timeStep); // temp
-		Renderer::DrawScene(ECS); //m_activescene
+		EditorCamera::OnUpdate(timeStep); // temp to be moved to editor app
+		m_activeScene.OnRender(); //m_activescene to be moved to EDITOR APP
 		m_input.OnFrameEnd();
 		m_window->SwapBuffers();
 		m_window->PollEvents();

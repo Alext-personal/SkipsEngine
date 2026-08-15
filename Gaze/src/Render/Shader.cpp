@@ -31,7 +31,7 @@ std::vector<Shader::ShaderCode> Shader::SeparateShaders(const std::filesystem::p
 			std::string type;
 			identifierLine >> type;
 			if (!(type == "Vertex" || type == "Fragment")) {
-				LOG_WARNING("INVALID SHADER TYPE, CHECK SHADER SOURCE CODE");
+				LOG_ERROR("INVALID SHADER TYPE, CHECK SHADER SOURCE CODE");
 				std::vector<ShaderCode> noShaders;
 				return noShaders;
 			}
@@ -50,7 +50,6 @@ std::vector<Shader::ShaderCode> Shader::SeparateShaders(const std::filesystem::p
 		}
 	}
 	if(currentType!=ShaderType::None){
-		Log::INFO("SHADER CODE IS : \n", shaderCode);
 		returnedShaders.push_back({ shaderCode,currentType });
 	}
 	return returnedShaders;
@@ -82,7 +81,7 @@ void Shader::CreateCompileAndLinkShaders(std::vector<ShaderCode>& shaders,const 
 				glGetShaderiv(ID, GL_INFO_LOG_LENGTH, &logLength);
 				char log[1024];
 				glGetShaderInfoLog(ID, logLength, &logLength, log);
-				LOG_WARNING(debugTypeName," Shader failed to compile \n ", filepath, log);
+				LOG_ERROR("${} Shader failed to compile \nFilepath: ${} \nLog: ${} ", debugTypeName,filepath, log);
 			}
 		}
 		shadersToDelete.push_back(ID);
@@ -101,7 +100,7 @@ void Shader::CreateCompileAndLinkShaders(std::vector<ShaderCode>& shaders,const 
 			char log[1024];
 			glGetProgramInfoLog(m_shaderID, logLength, &logLength, log);
 
-			LOG_WARNING("Program failed to link :\n", log);
+			LOG_ERROR("Program failed to link :\nLog: ${}", log);
 		}
 	}
 	for (uint32_t id : shadersToDelete) {

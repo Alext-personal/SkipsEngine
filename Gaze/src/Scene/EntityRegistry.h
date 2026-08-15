@@ -40,7 +40,7 @@
 				m_deletedEntities.pop_back();
 				m_entities.push_back(eID);
 			}
-			AddComponent<Transform>(eID); // entity has mandatory transform
+			AddComponent<Transform>(eID); // entity has mandatory transform migrate to entity class for ease of use
 			return eID;
 		}
 		void DeleteEntity(uint32_t entity){
@@ -69,7 +69,7 @@
 		template <typename T>
 		T& GetComponent(const uint32_t entity) {
 			if (!HasComponent<T>(entity))
-				LOG_ERROR("NO COMPONENT FOUND");
+				CLIENT_ASSERT(0,"NO COMPONENT FOUND");
 			auto& storage = GetComponentStorage<T>();
 			const uint32_t index = storage.sparse[entity];
 			return storage.components[index];
