@@ -5,22 +5,24 @@
 #include "Events/WindowEvents.h"
 #include "Core/Window.h"
 #include "Scene/Scene.h"
-class Application {
-public:
-	Application();
-	~Application() = default;
+namespace Gaze {
+	class Application {
+	public:
+		Application();
+		~Application() = default;
 
-	Application& Get() const { return *s_instance; }
-	void OnEvent(Event& e);
-	bool OnWindowClose(WindowCloseEvent& e);
-	bool OnWindowResize(WindowResizeEvent& e);
-	void Run();
+		Application& Get() const { return *s_instance; }
+		void OnEvent(Event& e);
+		bool OnWindowClose(WindowCloseEvent& e);
+		bool OnWindowResize(WindowResizeEvent& e);
+		void Run();
 
-private:
-	static Application* s_instance;
+	private:
+		static Application* s_instance;
 
-	std::unique_ptr<Window> m_window;
-	Input m_input;
-	bool m_running = true;
-	Scene m_activeScene{}; //TEMPORARY !!!!!!!!!
-};
+		std::unique_ptr<Window> m_window;
+		Input m_input;
+		bool m_running = true;
+		Scene m_activeScene{}; //TEMPORARY !!!!!!!!!
+	};
+}

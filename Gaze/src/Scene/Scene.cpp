@@ -1,15 +1,17 @@
 #include "Scene/Scene.h"
 #include "Render/Renderer.h"
 #include "Render/EditorCamera.h"
-Scene::Scene(): m_editor(true) {
-} 
-void Scene::OnRender() {
-	CameraUniformPass pass;
-	if (m_editor)
-		pass = { EditorCamera::GetProjectionMatrix(),EditorCamera::GetViewMatrix() };
-	//todo else
-	Renderer::SetUniformBuffer(pass);
-	for (auto& [transform, meshRenderer] : m_entities.Get<Transform, MeshRenderer>()) {
-		Renderer::Draw(transform, *meshRenderer.mesh, *meshRenderer.shader);
+namespace Gaze {
+	Scene::Scene() : m_editor(true) {
+	}
+	void Scene::OnRender() {
+		CameraUniformPass pass;
+		if (m_editor)
+			pass = { EditorCamera::GetProjectionMatrix(),EditorCamera::GetViewMatrix() };
+		//todo else
+		Renderer::SetUniformBuffer(pass);
+		for (auto& [transform, meshRenderer] : m_entities.Get<Transform, MeshRenderer>()) {
+			Renderer::Draw(transform, *meshRenderer.mesh, *meshRenderer.shader);
+		}
 	}
 }

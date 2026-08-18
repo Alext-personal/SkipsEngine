@@ -1,6 +1,7 @@
-	#pragma once
-	#include <vector>
-	#include "Scene/Component.h"
+#pragma once
+#include <vector>
+#include "Scene/Component.h"
+namespace Gaze {
 	#define NO_COMPONENT UINT32_MAX
 	struct IRegistry {
 		virtual ~IRegistry() = default;
@@ -42,9 +43,9 @@
 			}
 			return eID;
 		}
-		void DeleteEntity(uint32_t entity){
+		void DeleteEntity(uint32_t entity) {
 			std::apply([&](auto&&... args) {
-				((args.RemoveComponent(entity)),...);
+				((args.RemoveComponent(entity)), ...);
 				}, m_storages);
 			auto it = std::find(m_entities.begin(), m_entities.end(), entity);
 			*it = 0;
@@ -52,13 +53,13 @@
 		}
 		template <typename T>
 		T& AddComponent(const uint32_t entity) {
-			if(HasComponent<T>(entity))
+			if (HasComponent<T>(entity))
 				return GetComponent<T>(entity);
 			auto& storage = GetComponentStorage<T>();
 			const uint32_t index = storage.components.size();
-			storage.components.emplace_back(); 
+			storage.components.emplace_back();
 			if (entity >= storage.sparse.size())
-				storage.sparse.resize(entity + 1,NO_COMPONENT);
+				storage.sparse.resize(entity + 1, NO_COMPONENT);
 
 			storage.sparse[entity] = index;
 			storage.denseEntities.push_back(entity);
@@ -68,19 +69,19 @@
 		template <typename T>
 		T& GetComponent(const uint32_t entity) {
 			if (!HasComponent<T>(entity))
-				CLIENT_ASSERT(0,"NO COMPONENT FOUND");
+				CLIENT_ASSERT(0, "NO COMPONENT FOUND");
 			auto& storage = GetComponentStorage<T>();
 			const uint32_t index = storage.sparse[entity];
 			return storage.components[index];
 		}
-		template <typename T,typename Q>
-		std::vector<std::pair<T&, Q&>> Get()  {
+		template <typename T, typename Q>
+		std::vector<std::pair<T&, Q&>> Get() {
 			auto& TStorage = GetComponentStorage<T>();
 			auto& QStorage = GetComponentStorage<Q>();
 			uint32_t TSize = TStorage.components.size();
 			uint32_t QSize = QStorage.components.size();
 			std::vector<std::pair<T&, Q&>> returnedComponents{};
-			if(TSize <= QSize) // search the smallest container, and pick the ones that also have T
+			if (TSize <= QSize) // search the smallest container, and pick the ones that also have T
 				for (uint32_t index = 0; index < TSize; ++index) {
 					uint32_t entity = TStorage.denseEntities[index];
 					if (QStorage.sparse[entity] != NO_COMPONENT)
@@ -115,7 +116,7 @@
 		std::vector<uint32_t> m_deletedEntities{};
 		std::vector<uint32_t> m_entities{};
 		std::tuple <ComponentRegistry<Transform>,
-					ComponentRegistry<MeshRenderer>
+			ComponentRegistry<MeshRenderer>
 		>m_storages{};
 	private:
 		template <typename T>
@@ -123,3 +124,4 @@
 			return std::get<ComponentRegistry<T>>(m_storages);
 		}
 	};
+}
