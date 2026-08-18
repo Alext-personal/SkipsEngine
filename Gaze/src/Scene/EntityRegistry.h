@@ -40,7 +40,6 @@
 				m_deletedEntities.pop_back();
 				m_entities.push_back(eID);
 			}
-			AddComponent<Transform>(eID); // entity has mandatory transform migrate to entity class for ease of use
 			return eID;
 		}
 		void DeleteEntity(uint32_t entity){

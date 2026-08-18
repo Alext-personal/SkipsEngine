@@ -1,10 +1,11 @@
-#include "Assets/ModelLoader.h"
+#include "Assets/ModelLoader.h" // temp
 #include "Core/Log.h"
 #include "Core/Helpers.h"
 #include "Core/Application.h"
 #include "Render/Renderer.h"
-#include "Render/Primitives/Primitives.h"
+#include "Render/Primitives/Primitives.h" // temp
 #include "Render/EditorCamera.h" //temp
+#include "Scene/Entity.h" // temp
 Application* Application::s_instance = nullptr;
 Application::Application() : m_window(std::make_unique<Window>(1920, 1080, "Skips-Engine")), m_activeScene{}
 {
@@ -15,11 +16,12 @@ Application::Application() : m_window(std::make_unique<Window>(1920, 1080, "Skip
 	s_instance = this;
 	m_window->SetCallbackFunction(TO_EVENT_FN(OnEvent));
 	Renderer::Init();
-	m_activeScene.AddEntity();//temp
 	LOG_INFO("App Created");
 }
 void Application::Run() {
 	LOG_INFO("App Started");
+	Entity ent(m_activeScene); // temp
+	ent.AddComponent<MeshRenderer>().LoadMesh(PrimitiveType::Cube); // temp
 	auto start = GetTime();
 	auto t1 = GetTime();
 	LOG_INFO("Mesh loading took: ${} ", t1 - start);

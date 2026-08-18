@@ -1,3 +1,4 @@
+#pragma once
 #include "Scene/Component.h"
 #include "Events/Event.h"
 #include "Events/WindowEvents.h"

@@ -48,19 +48,3 @@ struct MeshRenderer {
 	}
 	
 };
-struct OrthographicCameraComponent {
-	float fustrumLeft;
-	float fustrumRight;
-	float fustrumBottom;
-	float fustrumTop;
-	float nearPlane;
-	float farPlane;
-	OrthographicCameraComponent(float left, float right, float bottom, float top, float near, float far) :
-		fustrumLeft(left), fustrumRight(right), fustrumBottom(bottom), fustrumTop(top), nearPlane(near), farPlane(far){}
-	glm::mat4 GetProjectionMatrix() {
-		return glm::ortho(fustrumLeft, fustrumRight, fustrumBottom, fustrumTop, nearPlane, farPlane);
-	}
-	glm::mat4 GetViewMatrix(const Transform& transform) {
-		return glm::lookAt(transform.translation, transform.translation + transform.GetForward(), transform.GetUp());
-	}
-};
