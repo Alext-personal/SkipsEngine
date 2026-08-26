@@ -35,17 +35,21 @@ namespace Gaze {
 		}
 	};
 	struct MeshRenderer {
-		std::shared_ptr<Mesh> mesh;
-		std::shared_ptr<Shader> shader;
+		AssetHandle<Mesh> mesh;
+		AssetHandle<Shader> shader;
 		MeshRenderer() {
-			mesh = AssetManager::GetMesh(PrimitiveType::Quad);
-			shader = AssetManager::GetShader();
+			mesh.id = ReservedUUID::CUBE;
+			shader.id = ReservedUUID::DEFAULTSHADER;
+			mesh.asset = AssetManager::Get<Mesh>(mesh.id);
+			shader.asset = AssetManager::Get<Shader>(shader.id);
 		}
-		void LoadMesh(const std::filesystem::path& filepath) {
+		
+		/*void LoadMesh(const std::filesystem::path& filepath) {
 			mesh = AssetManager::GetMesh(filepath);
-		}
-		void LoadMesh(PrimitiveType type) {
-			mesh = AssetManager::GetMesh(type);
+		}*/
+		void LoadMesh(const UUID& id) {
+			mesh.id = id;
+			mesh.asset = AssetManager::Get<Mesh>(id);
 		}
 
 	};

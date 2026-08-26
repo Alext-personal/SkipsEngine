@@ -1,0 +1,431 @@
+Gazel / Gaze Engine — Source Audit
+========================================
+
+Scope
+-----
+This audit covers the issues identified in the uploaded src.zip, excluding AssetManager because it was marked WIP.
+
+Priority guide:
+- CRITICAL / HIGH: likely to cause crashes, corruption, build failures, or severe architectural problems.
+- MEDIUM: correctness/robustness issues that should be fixed before the affected systems grow.
+- LOW: design/maintainability concerns that are worth addressing.
+
+1. CRITICAL — Accidental Gaze::std namespace
+------------------------------------------------
+File: src/Core/UUID.h
+
+Problem:
+A namespace std was declared inside namespace Gaze, creating Gaze::std instead of specializing the global ::std namespace.
+
+Bad structure:
+    namespace Gaze {
+        ...
+        namespace std {
+            template<>
+            struct hash<UUID> { ... };
+        }
+    }
+
+Why it is bad:
+Code inside namespace Gaze that writes std::unique_ptr, std::vector, std::string, std::move, etc. can resolve std as Gaze::std rather than ::std. This can cause apparently unrelated compilation failures throughout the engine.
+
+Fix:
+Close namespace Gaze before declaring the std specialization:
+
+    namespace Gaze {
+        class UUID {
+            ...
+        };
+    }
+
+    namespace std {
+        template<>
+        struct hash<Gaze::UUID> {
+            size_t operator()(const Gaze::UUID& uuid) const {
+                return hash<uint64_t>()(static_cast<uint64_t>(uuid));
+            }
+        };
+    }
+
+Also add the headers actually required by UUID.h:
+    #include <cstdint>
+    #include <functional>
+
+2. CRITICAL — ECS RemoveComponent sparse/dense bookkeeping bug
+-----------------------------------------------------------------
+File: src/.../EntityRegistry / ComponentRegistry
+
+Problem:
+RemoveComponent() moves the last dense component into the removed component's slot, but the sparse array bookkeeping is incorrect.
+
+The problematic pattern is conceptually:
+    denseEntities[index] = denseEntities.back();
+    components[index] = std::move(components.back());
+
+    const uint32_t movedComponent = denseEntities[index];
+    sparse[movedComponent] = sparse[index];
+
+    sparse[index] = NO_COMPONENT;
+
+The sparse array is indexed by entity ID, while index is a dense component-array index. They are not interchangeable.
+
+Why it is bad:
+After removal, sparse/dense mappings can become corrupted. Later HasComponent/Get/Remove operations can access the wrong component or invalid memory.
+
+Fix direction:
+Track the removed entity explicitly and update:
+    sparse[movedEntity] = index;
+    sparse[removedEntity] = NO_COMPONENT;
+
+Also validate:
+    index < components.size()
+    denseEntities[index] == removedEntity
+
+3. CRITICAL — DeleteEntity removes nonexistent components
+-----------------------------------------------------------
+File: EntityRegistry / DeleteEntity()
+
+Problem:
+DeleteEntity() iterates every component storage and calls RemoveComponent(entity), even when the entity does not own that component.
+
+Conceptually:
+    std::apply([&](auto&&... args) {
+        ((args.RemoveComponent(entity)), ...);
+    }, m_storages);
+
+Why it is bad:
+RemoveComponent() assumes the sparse entry is valid. Calling it for a component the entity does not have can produce an invalid index and out-of-bounds access.
+
+Fix:
+Make RemoveComponent() safe when the component is absent:
+    if (entity >= sparse.size() || sparse[entity] == NO_COMPONENT)
+        return;
+
+Better still, make the storage API explicitly support a safe remove-if-present operation.
+
+4. HIGH — Get<T,Q>() can read outside sparse storage
+-----------------------------------------------------
+File: EntityRegistry
+
+Problem:
+Code accesses:
+    QStorage.sparse[entity]
+
+without guaranteeing:
+    entity < QStorage.sparse.size()
+
+Why it is bad:
+Different component storages can have different sparse-array sizes. An entity can be valid in one storage but outside another storage's sparse array.
+
+Fix:
+Check bounds before every sparse lookup:
+    if (entity >= QStorage.sparse.size())
+        return nullptr; // or false, depending on API
+
+5. HIGH — Entity deletion uses 0 as a tombstone while 0 can be a valid entity
+--------------------------------------------------------------------------------
+File: EntityRegistry
+
+Problem:
+Deleted entities are replaced in m_entities with 0:
+    *it = 0;
+
+But m_lastEntityID starts at zero, so entity ID 0 is potentially a legitimate entity.
+
+Why it is bad:
+The same value represents both a valid entity and a deleted/tombstone entry.
+
+Fix:
+Use a dedicated invalid entity constant, e.g.:
+    constexpr EntityID INVALID_ENTITY = std::numeric_limits<EntityID>::max();
+
+Or remove the vector/tombstone approach and use explicit entity validity/generation tracking.
+
+6. HIGH — Window destructor terminates GLFW globally
+----------------------------------------------------
+File: Window.cpp
+
+Problem:
+Window::~Window() does:
+    glfwDestroyWindow(m_window);
+    glfwTerminate();
+
+Why it is bad:
+glfwTerminate() shuts down the global GLFW library, not merely this Window. If multiple windows ever exist, destroying one window can invalidate the entire GLFW environment.
+
+Fix:
+Move glfwInit()/glfwTerminate() ownership to an application/platform lifetime object. Window should own its GLFWwindow, not the global GLFW runtime.
+
+7. HIGH — GLFW callbacks copy WindowData instead of modifying it
+-----------------------------------------------------------------
+File: Window.cpp
+
+Problem:
+Callbacks use the equivalent of:
+    WindowData data = *(WindowData*)glfwGetWindowUserPointer(window);
+
+Then modify data.
+
+That modifies a local copy, not the persistent WindowData stored by Window.
+
+Why it is bad:
+Resize/input state updates can disappear immediately after the callback returns.
+
+Fix:
+Use a reference/pointer:
+    WindowData& data =
+        *static_cast<WindowData*>(glfwGetWindowUserPointer(window));
+
+Then modify data directly.
+
+8. HIGH — Entity is dangerously copyable
+-----------------------------------------
+File: Entity.h
+
+Problem:
+Entity contains:
+    EntityID
+    Scene* / scene reference
+
+and its destructor performs scene/registry deletion.
+
+If Entity is copied:
+    Entity a(scene);
+    Entity b = a;
+
+both objects can refer to the same entity, and both destructors may attempt to delete it.
+
+Why it is bad:
+Can cause double deletion and invalid ECS state.
+
+Fix options:
+A) Make Entity non-copyable and non-movable if it represents ownership.
+B) Preferably, make Entity a lightweight copyable handle and remove destructive behavior from its destructor.
+
+For an ECS, the handle approach is generally safer.
+
+9. MEDIUM/HIGH — First frame timestep is wrong
+-----------------------------------------------
+File: Application.cpp
+
+Problem:
+The loop starts with:
+    float lastTime = 0.0f;
+
+Then:
+    float currentTime = glfwGetTime();
+    float timeStep = currentTime - lastTime;
+
+Why it is bad:
+The first frame's delta time equals all time elapsed since GLFW initialization. If initialization/loading takes a noticeable amount of time, the first update can receive a huge timestep.
+
+Fix:
+Before the main loop:
+    float lastTime = glfwGetTime();
+
+10. MEDIUM — Application is mixing editor/game responsibilities
+---------------------------------------------------------------
+File: Application.cpp
+
+Problem:
+Application directly owns/updates editor-specific behavior such as EditorCamera.
+
+Why it is bad:
+The core application layer is becoming coupled to editor functionality. This will make the eventual editor architecture harder to separate and test.
+
+Fix direction:
+Establish a boundary such as:
+    Engine/Core
+    Runtime/Application
+    Editor
+
+Let the editor layer own EditorCamera/editor-only systems.
+
+11. MEDIUM — Entity lifetime/ownership model is unclear
+--------------------------------------------------------
+File: Entity.h / Scene
+
+Problem:
+Entity holds a raw Scene* and can perform deletion from its destructor.
+
+Why it is bad:
+The Entity object's lifetime and the ECS entity's lifetime become coupled in a fragile way. Moving/copying entities becomes dangerous.
+
+Fix:
+Prefer an explicit entity handle:
+    EntityID + Registry/Scene reference
+
+and explicit Create/Destroy operations, or a clearly defined RAII owner that is non-copyable.
+
+12. MEDIUM — PrimitiveTypeToString() can reach end of non-void function
+-----------------------------------------------------------------------
+File: Primitive/model helper code
+
+Problem:
+A switch over PrimitiveType returns strings for known cases but has no default/fallback return.
+
+Why it is bad:
+Passing an invalid enum value reaches the end of a non-void function, which is undefined behavior.
+
+Fix:
+Use an assertion/error path plus a fallback:
+    ENGINE_ASSERT(false, "Invalid primitive type");
+    return "Unknown";
+
+13. MEDIUM — Primitive loader has the same invalid-enum issue
+---------------------------------------------------------------
+File: ModelLoader / primitive loader
+
+Problem:
+LoadPrimitiveByType(PrimitiveType type) can reach the end without returning a MeshData for an invalid enum.
+
+Fix:
+Add a default/error path and a safe return or exception, depending on engine policy.
+
+14. MEDIUM — ModelLoader derives vertex layout from mesh 0
+-----------------------------------------------------------
+File: ModelLoader
+
+Problem:
+The initial layout is determined from the first mesh:
+    scene->mMeshes[0]->HasNormals()
+    scene->mMeshes[0]->HasTextureCoords(0)
+
+Other meshes can have different attributes.
+
+Why it is bad:
+The imported vertex layout becomes dependent on the first mesh. This gets increasingly fragile when adding tangents, colors, skinning, multiple UV sets, etc.
+
+Fix:
+Define an explicit engine-side vertex format and normalize every imported mesh to that format.
+
+15. MEDIUM — ModelLoader does not appear to preserve materials
+----------------------------------------------------------------
+File: ModelLoader
+
+Problem:
+Geometry/submesh data is loaded, but material assignments/textures/material indices are not preserved.
+
+Why it matters:
+A multi-material model needs each submesh to know which material it uses.
+
+Recommended structure:
+    Mesh
+      Vertex/index buffers
+      SubMeshes
+        index offset/count
+        material ID
+
+Then keep Material assets separately.
+
+16. MEDIUM — Shader compilation failure continues into linking
+---------------------------------------------------------------
+File: Shader.cpp
+
+Problem:
+When shader compilation fails, the code logs the error but continues attaching/linking the failed shader.
+
+Why it is bad:
+A Shader object can exist in an invalid state, while the eventual rendering error appears somewhere far away from the real cause.
+
+Fix:
+Make shader creation fail atomically. On compile failure:
+    log error
+    delete shader
+    clean up program
+    return/fail construction
+
+Also check program link status explicitly and treat link failure as construction failure.
+
+17. LOW/MEDIUM — Fixed-size shader error log buffer
+----------------------------------------------------
+File: Shader.cpp
+
+Problem:
+Uses a fixed char buffer such as:
+    char log[1024];
+
+Why it is bad:
+Longer compiler/linker logs can be truncated.
+
+Fix:
+Query GL_INFO_LOG_LENGTH and allocate a string/vector of the required size.
+
+18. MEDIUM — Logger can throw because of formatting errors
+-----------------------------------------------------------
+File: Log / ParseArguments
+
+Problem:
+Malformed logger arguments can throw std::runtime_error.
+
+Why it is bad:
+Logging should normally never be able to crash/throw through the engine because someone made a formatting mistake.
+
+Fix:
+Handle malformed formatting gracefully. At minimum, log a fallback message instead of throwing. In debug builds, an assertion can be appropriate if desired.
+
+19. MEDIUM — File helper continues after failing to open a file
+---------------------------------------------------------------
+File: Helpers.h
+
+Problem:
+The code logs failure to open a file but then still reads from the stream.
+
+Why it is bad:
+Downstream systems receive an empty/invalid result instead of an immediate, clear failure.
+
+Fix:
+Return an empty/optional/error result immediately after the open failure.
+
+20. MEDIUM/HIGH — Scene rendering dereferences potentially null resources
+------------------------------------------------------------------------
+File: Scene.cpp
+
+Problem:
+Rendering directly dereferences mesh/shader resources:
+    Renderer::Draw(transform, *meshRenderer.mesh, *meshRenderer.shader);
+
+Why it is bad:
+If asset loading fails, rendering can crash.
+
+Fix:
+Use validated handles and/or fallback resources. At minimum:
+    if (!meshRenderer.mesh || !meshRenderer.shader)
+        continue;
+
+Prefer a fallback mesh/shader for visible error state.
+
+Recommended fix order
+---------------------
+1. Remove Gaze::std and fix UUID.h includes.
+2. Fix ECS sparse/dense invariants.
+3. Make RemoveComponent safe for missing components.
+4. Fix DeleteEntity's all-storage removal behavior.
+5. Fix sparse bounds checks.
+6. Fix Entity ownership/copy semantics.
+7. Fix WindowData callback references.
+8. Move GLFW global lifetime out of Window.
+9. Fix shader failure handling.
+10. Fix file-helper and null-resource error paths.
+11. Fix invalid enum fallthroughs.
+12. Separate editor responsibilities from core Application.
+13. Formalize the model/vertex/material import architecture.
+
+ECS invariant to preserve
+-------------------------
+For every component storage:
+
+    sparse[entity] == dense index
+
+must be true exactly when the entity owns that component.
+
+If an entity does not own the component:
+
+    sparse[entity] == NO_COMPONENT
+
+After swap-remove:
+
+    removed entity -> NO_COMPONENT
+    moved entity   -> new dense index
+
+Every operation should preserve these invariants.

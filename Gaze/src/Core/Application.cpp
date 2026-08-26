@@ -22,7 +22,7 @@ namespace Gaze {
 	void Application::Run() {
 		LOG_INFO("App Started");
 		Entity ent(m_activeScene); // temp
-		ent.AddComponent<MeshRenderer>().LoadMesh(PrimitiveType::Cube); // temp
+		ent.AddComponent<MeshRenderer>();
 		auto start = GetTime();
 		auto t1 = GetTime();
 		LOG_INFO("Mesh loading took: ${} ", t1 - start);

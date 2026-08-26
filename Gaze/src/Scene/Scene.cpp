@@ -11,7 +11,7 @@ namespace Gaze {
 		//todo else
 		Renderer::SetUniformBuffer(pass);
 		for (auto& [transform, meshRenderer] : m_entities.Get<Transform, MeshRenderer>()) {
-			Renderer::Draw(transform, *meshRenderer.mesh, *meshRenderer.shader);
+			Renderer::Draw(transform, *meshRenderer.mesh.asset, *meshRenderer.shader.asset);
 		}
 	}
 }
