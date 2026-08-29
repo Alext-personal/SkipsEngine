@@ -4,7 +4,7 @@ namespace Gaze {
 	class UUID {
 	public:
 		UUID();
-		UUID(uint64_t);
+		UUID(uint64_t,bool copy = false);
 		operator uint64_t() const { return m_id; }
 		bool operator==(const UUID& id) { return m_id == (uint64_t)id.m_id; }
 		bool GetFlag() const { return m_id & (1ULL << 63); }

@@ -17,8 +17,8 @@ namespace Gaze {
 		void SetProjectionType(CameraProjectionType type) { m_type = type; RecalculateProjectionMatrix(); }
 		void SetPerspectiveFov(float fov) { m_perspectiveFov = fov; RecalculateProjectionMatrix(); }
 		float GetPerspectiveFov() const { return m_perspectiveFov; }
-		void SetNearPlane(float near) { m_nearPlane = near; RecalculateProjectionMatrix(); }
-		void SetFarPlane(float far) { m_farPlane = far; RecalculateProjectionMatrix(); }
+		void SetNearPlane(float nearPlane) { m_nearPlane = nearPlane; RecalculateProjectionMatrix(); }
+		void SetFarPlane(float farPlane) { m_farPlane = farPlane; RecalculateProjectionMatrix(); }
 
 		void SetOrtographicSize(float size) { m_ortographicSize = size; RecalculateProjectionMatrix(); }
 

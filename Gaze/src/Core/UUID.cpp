@@ -9,8 +9,12 @@ namespace Gaze {
 		m_id = s_uniformDistribution(s_engine);
 		m_id |= (1ULL << 63); // set last bit  to 1
 	}
-	UUID::UUID(uint64_t id) { // non-random uuid with last bet set to 0(engine asset)
-		m_id = id;
-		m_id &= ~(1ULL << 63); // set last bit to 0
+	UUID::UUID(uint64_t id, bool copy) { // non-random uuid with last bit set to 0(engine asset)
+		if (copy == false) {
+			m_id = id;
+			m_id &= ~(1ULL << 63); // set last bit to 0
+		}
+		else
+			m_id = id;
 	}
 }

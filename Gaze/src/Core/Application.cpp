@@ -1,11 +1,11 @@
-#include "Assets/ModelLoader.h" // temp
+
 #include "Core/Log.h"
 #include "Core/Helpers.h"
 #include "Core/Application.h"
 #include "Render/Renderer.h"
-#include "Render/Primitives/Primitives.h" // temp
 #include "Render/EditorCamera.h" //temp
 #include "Scene/Entity.h" // temp
+#include "Assets/AssetManager.h" // maybe temp
 namespace Gaze {
 	Application* Application::s_instance = nullptr;
 	Application::Application() : m_window(std::make_unique<Window>(1920, 1080, "Skips-Engine")), m_activeScene{}
@@ -17,17 +17,22 @@ namespace Gaze {
 		s_instance = this;
 		m_window->SetCallbackFunction(TO_EVENT_FN(OnEvent));
 		Renderer::Init();
+		AssetManager::Init();
 		LOG_INFO("App Created");
 	}
 	void Application::Run() {
 		LOG_INFO("App Started");
 		Entity ent(m_activeScene); // temp
 		ent.AddComponent<MeshRenderer>();
+		Entity ent2(m_activeScene);
+		ent2.AddComponent<MeshRenderer>().LoadMesh(UUID(12382722651447705300,true));
+		ent2.GetComponent<Transform>().translation.x += 4;
 		auto start = GetTime();
 		auto t1 = GetTime();
 		LOG_INFO("Mesh loading took: ${} ", t1 - start);
 		bool wireframe = true; //testing
 		float lastTime = 0.0f;
+		Transform& tr = ent.GetComponent<Transform>();
 		while (m_running) {
 			Renderer::BeginFrame();
 			float currentTime = glfwGetTime();
@@ -38,7 +43,8 @@ namespace Gaze {
 				wireframe = !wireframe;
 				LOG_WARNING("wireframe set: ${} ", wireframe);
 			}
-			//transform.rotation.y += 50.0f * timeStep;
+			tr.rotation.y += 50.0f * timeStep;
+			tr.rotation.z += 50.0f * timeStep;
 			EditorCamera::OnUpdate(timeStep); // temp to be moved to editor app
 			m_activeScene.OnRender(); //m_activescene to be moved to EDITOR APP
 			m_input.OnFrameEnd();

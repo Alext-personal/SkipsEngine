@@ -2,8 +2,31 @@
 #include "Core/UUID.h"
 namespace Gaze {
 	enum class AssetType {
-		Mesh, Material, Shader
+		None,Mesh, Material, Shader,Texture
 	};
+	inline std::string AssetTypeToString(const AssetType& type) {
+		switch (type) {
+		case AssetType::Material :
+			return "Material";
+		case AssetType::Mesh:
+			return "Mesh";
+		case AssetType::Shader:
+			return "Shader";
+		case AssetType::Texture:
+			return "Texture";
+		}
+	}
+	inline AssetType StringToAssetType(const std::string& str) {
+		if (str == "Material")
+			return AssetType::Material;
+		if (str == "Mesh")
+			return AssetType::Mesh;
+		if (str == "Shader")
+			return AssetType::Shader;
+		if (str == "Texture")
+			return AssetType::Texture;
+		ENGINE_ASSERT("INVALID STRING ASSETTYPE");
+	}
 	template <typename T>
 	struct AssetHandle {
 		UUID id;

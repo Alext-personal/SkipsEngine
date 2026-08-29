@@ -1,5 +1,8 @@
 #pragma once
 #include <utility>
+#ifdef _WIN32
+#include <Windows.h>
+#endif
 #include <filesystem>
 #include <fstream>
 #include <chrono>
@@ -15,5 +18,13 @@ namespace Gaze {
     }
     inline auto GetTime() {
         return std::chrono::high_resolution_clock::now();
+    }
+    inline std::filesystem::path GetCurrentPath() {
+       #ifdef _WIN32
+        wchar_t path[MAX_PATH];
+        GetModuleFileNameW(nullptr, path, MAX_PATH);
+        return std::filesystem::path(path).parent_path();
+       #endif
+        return "";
     }
 }

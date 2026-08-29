@@ -13,15 +13,15 @@ namespace Gaze {
 			out << "[" << localTime << "] : " << " ";
 		}
 		template <typename... Args>
-		static void ERROR(const std::source_location& location, const Args&... args) {
-			LOG("ERROR", location, args...);
+		static void LogError(const std::source_location& location, const Args&... args) {
+			m_Log("ERROR", location, args...);
 		}
 		template <typename... Args>
-		static void WARNING(const std::source_location& location, const Args&... args) {
-			LOG("WARNING", location, args...);
+		static void LogWarning(const std::source_location& location, const Args&... args) {
+			m_Log("WARNING", location, args...);
 		}
 		template <typename... Args>
-		static void INFO(const Args&... args) {
+		static void LogInfo(const Args&... args) {
 			std::cout << Green << "[INFO] " << White;
 			Log_Time(std::cout);
 			std::string message = ParseArguments(args...);
@@ -30,7 +30,7 @@ namespace Gaze {
 		template <typename... Args>
 		static void ASSERT(const std::string& type, bool condition, const std::source_location& location, const Args&... args) {
 			if (!condition) {
-				LOG("CRITICAL", location, args...);
+				m_Log("CRITICAL", location, args...);
 				if (type == "ENGINE")
 					std::abort();
 				if (type == "CLIENT")
@@ -44,7 +44,7 @@ namespace Gaze {
 		inline static const char* Green{ "\033[32m" };
 		inline static const char* DarkRed{ "\033[38;5;88m" };
 		template <typename... Args>
-		static void LOG(const std::string& type, const std::source_location& location, const Args&... args) {
+		static void m_Log(const std::string& type, const std::source_location& location, const Args&... args) {
 			const char* colour = Green;
 			if (type == "ERROR")
 				colour = Red;
@@ -100,11 +100,11 @@ namespace Gaze {
 		}
 	};
 #define LOG_ERROR(...) \
-	Log::ERROR(std::source_location::current(), __VA_ARGS__)
+	Log::LogError(std::source_location::current(), __VA_ARGS__)
 #define LOG_WARNING(...) \
-	Log::WARNING(std::source_location::current(), __VA_ARGS__)
+	Log::LogWarning(std::source_location::current(), __VA_ARGS__)
 #define LOG_INFO(...)\
-	Log::INFO(__VA_ARGS__)
+	Log::LogInfo(__VA_ARGS__)
 #define ENGINE_ASSERT(condition,...)\
 	Log::ASSERT("ENGINE",condition,std::source_location::current(),__VA_ARGS__)
 #define CLIENT_ASSERT(condition,...)\

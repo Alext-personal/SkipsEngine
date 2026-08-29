@@ -6,6 +6,7 @@
     "glad",
     "glm",
     "imgui",
-    "assimp"
+    "assimp",
+    "yaml-cpp"
   ]
 }

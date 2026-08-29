@@ -44,9 +44,6 @@ namespace Gaze {
 			shader.asset = AssetManager::Get<Shader>(shader.id);
 		}
 		
-		/*void LoadMesh(const std::filesystem::path& filepath) {
-			mesh = AssetManager::GetMesh(filepath);
-		}*/
 		void LoadMesh(const UUID& id) {
 			mesh.id = id;
 			mesh.asset = AssetManager::Get<Mesh>(id);
