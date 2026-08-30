@@ -8,26 +8,36 @@
 namespace Gaze {
 	struct Transform {
 		glm::vec3 translation{ 0.0f };
-		glm::vec3 rotation{ 0.0f };
+		glm::quat rotation{ glm::vec3(0.0f)};
 		glm::vec3 scale{ 1.0f };
 
-		glm::quat GetQuaternion() const {
-			return glm::quat(glm::radians(rotation));
+		void Rotate(glm::vec3 eulerAngles) {
+			glm::quat rotationquat(glm::radians(eulerAngles));
+			rotation *= rotationquat;
+		}
+		void SetRotation(glm::vec3 eulerAngles) {
+			rotation = glm::quat(glm::radians(eulerAngles));
+		}
+		void Rotate(glm::quat quat) {
+			rotation *= quat;
+		}
+		void SetRotation(glm::quat quat) {
+			rotation = quat;
 		}
 		glm::vec3 GetForward() const {
-			return GetQuaternion() * glm::vec3(0.0f, 0.0f, -1.0f);
+			return rotation * glm::vec3(0.0f, 0.0f, -1.0f);
 		}
 		glm::vec3 GetUp() const {
-			return GetQuaternion() * glm::vec3(0.0f, 1.0f, 0.0f);
+			return rotation * glm::vec3(0.0f, 1.0f, 0.0f);
 		}
 		glm::vec3 GetRight() const {
-			return GetQuaternion() * glm::vec3(1.0f, 0.0f, 0.0f);
+			return rotation * glm::vec3(1.0f, 0.0f, 0.0f);
 		}
 		glm::mat4 GetMatrix() const {
 			glm::mat4 model(1.0f);
 			model = glm::translate(model, translation);
 
-			model *= glm::mat4_cast(GetQuaternion());
+			model *= glm::mat4_cast(rotation);
 
 			model = glm::scale(model, scale);
 

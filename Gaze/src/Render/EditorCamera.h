@@ -13,8 +13,10 @@ namespace Gaze {
 		static const glm::mat4 GetViewMatrix() { return m_camera.GetViewMatrix(m_cameraTransform); }
 	private:
 		inline static Camera m_camera{};
-		inline static float m_cameraMoveSpeed{ 1.0f };
+		inline static float m_cameraMoveSpeed{ 2.5f };
 		inline static float m_cameraSensitivity{ 0.05f };
 		inline static Transform m_cameraTransform{ glm::vec3(0.0f,0.0f,1.0f),glm::vec3(0.0f),glm::vec3(1.0f) };
+		inline static float m_pitch{ 0 };
+		inline static float m_yaw{ 0 };
 	};
 }

@@ -14,8 +14,9 @@ namespace Gaze {
 		{
 			float xRotation = Input::GetMouseXDelta();
 			float yRotation = Input::GetMouseYDelta();
-			m_cameraTransform.rotation.y -= xRotation * m_cameraSensitivity;
-			m_cameraTransform.rotation.x += yRotation * m_cameraSensitivity;
+			m_pitch += yRotation * m_cameraSensitivity;
+			m_yaw -= xRotation * m_cameraSensitivity;
+			m_cameraTransform.SetRotation(glm::vec3(m_pitch, m_yaw, 0));
 		}
 	}
 

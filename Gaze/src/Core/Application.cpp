@@ -43,8 +43,7 @@ namespace Gaze {
 				wireframe = !wireframe;
 				LOG_WARNING("wireframe set: ${} ", wireframe);
 			}
-			tr.rotation.y += 50.0f * timeStep;
-			tr.rotation.z += 50.0f * timeStep;
+			tr.Rotate(glm::vec3(45, 45, 0) * timeStep);
 			EditorCamera::OnUpdate(timeStep); // temp to be moved to editor app
 			m_activeScene.OnRender(); //m_activescene to be moved to EDITOR APP
 			m_input.OnFrameEnd();
