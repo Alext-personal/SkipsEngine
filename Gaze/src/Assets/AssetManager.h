@@ -157,6 +157,9 @@ namespace Gaze {
 			LOG_ERROR("Reserved Shader not found");
 			return nullptr;
 		}
+
+		//add textures
+
 		template <> static std::shared_ptr<Material> Load(const Asset& asset) {
 			if (asset.id.GetFlag() == 0)
 				return LoadReserved<Material>(asset);

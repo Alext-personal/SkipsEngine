@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "Render/Mesh.h"
 namespace Gaze {
 	Mesh::Mesh(const MeshData& meshdata) :m_subMeshes(meshdata.subMeshes) {

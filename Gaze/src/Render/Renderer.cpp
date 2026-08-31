@@ -1,7 +1,7 @@
+#include "pch.h"
 #include "Render/Renderer.h"
-#include "Core/Log.h"
 #include "Render/EditorCamera.h"
-#include <GLFW/glfw3.h>
+#include "Render/VertexArray.h"
 namespace Gaze {
 	void Renderer::Init() {
 		if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))

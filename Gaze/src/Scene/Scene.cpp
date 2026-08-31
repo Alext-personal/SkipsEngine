@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "Scene/Scene.h"
 #include "Render/Renderer.h"
 #include "Render/EditorCamera.h"

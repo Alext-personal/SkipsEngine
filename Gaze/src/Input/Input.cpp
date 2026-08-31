@@ -1,5 +1,4 @@
-#include "Core/Helpers.h"
-#include "Core/Log.h"
+#include "pch.h"
 #include "Input/Input.h"
 namespace Gaze {
     Input* Input::s_instance = nullptr;

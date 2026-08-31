@@ -1,6 +1,6 @@
 #pragma once
-#include <vector>
 #include "Scene/Component.h"
+#include <vector>
 namespace Gaze {
 	#define NO_COMPONENT UINT32_MAX
 	struct IRegistry {

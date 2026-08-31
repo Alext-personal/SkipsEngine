@@ -9,6 +9,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 add_executable(engine)
 
+target_precompile_headers(engine PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/Gaze/src/pch.h")
+
 add_custom_command(TARGET engine POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
             ${CMAKE_SOURCE_DIR}/Gaze/engineAssets
@@ -25,6 +27,7 @@ find_package(glm CONFIG REQUIRED)
 find_package(imgui CONFIG REQUIRED)
 find_package(assimp CONFIG REQUIRED)
 find_package(yaml-cpp CONFIG REQUIRED)
+find_package(Stb REQUIRED)
 
 
 target_link_libraries(engine PRIVATE
@@ -48,4 +51,5 @@ target_sources(engine PRIVATE
 	${MY_SOURCES}
 )
 
+target_include_directories(engine PRIVATE ${Stb_INCLUDE_DIR})
 target_include_directories(engine PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/Gaze/src")

@@ -1,6 +1,7 @@
 #pragma once
-#include <vector>
 #include "Render/VertexArray.h"
+#include <vector>
+#include <memory>
 namespace Gaze {
 	struct SubMesh {
 		uint32_t indexCount;

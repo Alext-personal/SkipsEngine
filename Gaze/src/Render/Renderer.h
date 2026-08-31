@@ -1,8 +1,7 @@
 #pragma once
-#include "Render/VertexArray.h"
 #include "Render/Shader.h"
 #include "Render/Mesh.h"
-#include "Scene/EntityRegistry.h"
+#include "Scene/Component.h"
 namespace Gaze {
 	struct CameraUniformPass {
 		glm::mat4 proj;

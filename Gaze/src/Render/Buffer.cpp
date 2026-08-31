@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "Render/Buffer.h"
 namespace Gaze {
 	VertexBuffer::VertexBuffer(const std::vector<float>& data) {

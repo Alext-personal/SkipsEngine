@@ -32,76 +32,80 @@ namespace Gaze {
         static MeshData Triangle() {
             MeshData triangleData{};
             triangleData.bufferData[0].data = {
-                // Position              // Color
-                -0.8f, -0.8f, 0.0f,      1.0f, 0.0f, 0.0f, // Red
-                 0.8f, -0.8f, 0.0f,      0.0f, 1.0f, 0.0f, // Green
-                 0.0f,  0.8f, 0.0f,      0.0f, 0.0f, 1.0f  // Blue
+                // Position              // Normal           // TexCoord
+                -0.5f, -0.5f, 0.0f,       0.0f, 0.0f, 1.0f,   0.0f, 0.0f,
+                 0.5f, -0.5f, 0.0f,       0.0f, 0.0f, 1.0f,   1.0f, 0.0f,
+                 0.0f,  0.5f, 0.0f,       0.0f, 0.0f, 1.0f,   0.5f, 1.0f
             };
-            triangleData.bufferData[0].layout.Add(AttributeDataType::Float3);
-            triangleData.bufferData[0].layout.Add(AttributeDataType::Float3);
+            triangleData.bufferData[0].layout.Add(AttributeDataType::Float3); // pos
+            triangleData.bufferData[0].layout.Add(AttributeDataType::Float3); // normals
+            triangleData.bufferData[0].layout.Add(AttributeDataType::Float2); //texcoords
             return triangleData;
         }
         static MeshData Quad() {
             MeshData quadData{};
             quadData.bufferData[0].data = {
-                // Position 
-                -0.8f, -0.8f, 0.0f,
-                 0.8f, -0.8f, 0.0f,
-                 -0.8f,  0.8f, 0.0f,
-                 0.8f, 0.8f, 0.0f
+                // Position              // Normal           // TexCoord
+                -0.5f, -0.5f, 0.0f,       0.0f, 0.0f, 1.0f,   0.0f, 0.0f,
+                 0.5f, -0.5f, 0.0f,       0.0f, 0.0f, 1.0f,   1.0f, 0.0f,
+                -0.5f,  0.5f, 0.0f,       0.0f, 0.0f, 1.0f,   0.0f, 1.0f,
+                 0.5f,  0.5f, 0.0f,       0.0f, 0.0f, 1.0f,   1.0f, 1.0f
             };
             quadData.indices = {
                 0,1,2,
                 1,3,2
             };
-            quadData.bufferData[0].layout.Add(AttributeDataType::Float3);
+            quadData.bufferData[0].layout.Add(AttributeDataType::Float3);//Pos
+            quadData.bufferData[0].layout.Add(AttributeDataType::Float3);//Normals
+            quadData.bufferData[0].layout.Add(AttributeDataType::Float2);//TexCoords
             return quadData;
         }
         static MeshData Cube()
         {
             MeshData cubeData{};
             cubeData.bufferData[0].data = {
-                // Position               // Color
+                // Position               // Normal           // TexCoord
 
-                // Front - Red
-                -0.5f, -0.5f,  0.5f,      1.0f, 0.0f, 0.0f, // 0
-                 0.5f, -0.5f,  0.5f,      1.0f, 0.0f, 0.0f, // 1
-                 0.5f,  0.5f,  0.5f,      1.0f, 0.0f, 0.0f, // 2
-                -0.5f,  0.5f,  0.5f,      1.0f, 0.0f, 0.0f, // 3
+                // Front (+Z)
+                -0.5f, -0.5f,  0.5f,       0.0f,  0.0f,  1.0f,   0.0f, 0.0f, // 0
+                 0.5f, -0.5f,  0.5f,       0.0f,  0.0f,  1.0f,   1.0f, 0.0f, // 1
+                 0.5f,  0.5f,  0.5f,       0.0f,  0.0f,  1.0f,   1.0f, 1.0f, // 2
+                -0.5f,  0.5f,  0.5f,       0.0f,  0.0f,  1.0f,   0.0f, 1.0f, // 3
 
-                // Back - Green
-                -0.5f, -0.5f, -0.5f,      0.0f, 1.0f, 0.0f, // 4
-                 0.5f, -0.5f, -0.5f,      0.0f, 1.0f, 0.0f, // 5
-                 0.5f,  0.5f, -0.5f,      0.0f, 1.0f, 0.0f, // 6
-                -0.5f,  0.5f, -0.5f,      0.0f, 1.0f, 0.0f, // 7
+                // Back (-Z)
+                -0.5f, -0.5f, -0.5f,       0.0f,  0.0f, -1.0f,   1.0f, 0.0f, // 4
+                 0.5f, -0.5f, -0.5f,       0.0f,  0.0f, -1.0f,   0.0f, 0.0f, // 5
+                 0.5f,  0.5f, -0.5f,       0.0f,  0.0f, -1.0f,   0.0f, 1.0f, // 6
+                -0.5f,  0.5f, -0.5f,       0.0f,  0.0f, -1.0f,   1.0f, 1.0f, // 7
 
-                // Right - Blue
-                 0.5f, -0.5f,  0.5f,      0.0f, 0.0f, 1.0f, // 8
-                 0.5f, -0.5f, -0.5f,      0.0f, 0.0f, 1.0f, // 9
-                 0.5f,  0.5f, -0.5f,      0.0f, 0.0f, 1.0f, // 10
-                 0.5f,  0.5f,  0.5f,      0.0f, 0.0f, 1.0f, // 11
+                // Right (+X)
+                 0.5f, -0.5f,  0.5f,       1.0f,  0.0f,  0.0f,   0.0f, 0.0f, // 8
+                 0.5f, -0.5f, -0.5f,       1.0f,  0.0f,  0.0f,   1.0f, 0.0f, // 9
+                 0.5f,  0.5f, -0.5f,       1.0f,  0.0f,  0.0f,   1.0f, 1.0f, // 10
+                 0.5f,  0.5f,  0.5f,       1.0f,  0.0f, 0.0f,   0.0f, 1.0f, // 11
 
-                 // Left - Yellow
-                 -0.5f, -0.5f, -0.5f,      1.0f, 1.0f, 0.0f, // 12
-                 -0.5f, -0.5f,  0.5f,      1.0f, 1.0f, 0.0f, // 13
-                 -0.5f,  0.5f,  0.5f,      1.0f, 1.0f, 0.0f, // 14
-                 -0.5f,  0.5f, -0.5f,      1.0f, 1.0f, 0.0f, // 15
+                 // Left (-X)
+                 -0.5f, -0.5f, -0.5f,      -1.0f,  0.0f,  0.0f,   0.0f, 0.0f, // 12
+                 -0.5f, -0.5f,  0.5f,      -1.0f,  0.0f,  0.0f,   1.0f, 0.0f, // 13
+                 -0.5f,  0.5f,  0.5f,      -1.0f,  0.0f,  0.0f,   1.0f, 1.0f, // 14
+                 -0.5f,  0.5f, -0.5f,      -1.0f,  0.0f,  0.0f,   0.0f, 1.0f, // 15
 
-                 // Top - Magenta
-                 -0.5f,  0.5f,  0.5f,      1.0f, 0.0f, 1.0f, // 16
-                  0.5f,  0.5f,  0.5f,      1.0f, 0.0f, 1.0f, // 17
-                  0.5f,  0.5f, -0.5f,      1.0f, 0.0f, 1.0f, // 18
-                 -0.5f,  0.5f, -0.5f,      1.0f, 0.0f, 1.0f, // 19
+                 // Top (+Y)
+                 -0.5f,  0.5f,  0.5f,       0.0f,  1.0f,  0.0f,   0.0f, 0.0f, // 16
+                  0.5f,  0.5f,  0.5f,       0.0f,  1.0f,  0.0f,   1.0f, 0.0f, // 17
+                  0.5f,  0.5f, -0.5f,       0.0f,  1.0f,  0.0f,   1.0f, 1.0f, // 18
+                 -0.5f,  0.5f, -0.5f,       0.0f,  1.0f,  0.0f,   0.0f, 1.0f, // 19
 
-                 // Bottom - Cyan
-                 -0.5f, -0.5f, -0.5f,      0.0f, 1.0f, 1.0f, // 20
-                  0.5f, -0.5f, -0.5f,      0.0f, 1.0f, 1.0f, // 21
-                  0.5f, -0.5f,  0.5f,      0.0f, 1.0f, 1.0f, // 22
-                 -0.5f, -0.5f,  0.5f,      0.0f, 1.0f, 1.0f  // 23
+                 // Bottom (-Y)
+                 -0.5f, -0.5f, -0.5f,       0.0f, -1.0f,  0.0f,   0.0f, 0.0f, // 20
+                  0.5f, -0.5f, -0.5f,       0.0f, -1.0f,  0.0f,   1.0f, 0.0f, // 21
+                  0.5f, -0.5f,  0.5f,       0.0f, -1.0f,  0.0f,   1.0f, 1.0f, // 22
+                 -0.5f, -0.5f,  0.5f,       0.0f, -1.0f,  0.0f,   0.0f, 1.0f  // 23
             };
 
             cubeData.bufferData[0].layout.Add(AttributeDataType::Float3); // Position
-            cubeData.bufferData[0].layout.Add(AttributeDataType::Float3); // Color
+            cubeData.bufferData[0].layout.Add(AttributeDataType::Float3); // Normals
+            cubeData.bufferData[0].layout.Add(AttributeDataType::Float2); // TexCoords
 
             cubeData.indices = {
                 // Front

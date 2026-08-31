@@ -1,5 +1,7 @@
 #pragma once
 #include "Core/UUID.h"
+#include "Core/Log.h"
+#include <string>
 namespace Gaze {
 	enum class AssetType {
 		None,Mesh, Material, Shader,Texture

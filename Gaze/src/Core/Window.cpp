@@ -1,7 +1,5 @@
-#include <iostream>
+#include "pch.h"
 #include "Core/Window.h"
-#include "Events/WindowEvents.h"
-#include "Events/InputEvents.h"
 namespace Gaze {
 	Window::Window(unsigned int width, unsigned int height, const char* name) {
 		if (!glfwInit()) {

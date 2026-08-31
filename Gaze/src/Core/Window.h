@@ -1,7 +1,7 @@
 #pragma once
-#include <GLFW/glfw3.h>
 #include <functional>
 #include <string>
+class GLFWwindow;
 namespace Gaze {
 	class Event;
 	class Window {

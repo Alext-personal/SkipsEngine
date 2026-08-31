@@ -1,10 +1,10 @@
 #pragma once
-#include <memory>
+#include "Core/Window.h"
+#include "Scene/Scene.h"
 #include "Input/Input.h"
 #include "Events/Event.h"
 #include "Events/WindowEvents.h"
-#include "Core/Window.h"
-#include "Scene/Scene.h"
+#include <memory>
 namespace Gaze {
 	class Application {
 	public:

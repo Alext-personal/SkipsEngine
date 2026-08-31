@@ -1,10 +1,8 @@
 #pragma once
-#include <glad/glad.h>
 #include <string>
 #include <vector>
 #include <glm/mat4x4.hpp>
-#include "Core/Log.h"
-#include "Core/Helpers.h"
+#include <filesystem>
 namespace Gaze {
 	enum class ShaderType {
 		None, Vertex, Fragment

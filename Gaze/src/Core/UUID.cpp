@@ -1,5 +1,5 @@
+#include "pch.h"
 #include "Core/UUID.h"
-#include <random>
 namespace Gaze {
 	static std::random_device s_randomDevice;
 	static std::mt19937_64 s_engine(s_randomDevice());

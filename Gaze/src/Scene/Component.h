@@ -1,10 +1,10 @@
 #pragma once
+#include "Render/Mesh.h"
+#include "Assets/AssetManager.h"
 #include <glm/glm.hpp>
 #include <glm/vec3.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/quaternion.hpp>
-#include "Render/Mesh.h"
-#include "Assets/AssetManager.h"
 namespace Gaze {
 	struct Transform {
 		glm::vec3 translation{ 0.0f };
@@ -46,7 +46,7 @@ namespace Gaze {
 	};
 	struct MeshRenderer {
 		AssetHandle<Mesh> mesh;
-		AssetHandle<Shader> shader;
+		AssetHandle<Shader> shader; // vector<AssetHandle<Material>> materials (1 submesh - > 1 material)
 		MeshRenderer() {
 			mesh.id = ReservedUUID::CUBE;
 			shader.id = ReservedUUID::DEFAULTSHADER;

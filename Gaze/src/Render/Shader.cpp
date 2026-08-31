@@ -1,6 +1,5 @@
+#include "pch.h"
 #include "Render/Shader.h"
-#include <glm/glm.hpp>
-#include <glm/gtc/type_ptr.hpp>
 namespace Gaze {
 	Shader::Shader(const std::filesystem::path& filepath) {
 		m_shaderID = glCreateProgram();

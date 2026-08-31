@@ -1,6 +1,4 @@
-
-#include "Core/Log.h"
-#include "Core/Helpers.h"
+#include "pch.h"
 #include "Core/Application.h"
 #include "Render/Renderer.h"
 #include "Render/EditorCamera.h" //temp
@@ -43,7 +41,7 @@ namespace Gaze {
 				wireframe = !wireframe;
 				LOG_WARNING("wireframe set: ${} ", wireframe);
 			}
-			tr.Rotate(glm::vec3(45, 45, 0) * timeStep);
+			tr.Rotate(glm::vec3(0, 45, 45) * timeStep);
 			EditorCamera::OnUpdate(timeStep); // temp to be moved to editor app
 			m_activeScene.OnRender(); //m_activescene to be moved to EDITOR APP
 			m_input.OnFrameEnd();

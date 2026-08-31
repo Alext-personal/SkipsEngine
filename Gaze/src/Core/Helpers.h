@@ -1,12 +1,17 @@
 #pragma once
+#include "Core/Log.h"
+
+#include <string>
+#include <sstream>
 #include <utility>
-#ifdef _WIN32
-#include <Windows.h>
-#endif
 #include <filesystem>
 #include <fstream>
 #include <chrono>
-#include "Core/Log.h"
+
+#ifdef _WIN32
+#include <Windows.h>
+#endif
+
 namespace Gaze {
     inline std::string DumpFileToString(const std::filesystem::path& filepath) {
         std::stringstream ss;

@@ -7,6 +7,7 @@
     "glm",
     "imgui",
     "assimp",
-    "yaml-cpp"
+    "yaml-cpp",
+    "stb"
   ]
 }

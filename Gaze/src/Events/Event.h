@@ -1,6 +1,5 @@
 #pragma once
 #include <functional>
-#include "Core/Log.h"
 namespace Gaze {
 #define TO_EVENT_FN(fn) \
     [this](auto&&... args) -> decltype(auto)\

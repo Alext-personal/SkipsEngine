@@ -1,7 +1,5 @@
 #pragma once
-#include <glad/glad.h>
 #include <vector>
-#include "Core/Log.h"
 namespace Gaze {
 	enum class AttributeDataType {
 		None = 0, Float, Float2, Float3, Float4, Int, Int2, Int3, Int4, Bool
