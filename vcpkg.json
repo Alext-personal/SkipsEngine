@@ -5,7 +5,13 @@
     "glfw3",
     "glad",
     "glm",
-    "imgui",
+    {
+      "name": "imgui",
+      "features": [
+        "glfw-binding",
+        "opengl3-binding"
+      ]
+    },
     "assimp",
     "yaml-cpp",
     "stb"

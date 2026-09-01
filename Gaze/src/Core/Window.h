@@ -12,6 +12,9 @@ namespace Gaze {
 
 		bool ShouldClose() const;
 
+		void SwitchCursorMode();
+		bool IsCursorDisabled() const;
+
 		void SetVSync(bool enabled);
 		bool IsVSync() const { return m_data.vsync; }
 

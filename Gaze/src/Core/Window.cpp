@@ -97,6 +97,17 @@ namespace Gaze {
 			glfwDestroyWindow(m_window);
 		glfwTerminate();
 	}
+	void Window::SwitchCursorMode() {
+		if(IsCursorDisabled())
+			glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+		else
+			glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	}
+	bool Window::IsCursorDisabled() const {
+		if (glfwGetInputMode(m_window, GLFW_CURSOR) == GLFW_CURSOR_DISABLED)
+			return true;
+		return false;
+	}
 	bool Window::ShouldClose() const {
 		return glfwWindowShouldClose(m_window);
 	}
