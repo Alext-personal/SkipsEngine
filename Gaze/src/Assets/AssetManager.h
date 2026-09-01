@@ -101,6 +101,7 @@ namespace Gaze {
 		template <typename T> static AssetStorage<T>& GetStorage();
 		template <> static AssetStorage<Mesh>& GetStorage() { return s_meshStorage; }
 		template <> static AssetStorage<Shader>& GetStorage() { return s_shaderStorage; }
+		template <> static AssetStorage<Texture>& GetStorage() { return s_textureStorage; }
 		template <> static AssetStorage<Material>& GetStorage() { return s_materialStorage; }
 	private:
 		template <typename T> static std::shared_ptr<T> Load(const Asset& asset);
@@ -158,7 +159,29 @@ namespace Gaze {
 			return nullptr;
 		}
 
-		//add textures
+		template <> static std::shared_ptr<Texture> Load(const Asset& asset) {
+			if (asset.id.GetFlag() == 0)
+				return LoadReserved<Texture>(asset);
+			const auto& it = s_assetData.find(asset.id);
+			if (it != s_assetData.end())
+			{
+				MetaData data = it->second;
+				if (data.assetType != AssetType::Texture)
+				{
+					LOG_ERROR("Type mismatch, Metadata is shadertype but Get<NOT TEXTURE> was called");
+					return nullptr;
+				}
+				return std::make_shared<Texture>(data.filepath);
+			}
+			LOG_ERROR("Texture not found");
+			return nullptr;
+		}
+		template <> static std::shared_ptr<Texture> LoadReserved(const Asset& asset) {
+			if (asset.id == ReservedUUID::DEFAULTTEXTURE)
+				return std::make_shared<Texture>(GetCurrentPath() / "engineAssets/textures/DefaultTexture.png");
+			LOG_ERROR("Reserved Texture not found");
+			return nullptr;
+		}
 
 		template <> static std::shared_ptr<Material> Load(const Asset& asset) {
 			if (asset.id.GetFlag() == 0)
@@ -178,6 +201,8 @@ namespace Gaze {
 			return nullptr;
 		}
 		template <> static std::shared_ptr<Material> LoadReserved(const Asset& asset) {
+			if (asset.id == ReservedUUID::DEFAULTMATERIAL)
+				return std::make_shared<Material>(GetCurrentPath() / "engineAssets/materials/DefaultMaterial.mat");
 			LOG_ERROR("Reserved Material not found");
 			return nullptr;
 		}
@@ -187,6 +212,7 @@ namespace Gaze {
 		inline static std::unordered_map<UUID, MetaData> s_assetData{};
 		inline static AssetStorage<Mesh> s_meshStorage{ AssetType::Mesh };
 		inline static AssetStorage<Shader> s_shaderStorage{ AssetType::Shader };
+		inline static AssetStorage<Texture> s_textureStorage{ AssetType::Texture };
 		inline static AssetStorage<Material> s_materialStorage{ AssetType::Material };
 	};
 

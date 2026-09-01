@@ -13,10 +13,10 @@ namespace Gaze {
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	}
-	void Renderer::Draw(const Transform& transform, const Mesh& mesh, Shader& shader) {
+	void Renderer::Draw(const Transform& transform, const Mesh& mesh, Material& material) {
 		mesh.GetVAO().Bind();
-		shader.Bind();
-		shader.SetUniformMatrix4("modelMatrix", transform.GetMatrix());
+		material.Bind();
+		material.shader.asset->SetUniformMatrix4("modelMatrix", transform.GetMatrix());
 		if (!mesh.HasEBO()) {
 			glDrawArrays(GL_TRIANGLES, 0, mesh.GetVertexCount());
 		}

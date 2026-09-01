@@ -46,12 +46,12 @@ namespace Gaze {
 	};
 	struct MeshRenderer {
 		AssetHandle<Mesh> mesh;
-		AssetHandle<Shader> shader; // vector<AssetHandle<Material>> materials (1 submesh - > 1 material)
+		AssetHandle<Material> material; // vector<AssetHandle<Material>> materials (1 submesh - > 1 material)
 		MeshRenderer() {
 			mesh.id = ReservedUUID::CUBE;
-			shader.id = ReservedUUID::DEFAULTSHADER;
+			material.id = ReservedUUID::DEFAULTMATERIAL;
 			mesh.asset = AssetManager::Get<Mesh>(mesh.id);
-			shader.asset = AssetManager::Get<Shader>(shader.id);
+			material.asset = AssetManager::Get<Material>(material.id);
 		}
 		
 		void LoadMesh(const UUID& id) {

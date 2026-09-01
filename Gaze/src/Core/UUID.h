@@ -12,10 +12,13 @@ namespace Gaze {
 		uint64_t m_id;
 	};
 	namespace ReservedUUID {
-		inline const UUID TRIANGLE(0);
-		inline const UUID QUAD(1);
-		inline const UUID CUBE(2);
+		inline const UUID NONE(0);
+		inline const UUID TRIANGLE(1);
+		inline const UUID QUAD(2);
+		inline const UUID CUBE(3);
 		inline const UUID DEFAULTSHADER(10);
+		inline const UUID DEFAULTTEXTURE(20);
+		inline const UUID DEFAULTMATERIAL(30);
 	}
 }
 namespace std {

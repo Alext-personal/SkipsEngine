@@ -4,6 +4,9 @@
 #include <glm/mat4x4.hpp>
 #include <filesystem>
 namespace Gaze {
+	namespace TextureSlots {
+		inline const uint32_t Albedo = 0;
+	}
 	enum class ShaderType {
 		None, Vertex, Fragment
 	};
@@ -12,6 +15,9 @@ namespace Gaze {
 		Shader(const std::filesystem::path& filepath);
 		~Shader();
 		void SetUniformMatrix4(const std::string& name, const glm::mat4& matrix);
+		void SetTextureSlots();
+		bool TrySetUniformInt1(const std::string& name, uint32_t value);
+
 		void Bind() const;
 		uint32_t GetID() const { return m_shaderID; }
 	private:

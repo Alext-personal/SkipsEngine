@@ -10,9 +10,9 @@ namespace Gaze {
 		if (m_editor)
 			pass = { EditorCamera::GetProjectionMatrix(),EditorCamera::GetViewMatrix() };
 		//todo else
-		Renderer::SetUniformBuffer(pass);
+		Renderer::SetUniformBuffer(pass); // once per frame
 		for (auto& [transform, meshRenderer] : m_entities.Get<Transform, MeshRenderer>()) {
-			Renderer::Draw(transform, *meshRenderer.mesh.asset, *meshRenderer.shader.asset);
+			Renderer::Draw(transform, *meshRenderer.mesh.asset, *meshRenderer.material.asset);
 		}
 	}
 }

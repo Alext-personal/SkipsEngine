@@ -5,13 +5,24 @@ namespace Gaze {
 		m_shaderID = glCreateProgram();
 		std::vector<ShaderCode> shaders = SeparateShaders(filepath);
 		CreateCompileAndLinkShaders(shaders, filepath);
+		SetTextureSlots();
 	}
 	Shader::~Shader() {
 		glDeleteProgram(m_shaderID);
 	}
 	void Shader::SetUniformMatrix4(const std::string& name, const glm::mat4& matrix) {
-		Bind();
-		glUniformMatrix4fv(glGetUniformLocation(m_shaderID, name.c_str()), 1, 0, glm::value_ptr(matrix));
+		glProgramUniformMatrix4fv(m_shaderID,glGetUniformLocation(m_shaderID, name.c_str()), 1, 0, glm::value_ptr(matrix));
+	}
+	void Shader::SetTextureSlots() {
+		TrySetUniformInt1("AlbedoTexture", TextureSlots::Albedo);
+	}
+	bool Shader::TrySetUniformInt1(const std::string& name, uint32_t value) {
+		uint32_t loc = glGetUniformLocation(m_shaderID, name.c_str());
+		if (loc == -1)
+			return false;
+		glProgramUniform1i(m_shaderID, loc, value);
+		return true;
+	
 	}
 	void Shader::Bind() const {
 		glUseProgram(m_shaderID);
