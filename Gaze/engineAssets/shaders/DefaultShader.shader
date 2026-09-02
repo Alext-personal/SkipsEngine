@@ -22,11 +22,13 @@ void main()
 
 in vec3 v_position;
 in vec2 v_texcoords;
-out vec4 color;
+
 uniform sampler2D AlbedoTexture;
 layout(std140,binding = 1) uniform material{
 	vec4 tint;
 };
+
+out vec4 color;
 void main()
 {
 	color = tint * texture(AlbedoTexture,v_texcoords);

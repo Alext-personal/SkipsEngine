@@ -6,6 +6,19 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/quaternion.hpp>
 namespace Gaze {
+	enum class ComponentType {
+		Transform,MeshRenderer,HierarchyMember
+	};
+	inline static std::string ComponentTypeToString(ComponentType type) {
+		switch (type) {
+			case ComponentType::Transform:
+				return "Transform";
+			case ComponentType::MeshRenderer:
+				return "MeshRenderer";
+			case ComponentType::HierarchyMember:
+				return "HierarchyMember";
+		}
+	}
 	struct Transform {
 		glm::vec3 translation{ 0.0f };
 		glm::quat rotation{ glm::vec3(0.0f)};
@@ -59,5 +72,10 @@ namespace Gaze {
 			mesh.asset = AssetManager::Get<Mesh>(id);
 		}
 
+	};
+	struct HierarchyMember {
+		uint32_t parent{};
+		std::vector<uint32_t> children{};
+		HierarchyMember() :parent(0){}
 	};
 }

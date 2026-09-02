@@ -29,6 +29,13 @@ namespace Gaze {
 		LOG_INFO("App Started");
 		Entity ent(m_activeScene); // temp
 		ent.AddComponent<MeshRenderer>();
+		LOG_WARNING("entity 1 's parent is ${}", ent.GetParent().GetUUID());
+		Entity ent2(m_activeScene);
+		ent2.AddComponent<MeshRenderer>();
+		ent2.GetComponent<Transform>().translation.x = 2;
+		LOG_WARNING("entity 2 's parent is ${}", ent2.GetParent().GetUUID());
+		ent2.SetParent(ent);
+		LOG_WARNING("entity 2 's parent is set to  ${}", ent2.GetParent().GetUUID());
 		auto start = GetTime();
 		auto t1 = GetTime();
 		LOG_INFO("Mesh loading took: ${} ", t1 - start);
