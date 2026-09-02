@@ -18,6 +18,10 @@ namespace Gaze {
 	UniformBuffer::UniformBuffer(uint32_t size, uint32_t binding) {
 		glCreateBuffers(1, &m_ID);
 		glNamedBufferData(m_ID, size, nullptr, GL_DYNAMIC_DRAW);
+		Bind(binding);
+	}
+
+	void UniformBuffer::Bind(uint32_t binding) {
 		glBindBufferBase(GL_UNIFORM_BUFFER, binding, m_ID);
 	}
 	UniformBuffer::~UniformBuffer() {

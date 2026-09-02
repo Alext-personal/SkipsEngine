@@ -30,12 +30,16 @@ namespace YAML {
 	};
 }
 namespace Gaze {
-	Material::Material() {
+	Material::Material() :m_ubo(sizeof(MaterialBufferData),1) {
 		LoadDefaults();
+		MaterialBufferData data = { tint };
+		m_ubo.SetData(&data, sizeof(MaterialBufferData), 0);
 	}
-	Material::Material(const std::filesystem::path& filepath) {
+	Material::Material(const std::filesystem::path& filepath) :m_ubo(sizeof(MaterialBufferData), 1) {
 		if (!LoadFromFile(filepath))
 			LoadDefaults();
+		MaterialBufferData data = { tint };
+		m_ubo.SetData(&data, sizeof(MaterialBufferData), 0);
 	}
 
 	void Material::LoadDefaults()
@@ -81,7 +85,8 @@ namespace Gaze {
 		file.close();
 	}
 	void Material::Bind() {
-		shader.asset->Bind(); // bind material scalars ubo (tint ...);
+		shader.asset->Bind();
+		m_ubo.Bind(1);
 		albedoTexture.asset->Bind(TextureSlots::Albedo);
 	}
 }
