@@ -32,7 +32,8 @@ namespace Gaze {
 		LOG_WARNING("entity 1 's parent is ${}", ent.GetParent().GetUUID());
 		Entity ent2(m_activeScene);
 		ent2.AddComponent<MeshRenderer>();
-		ent2.GetComponent<Transform>().translation.x = 2;
+		Transform& trs = ent2.GetComponent<Transform>();
+		trs.SetPosition({ 2,0,0 });
 		LOG_WARNING("entity 2 's parent is ${}", ent2.GetParent().GetUUID());
 		ent2.SetParent(ent);
 		LOG_WARNING("entity 2 's parent is set to  ${}", ent2.GetParent().GetUUID());
@@ -71,9 +72,10 @@ namespace Gaze {
 			if (Input::IsKeyTapped(KeyCode::Tab))
 				Application::Get()->GetWindow().SwitchCursorMode();
 			tr = m_imguiLayer->testTransform;
+			trs.Translate(glm::vec3{ 0.1f,0.0f,0.0f }*timeStep);
 			if(Application::Get()->GetWindow().IsCursorDisabled())
 				EditorCamera::OnUpdate(timeStep); // temp to be moved to editor app
-			m_activeScene.OnRender(); //m_activescene to be moved to EDITOR APP
+			m_activeScene.OnUpdate(timeStep); //m_activescene to be moved to EDITOR APP
 			#pragma endregion
 			for (Layer* layer : m_layerStack) {
 				layer->OnUpdate(timeStep);

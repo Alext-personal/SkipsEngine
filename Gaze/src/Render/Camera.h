@@ -9,8 +9,8 @@ namespace Gaze {
 		Camera() { RecalculateProjectionMatrix(); }
 		const glm::mat4& GetProjectionMatrix() const { return m_projectionMatrix; }
 		glm::mat4 GetViewMatrix(const Transform& transform) const {
-			return glm::lookAt(transform.translation,
-				transform.translation + transform.GetForward(),
+			return glm::lookAt(transform.GetPosition(),
+				transform.GetPosition() + transform.GetForward(),
 				transform.GetUp());
 		}
 		void SetViewportSize(uint32_t width, uint32_t height) { m_aspectRatio = (float)width / (float)height; RecalculateProjectionMatrix(); }

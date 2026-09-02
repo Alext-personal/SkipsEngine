@@ -6,7 +6,9 @@ namespace Gaze {
 	ImguiLayer::~ImguiLayer() = default;
 	void ImguiLayer::OnUpdate(float dt)
 	{
-		testTransform.SetRotation({ rot[0],rot[1],rot[2] });
+		testTransform.SetPosition({ pos[0],pos[1],pos[2] });
+		testTransform.SetScale({ scl[0],scl[1],scl[2] });
+		testTransform.SetRotation({ rot[0],rot[1],rot[2] }); // testing
 	}
 	void ImguiLayer::OnEvent(Event& e)
 	{
@@ -37,9 +39,9 @@ namespace Gaze {
 	void ImguiLayer::OnImguiRender() {
 		ImGui::Begin("Cube Transform");
 		ImGui::Text("Default Cube Transform");
-		ImGui::DragFloat3("Position", &testTransform.translation.x ,0.005f, -FLT_MAX, +FLT_MAX, "%.3f", ImGuiSliderFlags_ColorMarkers);
+		ImGui::DragFloat3("Position", pos ,0.005f, -FLT_MAX, +FLT_MAX, "%.3f", ImGuiSliderFlags_ColorMarkers);
 		ImGui::DragFloat3("Rotation", rot,0.005f, -FLT_MAX, +FLT_MAX, "%.3f", ImGuiSliderFlags_ColorMarkers);
-		ImGui::DragFloat3("Scale", &testTransform.scale.x ,0.005f, -FLT_MAX, +FLT_MAX, "%.3f", ImGuiSliderFlags_ColorMarkers);
+		ImGui::DragFloat3("Scale", scl ,0.005f, -FLT_MAX, +FLT_MAX, "%.3f", ImGuiSliderFlags_ColorMarkers);
 		ImGui::End();
 	}
 

@@ -41,7 +41,38 @@ namespace Gaze {
 			return Entity(*m_scene,GetComponent<HierarchyMember>().parent);
 		}
 		void SetParent(Entity parent) {
-			GetComponent<HierarchyMember>().parent = parent.m_entityID;
+			if (parent.m_entityID == m_entityID)
+				return;
+			HierarchyMember& hierarchy = GetComponent<HierarchyMember>();
+			Transform& transform = GetComponent<Transform>();
+			if (transform.isDirty)
+				m_scene->GetTransformSystem()->ResolveEntity(m_entityID);
+			glm::mat4 currentWorldTransform = transform.GetMatrix();
+			if (hierarchy.parent != 0) {
+				Entity oldParent = GetParent();
+				oldParent.RemoveChild(*this);
+			}
+			if (parent.m_entityID != 0) {
+				parent.AddChild(*this);
+				Transform& parentTransform = parent.GetComponent<Transform>();
+				if(parentTransform.isDirty)
+					m_scene->GetTransformSystem()->ResolveEntity(parent.m_entityID);
+				glm::mat4 newParentWorld = parentTransform.GetMatrix();
+				glm::mat4 newLocal = glm::inverse(newParentWorld) * currentWorldTransform;
+				transform.SetFromMatrix(newLocal);
+			}
+			else
+				transform.SetFromMatrix(currentWorldTransform);
+			hierarchy.parent = parent.m_entityID;
+		}
+		void AddChild(Entity child) {
+			GetComponent<HierarchyMember>().children.push_back(child.m_entityID);
+		}
+		void RemoveChild(Entity child) {
+			HierarchyMember& hierarchy = GetComponent<HierarchyMember>();
+			auto it = std::find(hierarchy.children.begin(), hierarchy.children.end(), child.m_entityID);
+			if (it != hierarchy.children.end())
+				hierarchy.children.erase(it);
 		}
 		//GetChildren to add
 		template <typename T>

@@ -5,6 +5,7 @@
 #include <glm/vec3.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/quaternion.hpp>
+#include <glm/gtx/matrix_decompose.hpp>
 namespace Gaze {
 	enum class ComponentType {
 		Transform,MeshRenderer,HierarchyMember
@@ -19,24 +20,66 @@ namespace Gaze {
 				return "HierarchyMember";
 		}
 	}
-	struct Transform {
-		glm::vec3 translation{ 0.0f };
-		glm::quat rotation{ glm::vec3(0.0f)};
-		glm::vec3 scale{ 1.0f };
+	class Transform {
+	public:
+		bool isDirty{ true };
+	public:
+		Transform(const glm::vec3 pos, const glm::vec3 rot, const glm::vec3 scl) :translation(pos), rotation(glm::quat(rot)), scale(scl) { worldMatrix = glm::mat4(1.0f); }
+		Transform() {
+			translation = glm::vec3(0.0f);
+			rotation = glm::quat(glm::vec3(0.0f));
+			scale = glm::vec3(1.0f);
+			worldMatrix = glm::mat4(1.0f);
+		}
 
 		void Rotate(glm::vec3 eulerAngles) {
 			glm::quat rotationquat(glm::radians(eulerAngles));
 			rotation *= rotationquat;
+			isDirty = true;
 		}
 		void SetRotation(glm::vec3 eulerAngles) {
 			rotation = glm::quat(glm::radians(eulerAngles));
+			isDirty = true;
 		}
+		glm::vec3 GetRotationEuler() const { return glm::degrees(glm::eulerAngles(rotation)); }
+
 		void Rotate(glm::quat quat) {
 			rotation *= quat;
+			isDirty = true;
 		}
 		void SetRotation(glm::quat quat) {
 			rotation = quat;
+			isDirty = true;
 		}
+		glm::quat GetRotationQuat() const { return rotation; }
+
+		void SetScale(glm::vec3 newscale) {
+			scale = newscale;
+			isDirty = true;
+		}
+		void Scale(glm::vec3 newscale) {
+			scale += newscale;
+			isDirty = true;
+		}
+		glm::vec3 GetScale() const { return scale; }
+
+		void SetPosition(glm::vec3 pos) {
+			translation = pos;
+			isDirty = true;
+		}
+		void Translate(glm::vec3 pos) {
+			translation += pos;
+			isDirty = true;
+		}
+		glm::vec3 GetPosition() const { return translation; }
+
+		void SetFromMatrix(glm::mat4 matrix) {
+			glm::vec3 skew;
+			glm::vec4 perspective;
+			glm::decompose(matrix, scale, rotation, translation, skew, perspective);
+			isDirty = true;
+		}
+
 		glm::vec3 GetForward() const {
 			return rotation * glm::vec3(0.0f, 0.0f, -1.0f);
 		}
@@ -47,15 +90,24 @@ namespace Gaze {
 			return rotation * glm::vec3(1.0f, 0.0f, 0.0f);
 		}
 		glm::mat4 GetMatrix() const {
+			return worldMatrix;
+		}
+		void ComputeMatrix(const glm::mat4& parentWorldMatrix = glm::mat4(1.0f)) {
 			glm::mat4 model(1.0f);
 			model = glm::translate(model, translation);
 
 			model *= glm::mat4_cast(rotation);
 
 			model = glm::scale(model, scale);
-
-			return model;
+			
+			worldMatrix = parentWorldMatrix * model;
 		}
+	private:
+		glm::vec3 translation; // local
+		glm::quat rotation; // local 
+		glm::vec3 scale; // local
+
+		glm::mat4 worldMatrix;
 	};
 	struct MeshRenderer {
 		AssetHandle<Mesh> mesh;

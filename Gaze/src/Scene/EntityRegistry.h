@@ -38,12 +38,6 @@ namespace Gaze {
 	class EntityRegistry {
 	public:
 		EntityRegistry() = default;
-		~EntityRegistry() {
-			for (auto it = m_entities.begin(); it != m_entities.end();)
-			{
-				it = DeleteEntity(*it);
-			}
-		}
 		uint32_t CreateEntity(const UUID& persistentID = ReservedUUID::NONE) {
 			uint32_t eID;
 			if (m_deletedEntities.empty()) {
@@ -82,6 +76,12 @@ namespace Gaze {
 			auto it = std::find(m_entities.begin(), m_entities.end(), entity);
 			return m_entities.erase(it);
 		}
+		~EntityRegistry() {
+			for (auto it = m_entities.begin(); it != m_entities.end();)
+			{
+				it = DeleteEntity(*it);
+			}
+		}
 		UUID& GetUUID(uint32_t entity) {
 			return m_entitiesPersistent[entity];
 		}
@@ -111,23 +111,23 @@ namespace Gaze {
 			return storage.components[index];
 		}
 		template <typename T, typename Q>
-		std::vector<std::pair<T&, Q&>> Get() {
+		std::vector<std::pair<T*, Q*>> Get() {
 			auto& TStorage = GetComponentStorage<T>();
 			auto& QStorage = GetComponentStorage<Q>();
 			uint32_t TSize = TStorage.components.size();
 			uint32_t QSize = QStorage.components.size();
-			std::vector<std::pair<T&, Q&>> returnedComponents{};
+			std::vector<std::pair<T*, Q*>> returnedComponents{};
 			if (TSize <= QSize) // search the smallest container, and pick the ones that also have T
 				for (uint32_t index = 0; index < TSize; ++index) {
 					uint32_t entity = TStorage.denseEntities[index];
 					if (QStorage.sparse[entity] != NO_COMPONENT)
-						returnedComponents.emplace_back(TStorage.components[index], QStorage.components[QStorage.sparse[entity]]);
+						returnedComponents.emplace_back(&TStorage.components[index], &QStorage.components[QStorage.sparse[entity]]);
 				}
 			else
 				for (uint32_t index = 0; index < QSize; ++index) {
 					uint32_t entity = QStorage.denseEntities[index];
 					if (TStorage.sparse[entity] != NO_COMPONENT)
-						returnedComponents.emplace_back(TStorage.components[TStorage.sparse[entity]], QStorage.components[index]);
+						returnedComponents.emplace_back(&TStorage.components[TStorage.sparse[entity]], &QStorage.components[index]);
 				}
 			return returnedComponents;
 		}

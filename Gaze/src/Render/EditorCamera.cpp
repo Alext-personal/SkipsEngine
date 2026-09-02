@@ -3,13 +3,13 @@
 namespace Gaze {
 	void EditorCamera::OnUpdate(float dt) {
 		if (Input::IsKeyPressed(KeyCode::W))
-			m_cameraTransform.translation += m_cameraMoveSpeed * m_cameraTransform.GetForward() * dt;
+			m_cameraTransform.Translate(m_cameraMoveSpeed * m_cameraTransform.GetForward() * dt);
 		if (Input::IsKeyPressed(KeyCode::S))
-			m_cameraTransform.translation += m_cameraMoveSpeed * (-1) * m_cameraTransform.GetForward() * dt;
+			m_cameraTransform.Translate(m_cameraMoveSpeed * (-1) * m_cameraTransform.GetForward() * dt);
 		if (Input::IsKeyPressed(KeyCode::D))
-			m_cameraTransform.translation += m_cameraMoveSpeed * m_cameraTransform.GetRight() * dt;
+			m_cameraTransform.Translate(m_cameraMoveSpeed * m_cameraTransform.GetRight() * dt);
 		if (Input::IsKeyPressed(KeyCode::A))
-			m_cameraTransform.translation += m_cameraMoveSpeed * (-1) * m_cameraTransform.GetRight() * dt;
+			m_cameraTransform.Translate(m_cameraMoveSpeed * (-1) * m_cameraTransform.GetRight() * dt);
 		if (Input::MouseMoved())
 		{
 			float xRotation = Input::GetMouseXDelta();
