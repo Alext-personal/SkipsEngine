@@ -9,7 +9,7 @@ namespace Gaze {
 		void OnUpdate(float dt);
 		void OnRender();
 		EntityRegistry& GetRegistry() { return m_entities; }
-		EntitySystem* GetTransformSystem() { return m_systems[0].get(); }
+		TransformSystem* GetTransformSystem() { return static_cast<TransformSystem*>(m_systems[0].get()); }
 	private:
 		EntityRegistry m_entities{};
 		std::unique_ptr<Camera> m_activeCamera;

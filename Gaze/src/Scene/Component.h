@@ -20,9 +20,8 @@ namespace Gaze {
 				return "HierarchyMember";
 		}
 	}
+	//modify only through Entity (Entity.SetTransform .. etc ) , modyfying directly doesn't update children transforms : Entity.GetComponent<Transform>() this doesn't mark dirty
 	class Transform {
-	public:
-		bool isDirty{ true };
 	public:
 		Transform(const glm::vec3 pos, const glm::vec3 rot, const glm::vec3 scl) :translation(pos), rotation(glm::quat(rot)), scale(scl) { worldMatrix = glm::mat4(1.0f); }
 		Transform() {
@@ -35,41 +34,33 @@ namespace Gaze {
 		void Rotate(glm::vec3 eulerAngles) {
 			glm::quat rotationquat(glm::radians(eulerAngles));
 			rotation *= rotationquat;
-			isDirty = true;
 		}
 		void SetRotation(glm::vec3 eulerAngles) {
 			rotation = glm::quat(glm::radians(eulerAngles));
-			isDirty = true;
 		}
 		glm::vec3 GetRotationEuler() const { return glm::degrees(glm::eulerAngles(rotation)); }
 
 		void Rotate(glm::quat quat) {
 			rotation *= quat;
-			isDirty = true;
 		}
 		void SetRotation(glm::quat quat) {
 			rotation = quat;
-			isDirty = true;
 		}
 		glm::quat GetRotationQuat() const { return rotation; }
 
 		void SetScale(glm::vec3 newscale) {
 			scale = newscale;
-			isDirty = true;
 		}
 		void Scale(glm::vec3 newscale) {
 			scale += newscale;
-			isDirty = true;
 		}
 		glm::vec3 GetScale() const { return scale; }
 
 		void SetPosition(glm::vec3 pos) {
 			translation = pos;
-			isDirty = true;
 		}
 		void Translate(glm::vec3 pos) {
 			translation += pos;
-			isDirty = true;
 		}
 		glm::vec3 GetPosition() const { return translation; }
 
@@ -77,7 +68,6 @@ namespace Gaze {
 			glm::vec3 skew;
 			glm::vec4 perspective;
 			glm::decompose(matrix, scale, rotation, translation, skew, perspective);
-			isDirty = true;
 		}
 
 		glm::vec3 GetForward() const {

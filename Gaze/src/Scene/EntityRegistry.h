@@ -106,7 +106,7 @@ namespace Gaze {
 			if (!HasComponent<T>(entity))
 				CLIENT_ASSERT(0, "NO COMPONENT FOUND IN ENTITY ${}", entity);
 			auto& storage = GetComponentStorage<T>();
-			LOG_INFO("Fetched ${} component from Entity with UUID : ${} ", ComponentTypeToString(storage.type), GetUUID(entity));
+			//LOG_INFO("Fetched ${} component from Entity with UUID : ${} ", ComponentTypeToString(storage.type), GetUUID(entity));
 			const uint32_t index = storage.sparse[entity];
 			return storage.components[index];
 		}

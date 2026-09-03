@@ -32,8 +32,7 @@ namespace Gaze {
 		LOG_WARNING("entity 1 's parent is ${}", ent.GetParent().GetUUID());
 		Entity ent2(m_activeScene);
 		ent2.AddComponent<MeshRenderer>();
-		Transform& trs = ent2.GetComponent<Transform>();
-		trs.SetPosition({ 2,0,0 });
+		ent2.SetPosition({ 2,0,0 });
 		LOG_WARNING("entity 2 's parent is ${}", ent2.GetParent().GetUUID());
 		ent2.SetParent(ent);
 		LOG_WARNING("entity 2 's parent is set to  ${}", ent2.GetParent().GetUUID());
@@ -42,27 +41,25 @@ namespace Gaze {
 		LOG_INFO("Mesh loading took: ${} ", t1 - start);
 		bool wireframe = true; //testing
 		float lastTime = 0.0f;
-		float frameTime = 0;
-		int fps = 0;
-		int fpscount = 0;
-		Transform& tr = ent.GetComponent<Transform>();
+		double accumulated = 0.0f;
+		int frames = 0;
 		while (m_running) {
 			m_window->PollEvents();
 			Renderer::BeginFrame();
 			float currentTime = glfwGetTime();
 			float timeStep = currentTime - lastTime;
-			if (frameTime >= 1)
-			{
-				fps = fpscount / frameTime;
-				frameTime = 0;
-				fpscount = 0;
-			}
-			else
-			{
-				frameTime += timeStep;
-				fpscount++;
-			}
 			lastTime = currentTime;
+			accumulated += timeStep;
+			frames++;
+			if (frames == 5000)
+			{
+				double average = accumulated / frames;
+
+				LOG_INFO("Average Frame Time : ${} ms", average * 1000);
+
+				accumulated = 0.0f;
+				frames = 0;
+			}
 			#pragma region EDITOR
 			if (Input::IsKeyTapped(KeyCode::Escape)) { // to be moved to editor 
 				Renderer::SetWireFrameMode(wireframe);
@@ -71,8 +68,8 @@ namespace Gaze {
 			}
 			if (Input::IsKeyTapped(KeyCode::Tab))
 				Application::Get()->GetWindow().SwitchCursorMode();
-			tr = m_imguiLayer->testTransform;
-			trs.Translate(glm::vec3{ 0.1f,0.0f,0.0f }*timeStep);
+			ent.SetTransform(m_imguiLayer->testTransform);
+			//ent2.Translate(glm::vec3{ 0.1f,0.0f,0.0f }*timeStep);
 			if(Application::Get()->GetWindow().IsCursorDisabled())
 				EditorCamera::OnUpdate(timeStep); // temp to be moved to editor app
 			m_activeScene.OnUpdate(timeStep); //m_activescene to be moved to EDITOR APP
