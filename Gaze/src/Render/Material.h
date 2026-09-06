@@ -1,7 +1,7 @@
 #pragma once
 #include "Render/Shader.h"
 #include "Render/Texture.h"
-#include "Assets/Asset.h"
+#include "Resources/Asset.h"
 #include "Render/Buffer.h"
 namespace Gaze {
 	struct MaterialBufferData {

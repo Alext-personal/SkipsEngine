@@ -17,4 +17,9 @@ namespace Gaze {
 		else
 			m_id = id;
 	}
+	std::string UUID::ToString() const  {
+		std::stringstream ss;
+		ss << m_id;
+		return ss.str();
+	}
 }

@@ -1,6 +1,6 @@
 #pragma once
 #include "Render/Mesh.h"
-#include "Assets/AssetManager.h"
+#include "Resources/AssetManager.h"
 #include <glm/glm.hpp>
 #include <glm/vec3.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -52,7 +52,7 @@ namespace Gaze {
 			scale = newscale;
 		}
 		void Scale(glm::vec3 newscale) {
-			scale += newscale;
+			scale *= newscale;
 		}
 		glm::vec3 GetScale() const { return scale; }
 

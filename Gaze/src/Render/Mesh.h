@@ -6,7 +6,9 @@ namespace Gaze {
 	struct SubMesh {
 		uint32_t indexCount;
 		uint32_t indexOffset;
-		SubMesh(uint32_t count, uint32_t offset) :indexCount(count), indexOffset(offset) {}
+		uint32_t materialIndex;
+		SubMesh(uint32_t count, uint32_t offset,uint32_t materialindex = 0) :indexCount(count), indexOffset(offset),materialIndex(materialindex) {}
+		SubMesh() = default;
 	};
 	struct MeshData { // for loading meshes
 		struct VertexBufferData {

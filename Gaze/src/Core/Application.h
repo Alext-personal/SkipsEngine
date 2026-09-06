@@ -14,8 +14,8 @@ namespace Gaze {
 		Application();
 		~Application() = default;
 
-		static Application* Get() { return s_instance; }
-		Window& GetWindow() const { return *m_window; }
+		static Application& Get() { ENGINE_ASSERT(!s_instance, "NO APPLICATION INSTANCE"); return *s_instance; }
+		Window& GetWindow() const { ENGINE_ASSERT(!m_window.get(), "NO WINDOW "); return *m_window; }
 		void PushLayer(Layer* layer);
 		void PushOverlay(Layer* layer);
 

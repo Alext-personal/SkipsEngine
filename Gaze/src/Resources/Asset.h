@@ -4,7 +4,12 @@
 #include <string>
 namespace Gaze {
 	enum class AssetType {
-		None,Mesh, Material, Shader,Texture
+		None,
+		Mesh,
+		Material,
+		Shader,
+		Texture,
+		Prefab
 	};
 	inline std::string AssetTypeToString(const AssetType& type) {
 		switch (type) {
@@ -16,6 +21,8 @@ namespace Gaze {
 			return "Shader";
 		case AssetType::Texture:
 			return "Texture";
+		case AssetType::Prefab:
+			return "Prefab";
 		}
 	}
 	inline AssetType StringToAssetType(const std::string& str) {
@@ -27,6 +34,8 @@ namespace Gaze {
 			return AssetType::Shader;
 		if (str == "Texture")
 			return AssetType::Texture;
+		if (str == "Prefab")
+			return AssetType::Prefab;
 		ENGINE_ASSERT("INVALID STRING ASSETTYPE");
 	}
 	template <typename T>

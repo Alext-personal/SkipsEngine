@@ -3,14 +3,14 @@
 #include "Render/Renderer.h"
 #include "Render/EditorCamera.h" //temp
 #include "Scene/Entity.h" // temp
-#include "Assets/AssetManager.h" // maybe temp
+#include "Resources/AssetManager.h" // maybe temp
 namespace Gaze {
 	Application::Application() : m_window(std::make_unique<Window>(1920, 1080, "Skips-Engine")), m_activeScene{}
 	{
-		if (s_instance == nullptr)
-			s_instance = this;
-		else
-			ENGINE_ASSERT("Duplicate Application Instance");
+			if (s_instance == nullptr)
+				s_instance = this;
+			else
+				ENGINE_ASSERT("Duplicate Application Instance");
 		m_window->SetCallbackFunction(TO_EVENT_FN(OnEvent));
 		m_window->SetVSync(false);
 		Renderer::Init();
@@ -67,10 +67,10 @@ namespace Gaze {
 				LOG_WARNING("wireframe set: ${} ", wireframe);
 			}
 			if (Input::IsKeyTapped(KeyCode::Tab))
-				Application::Get()->GetWindow().SwitchCursorMode();
+				Application::Get().GetWindow().SwitchCursorMode();
 			ent.SetTransform(m_imguiLayer->testTransform);
-			//ent2.Translate(glm::vec3{ 0.1f,0.0f,0.0f }*timeStep);
-			if(Application::Get()->GetWindow().IsCursorDisabled())
+			ent2.Translate(glm::vec3{ 0.1f,0.0f,0.0f }*timeStep);
+			if(Application::Get().GetWindow().IsCursorDisabled())
 				EditorCamera::OnUpdate(timeStep); // temp to be moved to editor app
 			m_activeScene.OnUpdate(timeStep); //m_activescene to be moved to EDITOR APP
 			#pragma endregion

@@ -31,6 +31,12 @@
 #include <imgui_impl_opengl3.h>
 #include <imgui_impl_glfw.h>
 
+#include <assimp/Importer.hpp>   
+#include <assimp/scene.h>           
+#include <assimp/postprocess.h> 
+
+#include <yaml-cpp/yaml.h>
+
 #include "Core/Helpers.h"
 #include "Core/Log.h"
 #include "Core/UUID.h"

@@ -11,15 +11,6 @@ add_executable(engine)
 
 target_precompile_headers(engine PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/Gaze/src/pch.h")
 
-add_custom_command(TARGET engine POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_directory
-            ${CMAKE_SOURCE_DIR}/Gaze/engineAssets
-            $<TARGET_FILE_DIR:engine>/engineAssets)
-add_custom_command(TARGET engine POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_directory
-            ${CMAKE_SOURCE_DIR}/Assets
-            $<TARGET_FILE_DIR:engine>/Assets)
-
 #dependencies
 find_package(glfw3 CONFIG REQUIRED)
 find_package(glad CONFIG REQUIRED)

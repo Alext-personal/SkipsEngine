@@ -10,6 +10,7 @@ namespace Gaze {
 		bool operator==(const UUID& id) { return m_id == (uint64_t)id.m_id; }
 		UUID& operator=(const UUID& id) { m_id = id; return *this; }
 		bool GetFlag() const { return m_id & (1ULL << 63); }
+		std::string ToString() const;
 	private:
 		uint64_t m_id;
 	};
