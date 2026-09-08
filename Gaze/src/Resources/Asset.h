@@ -9,7 +9,8 @@ namespace Gaze {
 		Material,
 		Shader,
 		Texture,
-		Prefab
+		Prefab,
+		Source // used for asset importing 
 	};
 	inline std::string AssetTypeToString(const AssetType& type) {
 		switch (type) {
@@ -23,6 +24,8 @@ namespace Gaze {
 			return "Texture";
 		case AssetType::Prefab:
 			return "Prefab";
+		case AssetType::Source:
+			return "Source";
 		}
 	}
 	inline AssetType StringToAssetType(const std::string& str) {
@@ -36,6 +39,8 @@ namespace Gaze {
 			return AssetType::Texture;
 		if (str == "Prefab")
 			return AssetType::Prefab;
+		if (str == "Source")
+			return AssetType::Source;
 		ENGINE_ASSERT("INVALID STRING ASSETTYPE");
 	}
 	template <typename T>

@@ -1,6 +1,13 @@
 #pragma once
 #include <filesystem>
 namespace Gaze {
+	class YAML::Emitter;
+	class YAML::Node;
+	struct IImportSettings {
+		virtual ~IImportSettings();
+		virtual void Serialize(YAML::Emitter& out) const = 0;
+		virtual void DeSerialize(const YAML::Node& in) = 0;
+	};
 	class AssetImporter {
 	public:
 		std::filesystem::path ImportMesh(const std::filesystem::path& sourcePath);
