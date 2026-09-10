@@ -11,7 +11,6 @@
 #ifdef _WIN32
 #include <Windows.h>
 #endif
-
 namespace Gaze {
     inline std::string DumpFileToString(const std::filesystem::path& filepath) {
         std::stringstream ss;

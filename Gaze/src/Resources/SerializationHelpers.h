@@ -1,10 +1,11 @@
 #include "Render/Buffer.h"
 #include "Render/Texture.h"
+#include "Render/Shader.h"
 #include <memory>
 namespace Gaze {
 #pragma pack(push,1)
 	struct MeshFileHeader {
-		char validation[4];
+		char validation[5];
 		uint32_t format_version;
 		uint64_t UUID;
 		uint32_t buffers_count;
@@ -28,7 +29,7 @@ namespace Gaze {
 		uint32_t offset;
 	};
 	struct TextureFileHeader {
-		char validation[7];
+		char validation[8];
 		PixelDataFormat format;
 		uint32_t width, height;
 		uint8_t mipCount;
@@ -36,6 +37,14 @@ namespace Gaze {
 	};
 	struct MipDataPacked {
 		uint32_t width, height, offset, byteSize;
+	};
+	struct ShaderFileHeader {
+		char validation[7];
+		uint32_t shaderCount;
+	};
+	struct ShaderDataPacked {
+		ShaderType type;
+		uint32_t size;
 	};
 #pragma pack(pop)
 }

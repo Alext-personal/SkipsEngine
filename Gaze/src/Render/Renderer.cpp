@@ -2,10 +2,12 @@
 #include "Render/Renderer.h"
 #include "Render/EditorCamera.h"
 #include "Render/VertexArray.h"
+#include "Render/Material.h"
+#include "Resources/ResourceManager.h"
 namespace Gaze {
 	void Renderer::Init() {
 		if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
-			ENGINE_ASSERT(0, "Error at glad initialisation");
+			ENGINE_ASSERT(1, "Error at glad initialisation");
 		s_uniformBuffer = std::make_unique<UniformBuffer>(sizeof(CameraUniformPass), 0);
 	}
 	void Renderer::BeginFrame() {
@@ -16,7 +18,9 @@ namespace Gaze {
 	void Renderer::Draw(const Transform& transform, const Mesh& mesh, Material& material) {
 		mesh.GetVAO().Bind();
 		material.Bind();
-		material.shader.asset->SetUniformMatrix4("modelMatrix", transform.GetMatrix());
+		std::shared_ptr<Shader> shader = ResourceManager::Get().GetResource<Shader>(material.shader);
+		shader->SetUniformMatrix4("modelMatrix", transform.GetMatrix());
+		shader->Bind();
 		if (!mesh.HasEBO()) {
 			glDrawArrays(GL_TRIANGLES, 0, mesh.GetVertexCount());
 		}

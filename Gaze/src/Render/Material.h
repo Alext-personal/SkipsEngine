@@ -7,16 +7,23 @@ namespace Gaze {
 	struct MaterialBufferData {
 		glm::vec4 tint;
 	};
+	struct MaterialData {
+		UUID shader;
+		UUID albedoTexture;
+		glm::vec4 tint;
+		MaterialData():shader(ReservedUUID::DEFAULTSHADER),albedoTexture(ReservedUUID::NONE)
+		,tint(1,1,1,1){}
+	};
 	class Material {
 	public:
-		AssetHandle<Shader> shader;
-		AssetHandle<Texture> albedoTexture; // temp :singular for now, later material can have multiple textures : Map["string"] - > assethandle or whatever
+		UUID shader;
+		UUID albedoTexture; // temp :singular for now, later material can have multiple textures : Map["string"] - > assethandle or whatever
 		glm::vec4 tint;
-		Material();
-		Material(const std::filesystem::path& filepath);
-		void LoadDefaults();
-		bool LoadFromFile(const std::filesystem::path& filepath);
-		void SaveToFile(const std::filesystem::path& filepath);
+		Material(const MaterialData& data);
+	
+
+		static const MaterialData& GetFallbackMaterial();
+
 		void Bind();
 	private: // think about changing, idk how this should work yet, material - > ubo, or idk TODO later
 		UniformBuffer m_ubo;

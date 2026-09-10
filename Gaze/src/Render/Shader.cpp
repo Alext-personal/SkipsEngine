@@ -1,10 +1,12 @@
 #include "pch.h"
 #include "Render/Shader.h"
 namespace Gaze {
-	Shader::Shader(const std::filesystem::path& filepath) {
+	Shader::Shader(const std::vector<ShaderData>& shaders) {
 		m_shaderID = glCreateProgram();
-		std::vector<ShaderCode> shaders = SeparateShaders(filepath);
-		CreateCompileAndLinkShaders(shaders, filepath);
+		if (!shaders.empty())
+			CreateCompileAndLinkShaders(shaders);
+		else
+			CreateCompileAndLinkShaders(Shader::GetFallbackShader());
 		SetTextureSlots();
 	}
 	Shader::~Shader() {
@@ -24,50 +26,46 @@ namespace Gaze {
 		return true;
 	
 	}
+
+	const std::vector<ShaderData>& Shader::GetFallbackShader() {
+		static const std::vector<ShaderData> fallback = [] {
+			std::vector<ShaderData> data;
+			ShaderData vertex;
+			ShaderData fragment;
+			vertex.type = ShaderType::Vertex;
+			vertex.src = R"(#version 460 core
+			layout(location = 0) in vec3 position;
+			uniform mat4 modelMatrix;
+			layout(std140, binding = 0) uniform Matrices {
+				mat4 projection;
+				mat4 view;
+			};
+			void main() 
+			{ 
+				gl_Position = projection * view * modelMatrix * vec4(position,1.0f);
+			}
+			)";
+			fragment.type = ShaderType::Fragment;
+			fragment.src = R"(#version 460 core
+			out vec4 color;
+			void main()
+			{
+				color = vec4(1.0,0.0,1.0,1.0);
+			}
+			)";
+			data.push_back(vertex);
+			data.push_back(fragment);
+			return data;
+			}();
+		return fallback;
+	}
+
 	void Shader::Bind() const {
 		glUseProgram(m_shaderID);
 	}
-	std::vector<Shader::ShaderCode> Shader::SeparateShaders(const std::filesystem::path& filepath) {
-		std::vector<ShaderCode> returnedShaders{};
-		std::string shaderCode;
-		ShaderType currentType = ShaderType::None;
-		std::stringstream shadersSource(DumpFileToString(filepath));
-		std::string line;
-		while (std::getline(shadersSource, line)) {
-			std::stringstream identifierLine(line);
-			std::string identifier;
-			identifierLine >> identifier;
-			if (identifier == "#type")
-			{
-				std::string type;
-				identifierLine >> type;
-				if (!(type == "Vertex" || type == "Fragment")) {
-					LOG_ERROR("INVALID SHADER TYPE, CHECK SHADER SOURCE CODE");
-					std::vector<ShaderCode> noShaders;
-					return noShaders;
-				}
-				if (currentType != ShaderType::None) {
-					returnedShaders.push_back({ shaderCode,currentType });
-					currentType = ShaderType::None;
-					shaderCode.clear();
-				}
-				if (type == "Vertex")
-					currentType = ShaderType::Vertex;
-				if (type == "Fragment")
-					currentType = ShaderType::Fragment;
-			}
-			else {
-				shaderCode += line + "\n";
-			}
-		}
-		if (currentType != ShaderType::None) {
-			returnedShaders.push_back({ shaderCode,currentType });
-		}
-		return returnedShaders;
-	}
-	void Shader::CreateCompileAndLinkShaders(std::vector<ShaderCode>& shaders, const std::filesystem::path& filepath) {
+	void Shader::CreateCompileAndLinkShaders(const std::vector<ShaderData>& shaders) {
 		std::vector<uint32_t> shadersToDelete;
-		for (const ShaderCode& shader : shaders) {
+		for (const ShaderData& shader : shaders) {
 			GLenum glType;
 			std::string debugTypeName;
 			if (shader.type == ShaderType::Vertex) {
@@ -92,7 +90,7 @@ namespace Gaze {
 					glGetShaderiv(ID, GL_INFO_LOG_LENGTH, &logLength);
 					char log[1024];
 					glGetShaderInfoLog(ID, logLength, &logLength, log);
-					LOG_ERROR("${} Shader failed to compile \nFilepath: ${} \nLog: ${} ", debugTypeName, filepath, log);
+					LOG_ERROR("${} Shader failed to compile \nFilepath: ${} \nLog: ${} ", debugTypeName, log);
 				}
 			}
 			shadersToDelete.push_back(ID);

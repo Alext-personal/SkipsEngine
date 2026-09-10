@@ -1,7 +1,5 @@
 #include "pch.h"
 #include "Texture.h"
-#define STB_IMAGE_IMPLEMENTATION
-#include <stb_image.h>
 namespace Gaze {
 	inline GLenum PixelDataFormatToGlFormat(PixelDataFormat pixel)
 	{

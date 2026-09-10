@@ -11,6 +11,16 @@
 #include "Core/Helpers.h"
 #include "Resources/ResourceLoader.h"
 namespace Gaze {
+	ResourceManager::ResourceManager() {
+		ENGINE_ASSERT(s_instance != nullptr, "DUPLICATE RESOURCE MANAGER INSTANCE");
+		s_instance = this;
+		m_resources.resize(10); //10 types for now
+		m_resources[GetResourceTypeID<Mesh>()] = std::make_unique<ResourceStorage<Mesh>>(AssetType::Mesh);
+		m_resources[GetResourceTypeID<Shader>()] = std::make_unique<ResourceStorage<Shader>>(AssetType::Shader);
+		m_resources[GetResourceTypeID<Texture>()] = std::make_unique<ResourceStorage<Texture>>(AssetType::Texture);
+		m_resources[GetResourceTypeID<Material>()] = std::make_unique<ResourceStorage<Material>>(AssetType::Material);
+		m_resources[GetResourceTypeID<Prefab>()] = std::make_unique<ResourceStorage<Prefab>>(AssetType::Prefab);
+	}
 	template <>
 	std::shared_ptr<Mesh> ResourceManager::LoadResource(const UUID& id) {
 		MeshData defaultMesh = Primitives::LoadPrimitiveByType(PrimitiveType::Cube);
@@ -25,9 +35,9 @@ namespace Gaze {
 				loadedMesh = Primitives::LoadPrimitiveByType(PrimitiveType::Triangle);
 		}
 		else {
-			if (!HasData(id))
+			if (id == ReservedUUID::NONE || !HasData(id))
 			{
-				LOG_ERROR("${} Resource with UUID : ${} failed to load,  No Data  ", AssetTypeToString(m_resourcesImportData[id].type), id.ToString());
+				LOG_ERROR("Resource with UUID : ${} failed to load,  No Data  ", id);
 				return std::make_shared<Mesh>(defaultMesh);
 			}
 			loadedMesh = ResourceLoader::LoadMesh(m_resourcesImportData[id].filepath);
@@ -36,71 +46,42 @@ namespace Gaze {
 	}
 	template <>
 	std::shared_ptr<Texture> ResourceManager::LoadResource(const UUID& id) {
-		TextureData loadedTexture;
-		std::filesystem::path defaultTexturePath = GetCurrentPath() / "Library/Engine/Textures" / ReservedUUID::DEFAULTTEXTURE.ToString();
-		defaultTexturePath += ".tex";
-		if (id.GetFlag() == 0)
+		if (id == ReservedUUID::NONE || !HasData(id))
 		{
-			if (id == ReservedUUID::DEFAULTTEXTURE)
-				loadedTexture = ResourceLoader::LoadTexture(defaultTexturePath);
+			LOG_ERROR("Resource with UUID : ${} failed to load, No Data  ", id);
+			return std::make_shared<Texture>(Texture::GetFallbackTexture());
 		}
-		else {
-			if (!HasData(id))
-			{
-				LOG_ERROR("${} Resource with UUID : ${} failed to load, No Data  ", AssetTypeToString(m_resourcesImportData[id].type), id.ToString());
-				return std::make_shared<Texture>(ResourceLoader::LoadTexture(defaultTexturePath));
-			}
-			loadedTexture = ResourceLoader::LoadTexture(m_resourcesImportData[id].filepath);
-		}
+		TextureData loadedTexture = ResourceLoader::LoadTexture(m_resourcesImportData[id].filepath);
 		std::shared_ptr<Texture> loadedAsset = std::make_shared<Texture>(loadedTexture);
 		return loadedAsset;
 	}
 	template <>
 	std::shared_ptr<Shader> ResourceManager::LoadResource(const UUID& id) {
-		std::shared_ptr<Shader> loadedAsset;
-		std::filesystem::path defaultShaderPath = GetCurrentPath() / "Library/Engine/Shaders" / ReservedUUID::DEFAULTSHADER.ToString();
-		defaultShaderPath += ".shader";
-		if (id.GetFlag() == 0)
+		if (id == ReservedUUID::NONE || !HasData(id))
 		{
-			if (id == ReservedUUID::DEFAULTSHADER)
-				loadedAsset = std::make_shared<Shader>(defaultShaderPath);
+			LOG_ERROR("Resource with UUID : ${} failed to load,  No Data  ", id);
+			return std::make_shared<Shader>(Shader::GetFallbackShader());
 		}
-		else {
-			if (!HasData(id))
-			{
-				LOG_ERROR("${} Resource with UUID : ${} failed to load,  No Data  ", AssetTypeToString(m_resourcesImportData[id].type), id.ToString());
-				return std::make_shared<Shader>(defaultShaderPath);
-			}
-			loadedAsset = std::make_shared<Shader>(m_resourcesImportData[id].filepath);//ResourceLoader::LoadShader(m_resourcesImportData[id].filepath); // later ,shader needs rewriting
-		}
+		std::shared_ptr<Shader> loadedAsset;
+		loadedAsset = std::make_shared<Shader>(ResourceLoader::LoadShader(m_resourcesImportData[id].filepath));
 		return loadedAsset;
-	} //no ResourceLoader::LoadShader yet , to implement later (custom shading language -> binary dump of all shader parts with header files ( nrshaders : 2 , vertex char count , fragment char count, vertex src, fragment src)
+	}
 	template <>
 	std::shared_ptr<Material> ResourceManager::LoadResource(const UUID& id) {
-		std::shared_ptr<Material> loadedAsset;
-		std::filesystem::path defaultMaterialPath = GetCurrentPath() / "Library/Engine/Materials" / ReservedUUID::DEFAULTMATERIAL.ToString();
-		defaultMaterialPath += ".mat";
-		if (id.GetFlag() == 0)
+		if (id == ReservedUUID::NONE || !HasData(id))
 		{
-			if (id == ReservedUUID::DEFAULTMATERIAL) {
-				loadedAsset = std::make_shared<Material>(defaultMaterialPath);
-			}
+			LOG_ERROR("Resource with UUID : ${} failed to load,  No Data  ", id);
+			return std::make_shared<Material>(Material::GetFallbackMaterial());
 		}
-		else {
-			if (!HasData(id))
-			{
-				LOG_ERROR("${} Resource with UUID : ${} failed to load,  No Data  ", AssetTypeToString(m_resourcesImportData[id].type), id.ToString());
-				return std::make_shared<Material>(defaultMaterialPath);
-			}
-			loadedAsset = std::make_shared<Material>(m_resourcesImportData[id].filepath);
-		}
+		MaterialData loadedMaterial = ResourceLoader::LoadMaterial(m_resourcesImportData[id].filepath);
+		std::shared_ptr<Material> loadedAsset = std::make_shared<Material>(loadedMaterial);
 		return loadedAsset;
 	}
 	template <>
 	std::shared_ptr<Prefab> ResourceManager::LoadResource(const UUID& id) {
-		if (!HasData(id))
+		if (id == ReservedUUID::NONE || !HasData(id))
 		{
-			LOG_ERROR("${} Resource with UUID : ${} failed to load, No Data  ", AssetTypeToString(m_resourcesImportData[id].type), id.ToString());
+			LOG_ERROR("Resource with UUID : ${} failed to load, No Data  ", id);
 			return nullptr;
 		}
 		Prefab loadedPrefab = ResourceLoader::LoadPrefab(m_resourcesImportData[id].filepath);

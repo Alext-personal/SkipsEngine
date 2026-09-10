@@ -33,7 +33,7 @@ namespace Gaze {
 
 		case AttributeDataType::Bool: return "Bool";
 		}
-		ENGINE_ASSERT(0, "INVALID STRING ATTRIBUTE DATA TYPE");
+		ENGINE_ASSERT(1, "INVALID STRING ATTRIBUTE DATA TYPE");
 	}
 	static AttributeDataType StringToAttributeDataType(const std::string& str) {
 		if (str == "Float") return AttributeDataType::Float;
@@ -45,7 +45,7 @@ namespace Gaze {
 		if (str == "Int3") return AttributeDataType::Int3;
 		if (str == "Int4") return AttributeDataType::Int4;
 		if (str == "Bool") return AttributeDataType::Bool;
-		ENGINE_ASSERT(0, "INVALID STRING ATTRIBUTE DATA TYPE");
+		ENGINE_ASSERT(1, "INVALID STRING ATTRIBUTE DATA TYPE");
 	}
 	struct VertexBufferAttribute {
 		AttributeDataType type;

@@ -67,8 +67,12 @@ namespace Gaze {
 				currentTransform.ComputeMatrix(parentTransform.GetMatrix());
 			}
 			UnMarkDirty(entity);
-			for (uint32_t child : currentHierarchy.children)
+			uint32_t child = m_registry->GetComponent<HierarchyMember>(entity).firstChild;
+			while (child != 0)
+			{
 				ResolveTransforms(child);
+				child = m_registry->GetComponent<HierarchyMember>(child).nextSibling;
+			}
 		}
 		void ResolveDirty() {
 			for (uint32_t entity : m_dirtyEntities) {

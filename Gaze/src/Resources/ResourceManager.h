@@ -12,27 +12,45 @@ namespace Gaze {
 		AssetType type;
 		IResourceStorage(AssetType _type) : type(_type){}
 		virtual ~IResourceStorage() = default;
+		virtual void AddRef(const UUID& id) = 0;
+		virtual void RemoveRef(const UUID& id) = 0;
+	};
+	template <typename T>
+	struct ref_ptr {
+		std::shared_ptr<T> ptr = nullptr;
+		uint32_t refcount = 0;
 	};
 	template <typename T>
 	struct ResourceStorage : IResourceStorage  { //runtime
-		std::unordered_map<UUID, std::weak_ptr<T>> storage;
+		std::unordered_map<UUID, ref_ptr<T>> storage;
 		ResourceStorage(AssetType t) : IResourceStorage(t) {}
 
-		std::weak_ptr<T> Get(const UUID& id) const {
+		std::shared_ptr<T> Get(const UUID& id) const {
 			auto it = storage.find(id);
 			if (it != storage.end())
-				return it->second;
-			return std::weak_ptr<T>();
+				return it->second.ptr;
+			return nullptr;
 		}
-		void Add(const UUID& id, std::weak_ptr<T> ptr) {
-			if (!ptr.expired())
-				storage[id] = ptr;
+		void Add(const UUID& id, std::shared_ptr<T> ptr) {
+			storage[id].ptr = ptr;
+			storage[id].refcount = 1;
+		}
+		void AddRef(const UUID& id) override {
+			auto it = storage.find(id);
+			if (it != storage.end())
+				it->second.refcount++;
+		}
+		void RemoveRef(const UUID& id) override {
+			auto it = storage.find(id);
+			if (it != storage.end()) {
+				if (it->second.refcount == 0)
+					return;
+				if (--(it->second.refcount) == 0)
+					it->second.ptr = nullptr;
+				
+			}
 		}
 	};
-	template <typename T>
-	struct PersistentResourceStorage : IResourceStorage {
-
-	}; // todo implement (for prefabs for example , prefab = lightweight handle over scene hierarchy
 	inline uint8_t GetLastResourceTypeID() {
 		static uint8_t globalResourceTypeID = 0;
 		return globalResourceTypeID++;
@@ -45,35 +63,53 @@ namespace Gaze {
 	class ResourceManager {
 	public:
 		static ResourceManager& Get() {
-			ENGINE_ASSERT(!s_instance, "NO RESOURCE MANAGER INSTANCE");
+			ENGINE_ASSERT(s_instance == nullptr, "NO RESOURCE MANAGER INSTANCE");
 			return *s_instance;
 		}
-		ResourceManager() {
-			m_resources.resize(10); //10 types for now
-			m_resources[GetResourceTypeID<Mesh>()] = std::make_unique<ResourceStorage<Mesh>>(AssetType::Mesh);
-			m_resources[GetResourceTypeID<Shader>()] = std::make_unique<ResourceStorage<Shader>>(AssetType::Shader);
-			m_resources[GetResourceTypeID<Texture>()] = std::make_unique<ResourceStorage<Texture>>(AssetType::Texture);
-			m_resources[GetResourceTypeID<Material>()] = std::make_unique<ResourceStorage<Material>>(AssetType::Material);
-			m_resources[GetResourceTypeID<Prefab>()] = std::make_unique<ResourceStorage<Prefab>>(AssetType::Prefab);
-		}
+		ResourceManager();
 		template <typename T>
 		std::shared_ptr<T> GetResource(const UUID& id) {
 			auto& storage = GetStorage<T>();
 
-			std::weak_ptr<T> existingAsset = storage.Get(id);
-			std::shared_ptr<T> returnedAsset;
+			std::shared_ptr<T> returnedAsset = storage.Get(id);
 
-			if (returnedAsset = existingAsset.lock())
+			if (returnedAsset != nullptr)
 				return returnedAsset;
 			else
 			{
 				std::shared_ptr<T> loadedAsset = LoadResource<T>(id);
-				if(loadedAsset!= nullptr)
-					storage.Add(id, std::weak_ptr(loadedAsset));
+				storage.Add(id,loadedAsset);
 				return loadedAsset;
 			}
 		}
-		void SetResourceImportData(const UUID& id, const ResourceImportData& data) { m_resourcesImportData[id] = data; }
+		bool IsResourceDataLoaded(const UUID& id) {
+			auto it = m_resourcesImportData.find(id);
+			if (it != m_resourcesImportData.end())
+				return true;
+			return false;
+		}
+		void UnloadResourceData(const UUID& id) {
+			auto it = m_resourcesImportData.find(id);
+			if (it != m_resourcesImportData.end())
+				m_resourcesImportData.erase(it);
+		}
+		void LoadResourceData(const UUID& id, const ResourceImportData& data) {
+			m_resourcesImportData[id] = data;
+		}
+		void UnloadResourcesData() {
+			m_resourcesImportData.clear();
+		}
+		void UnloadResources(){
+			m_resources.clear();
+		}
+		void AddRef(const UUID& id) {
+			for (auto& storage : m_resources)
+				storage->AddRef(id);
+		}
+		void RemoveRef(const UUID& id) {
+			for (auto& storage : m_resources)
+				storage->RemoveRef(id);
+		}
 
 	private:
 		inline static ResourceManager* s_instance = nullptr;
@@ -87,8 +123,8 @@ namespace Gaze {
 			);
 		}
 		template <typename T>
-		PersistentResourceStorage<T>& GetPersistentStorage() {
-			return *static_cast<PersistentResourceStorage<T>*>(
+		ResourceStorage<T>& GetStorage(const UUID& id) {
+			return *static_cast<ResourceStorage<T>*>(
 				m_resources[GetResourceTypeID<T>()].get()
 				);
 		}
@@ -96,7 +132,7 @@ namespace Gaze {
 			auto it = m_resourcesImportData.find(id);
 			if (it == m_resourcesImportData.end())
 			{
-				LOG_ERROR("Resource with UUID : ${} failed to load, import data  not stored in memory", id.ToString());
+				LOG_ERROR("Resource with UUID : ${} failed to load, import data  not stored in memory", id);
 				return false;
 			}
 			return true;

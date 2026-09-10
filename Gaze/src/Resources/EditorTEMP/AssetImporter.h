@@ -1,19 +1,18 @@
 #pragma once
 #include <filesystem>
 namespace Gaze {
-	class YAML::Emitter;
-	class YAML::Node;
-	struct IImportSettings {
-		virtual ~IImportSettings();
-		virtual void Serialize(YAML::Emitter& out) const = 0;
-		virtual void DeSerialize(const YAML::Node& in) = 0;
-	};
+	struct AssetRegistry;
+	struct TextureImportSettings;
 	class AssetImporter {
 	public:
-		std::filesystem::path ImportMesh(const std::filesystem::path& sourcePath);
-		std::filesystem::path ImportTexture(const std::filesystem::path& sourcePath);
-		std::filesystem::path ImportShader(const std::filesystem::path& sourcePath);
-		std::filesystem::path ImportMaterial(const std::filesystem::path& sourcePath);
-		std::filesystem::path ImportPrefab(const std::filesystem::path& sourcePath);
+		AssetImporter(AssetRegistry& registry) : m_registry(registry) {}
+		std::filesystem::path ImportModel(const UUID& id);
+		std::filesystem::path ImportTexture(const UUID& id,TextureImportSettings* settings);
+		std::filesystem::path ImportShader(const UUID& id);
+		std::filesystem::path ImportMaterial(const UUID& id);
+		std::filesystem::path ImportPrefab(const UUID& id);
+		uint64_t GetImportHash() const;
+	private:
+		AssetRegistry& m_registry;
 	};
 }

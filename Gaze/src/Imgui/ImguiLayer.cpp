@@ -19,7 +19,7 @@ namespace Gaze {
 		ImGui::CreateContext();
 		ImGuiIO& io = ImGui::GetIO(); (void)io;
 		ImGui::StyleColorsDark();
-		ImGui_ImplGlfw_InitForOpenGL(Application::Get()->GetWindow().GetNativeWindow(), true);
+		ImGui_ImplGlfw_InitForOpenGL(Application::Get().GetWindow().GetNativeWindow(), true);
 		ImGui_ImplOpenGL3_Init("#version 460");
 	}
 	void ImguiLayer::OnDetach() {

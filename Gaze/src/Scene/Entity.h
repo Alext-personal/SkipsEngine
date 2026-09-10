@@ -45,100 +45,31 @@ namespace Gaze {
 		}
 
 		UUID& GetUUID() { return m_persistentID; }
-		Entity GetParent() {
-			if (GetComponent<HierarchyMember>().parent == 0)
-				return *this;
-			return Entity(*m_scene, GetComponent<HierarchyMember>().parent);
-		}
-		std::vector<Entity> GetChildren() {
-			std::vector<Entity> children;
-			HierarchyMember& hierarchy = GetComponent<HierarchyMember>();
-			for (uint32_t child : hierarchy.children)
-				children.emplace_back(*m_scene, child);
-			return children;
-		}
-		void SetParent(Entity parent) {
-			if (parent.m_entityID == m_entityID)
-				return;
-			HierarchyMember& hierarchy = GetComponent<HierarchyMember>();
-			Transform& transform = GetComponent<Transform>();
-			if (m_scene->GetTransformSystem()->IsDirty(m_entityID))
-				m_scene->GetTransformSystem()->ResolveEntity(m_entityID);
-			glm::mat4 currentWorldTransform = transform.GetMatrix();
-			if (hierarchy.parent != 0) {
-				Entity oldParent = GetParent();
-				oldParent.RemoveChild(*this);
-			}
-			if (parent.m_entityID != 0) {
-				parent.AddChild(*this);
-				Transform& parentTransform = parent.GetComponent<Transform>();
-				if (m_scene->GetTransformSystem()->IsDirty(parent.m_entityID))
-					m_scene->GetTransformSystem()->ResolveEntity(parent.m_entityID);
-				glm::mat4 newParentWorld = parentTransform.GetMatrix();
-				glm::mat4 newLocal = glm::inverse(newParentWorld) * currentWorldTransform;
-				transform.SetFromMatrix(newLocal);
-			}
-			else {
-				transform.SetFromMatrix(currentWorldTransform);
-			}
-			m_scene->GetTransformSystem()->MarkDirty(m_entityID);
-			hierarchy.parent = parent.m_entityID;
-		}
-		void AddChild(Entity child) {
-			GetComponent<HierarchyMember>().children.push_back(child.m_entityID);
-		}
-		void RemoveChild(Entity child) {
-			HierarchyMember& hierarchy = GetComponent<HierarchyMember>();
-			auto it = std::find(hierarchy.children.begin(), hierarchy.children.end(), child.m_entityID);
-			if (it != hierarchy.children.end())
-				hierarchy.children.erase(it);
-		}
+		Entity GetParent();
+		std::vector<Entity> GetChildren();
+		void SetParent(Entity& parent);
+		void AddChild(Entity& child);
+		void RemoveChild(Entity& child);
 
-		void Rotate(glm::vec3 eulerAngles) {
-			GetComponent<Transform>().Rotate(eulerAngles);
-			m_scene->GetTransformSystem()->MarkDirty(m_entityID);
-		}
-		void SetRotation(glm::vec3 eulerAngles) {
-			GetComponent<Transform>().SetRotation(eulerAngles);
-			m_scene->GetTransformSystem()->MarkDirty(m_entityID);
-		}
-		glm::vec3 GetRotationEuler() { GetComponent<Transform>().GetRotationEuler(); }
+		void Rotate(glm::vec3 eulerAngles);
+		void SetRotation(glm::vec3 eulerAngles);
+		glm::vec3 GetRotationEuler();
 
-		void Rotate(glm::quat quat) {
-			GetComponent<Transform>().Rotate(quat);
-			m_scene->GetTransformSystem()->MarkDirty(m_entityID);
-		}
-		void SetRotation(glm::quat quat) {
-			GetComponent<Transform>().SetRotation(quat);
-			m_scene->GetTransformSystem()->MarkDirty(m_entityID);
-		}
-		glm::quat GetRotationQuat(){ return GetComponent<Transform>().GetRotationQuat(); }
+		void Rotate(glm::quat quat);
+		void SetRotation(glm::quat quat);
+		glm::quat GetRotationQuat();
 
-		void SetScale(glm::vec3 newscale) {
-			GetComponent<Transform>().SetScale(newscale);
-			m_scene->GetTransformSystem()->MarkDirty(m_entityID);
-		}
-		void Scale(glm::vec3 newscale) {
-			GetComponent<Transform>().Scale(newscale);
-			m_scene->GetTransformSystem()->MarkDirty(m_entityID);
-		}
-		glm::vec3 GetScale() { return GetComponent<Transform>().GetScale(); }
+		void SetScale(glm::vec3 newscale);
+		void Scale(glm::vec3 newscale);
+		glm::vec3 GetScale();
 
-		void SetPosition(glm::vec3 pos) {
-			GetComponent<Transform>().SetPosition(pos);
-			m_scene->GetTransformSystem()->MarkDirty(m_entityID);
-		}
-		void Translate(glm::vec3 pos) {
-			GetComponent<Transform>().Translate(pos);
-			m_scene->GetTransformSystem()->MarkDirty(m_entityID);
-		}
-		glm::vec3 GetPosition() { return GetComponent<Transform>().GetPosition(); }
+		void SetPosition(glm::vec3 pos);
+		void Translate(glm::vec3 pos);
+		glm::vec3 GetPosition();
 
-		void SetTransform(const Transform& t) {
-			SetPosition(t.GetPosition());
-			SetRotation(t.GetRotationQuat());
-			SetScale(t.GetScale());
-		}
+		void SetTransform(const Transform& t);
+		void SetMesh(const UUID& meshID);
+		void SetMaterialSlot(uint32_t slot, const UUID& materialID);
 
 	private:
 		uint32_t m_entityID{};

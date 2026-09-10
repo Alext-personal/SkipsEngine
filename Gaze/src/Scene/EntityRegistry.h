@@ -76,12 +76,6 @@ namespace Gaze {
 			auto it = std::find(m_entities.begin(), m_entities.end(), entity);
 			return m_entities.erase(it);
 		}
-		~EntityRegistry() {
-			for (auto it = m_entities.begin(); it != m_entities.end();)
-			{
-				it = DeleteEntity(*it);
-			}
-		}
 		UUID& GetUUID(uint32_t entity) {
 			return m_entitiesPersistent[entity];
 		}
@@ -90,7 +84,7 @@ namespace Gaze {
 			if (HasComponent<T>(entity))
 				return GetComponent<T>(entity);
 			auto& storage = GetComponentStorage<T>();
-			LOG_INFO("Added ${} component to Entity with UUID : ${} ", ComponentTypeToString(storage.type), GetUUID(entity));
+			LOG_INFO("Added ${} component to Entity with UUID : ${} ", ComponentTypeToString(storage.type), GetUUID(entity).Get());
 			const uint32_t index = storage.components.size();
 			storage.components.emplace_back();
 			if (entity >= storage.sparse.size())

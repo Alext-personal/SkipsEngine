@@ -1,5 +1,7 @@
 #include "pch.h"
 #include "Resources/EditorTEMP/AssetManager.h"
+#include "Resources/EditorTEMP/AssetImporter.h"
+#include "Resources/EditorTEMP/AssetRegistry.h"
 namespace Gaze {
 	inline AssetType GetAssetTypeFromFileExtension(const std::string& extension) {
 		if (extension == ".png" || extension == ".jpg" || extension == ".jpeg" || extension == ".hdr")
@@ -8,9 +10,9 @@ namespace Gaze {
 			return  AssetType::Shader;
 		if (extension == ".fbx" || extension == ".obj" || extension == ".gltf" || extension == ".glb")
 			return  AssetType::Source;
-		if (extension == ".prefab")
+		if (extension == ".gprefab")
 			return AssetType::Prefab;
-		if (extension == ".mat")
+		if (extension == ".gmat")
 			return AssetType::Material;
 		return AssetType::None;
 	}
@@ -57,7 +59,7 @@ namespace Gaze {
 							}
 							break;
 					}
-					m_assetData[meta.id] = meta;
+					m_registry.storage[meta.id] = meta;
 					continue;
 				}
 			}
@@ -65,13 +67,21 @@ namespace Gaze {
 			meta.source = file.path();
 			meta.importSettings = nullptr;
 			meta.importHash = 0; //generate it
+
+			YAML::Node metafile;
+			metafile["Source"] = meta.source.string();
+			metafile["UUID"] = meta.id.Get();
+			metafile["ImportHash"] = meta.importHash;
 			switch (meta.assetType) {
 				case AssetType::Texture:
 					meta.importSettings = std::make_unique<TextureImportSettings>();
+					metafile["ImportSettings"] = meta.importSettings->Serialize();
 					break;
 			}
-
-			//create meta file
+			
 		}
+	}
+	void AssetManager::LoadAssets() {
+
 	}
 }

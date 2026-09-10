@@ -41,7 +41,7 @@ namespace Gaze {
 			return AssetType::Prefab;
 		if (str == "Source")
 			return AssetType::Source;
-		ENGINE_ASSERT("INVALID STRING ASSETTYPE");
+		ENGINE_ASSERT(1,"INVALID STRING ASSETTYPE");
 	}
 	template <typename T>
 	struct AssetHandle {

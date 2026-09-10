@@ -1,8 +1,4 @@
-#include "pch.h"
-#include "Resources/ModelLoader.h"
-#include "Render/Primitives/Primitives.h"
-#include "Resources/SerializationHelpers.h"
-namespace Gaze {
+/*namespace Gaze {
 	 MeshData ModelLoader::LoadModel(const std::filesystem::path& filepath) {
 		auto start = GetTime();
 		Assimp::Importer importer;
@@ -116,4 +112,4 @@ namespace Gaze {
 			 file.write(reinterpret_cast<const char*>(attributesPacked.data()), bufferHeader.attribute_count * sizeof(VertexBufferAttributeEntry));
 		 }
 	 } // editor
-}
+}*/

@@ -1,6 +1,7 @@
 #pragma once
 #include "Render/Shader.h"
 #include "Render/Mesh.h"
+#include "Render/Material.h"
 #include "Scene/Component.h"
 namespace Gaze {
 	struct CameraUniformPass {

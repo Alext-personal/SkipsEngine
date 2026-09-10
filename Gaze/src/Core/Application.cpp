@@ -3,18 +3,16 @@
 #include "Render/Renderer.h"
 #include "Render/EditorCamera.h" //temp
 #include "Scene/Entity.h" // temp
-#include "Resources/AssetManager.h" // maybe temp
+#include "Resources/EditorTEMP/AssetManager.h"
 namespace Gaze {
 	Application::Application() : m_window(std::make_unique<Window>(1920, 1080, "Skips-Engine")), m_activeScene{}
 	{
-			if (s_instance == nullptr)
-				s_instance = this;
-			else
-				ENGINE_ASSERT("Duplicate Application Instance");
+		ENGINE_ASSERT(s_instance != nullptr,"Duplicate Application Instance");
+		s_instance = this;
 		m_window->SetCallbackFunction(TO_EVENT_FN(OnEvent));
 		m_window->SetVSync(false);
 		Renderer::Init();
-		AssetManager::Init();
+		//AssetManager::Init();
 		m_imguiLayer = new ImguiLayer();
 		PushOverlay(m_imguiLayer);
 		LOG_INFO("App Created");

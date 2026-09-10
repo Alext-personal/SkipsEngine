@@ -29,7 +29,7 @@ namespace Gaze {
 		}
 		template <typename... Args>
 		static void ASSERT(const std::string& type, bool condition, const std::source_location& location, const Args&... args) {
-			if (!condition) {
+			if (condition) {
 				m_Log("CRITICAL", location, args...);
 				if (type == "ENGINE")
 					std::abort();

@@ -7,6 +7,7 @@
 #include "Events/Event.h"
 #include "Events/WindowEvents.h"
 #include "Imgui/ImguiLayer.h"
+#include "Resources/ResourceManager.h"
 #include <memory>
 namespace Gaze {
 	class Application {
@@ -14,8 +15,8 @@ namespace Gaze {
 		Application();
 		~Application() = default;
 
-		static Application& Get() { ENGINE_ASSERT(!s_instance, "NO APPLICATION INSTANCE"); return *s_instance; }
-		Window& GetWindow() const { ENGINE_ASSERT(!m_window.get(), "NO WINDOW "); return *m_window; }
+		static Application& Get() { ENGINE_ASSERT(s_instance == nullptr, "NO APPLICATION INSTANCE"); return *s_instance; }
+		Window& GetWindow() const { ENGINE_ASSERT(m_window.get() == nullptr, "NO WINDOW "); return *m_window; }
 		void PushLayer(Layer* layer);
 		void PushOverlay(Layer* layer);
 
@@ -29,6 +30,7 @@ namespace Gaze {
 		inline static Application* s_instance = nullptr;
 		std::unique_ptr<Window> m_window;
 		Input m_input;
+		ResourceManager m_resourceManager;
 		LayerStack m_layerStack;
 		ImguiLayer* m_imguiLayer;
 		bool m_running = true;

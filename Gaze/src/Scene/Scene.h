@@ -8,6 +8,7 @@ namespace Gaze {
 		Scene();
 		void OnUpdate(float dt);
 		void OnRender();
+		void Unload();
 		EntityRegistry& GetRegistry() { return m_entities; }
 		TransformSystem* GetTransformSystem() { return static_cast<TransformSystem*>(m_systems[0].get()); }
 	private:

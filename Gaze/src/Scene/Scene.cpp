@@ -2,6 +2,8 @@
 #include "Scene/Scene.h"
 #include "Render/Renderer.h"
 #include "Render/EditorCamera.h"
+#include "Resources/ResourceManager.h"
+#include "Render/Material.h"
 namespace Gaze {
 	Scene::Scene() : m_editor(true) {
 		m_systems.push_back(std::make_unique<TransformSystem>(&m_entities));
@@ -19,7 +21,12 @@ namespace Gaze {
 		//todo else
 		Renderer::SetUniformBuffer(pass); // once per frame
 		for (auto& [transform, meshRenderer] : m_entities.Get<Transform, MeshRenderer>()) {
-			Renderer::Draw(*transform, *meshRenderer->mesh.asset, *meshRenderer->material.asset);
+			std::shared_ptr<Mesh> mesh = ResourceManager::Get().GetResource<Mesh>(meshRenderer->mesh);
+			std::shared_ptr<Material> material = ResourceManager::Get().GetResource<Material>(meshRenderer->material);
+			Renderer::Draw(*transform, *mesh, *material);
 		}
+	}
+	void Scene::Unload() {
+		ResourceManager::Get().UnloadResources();
 	}
 }

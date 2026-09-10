@@ -2,7 +2,7 @@
 #include <filesystem>
 #include <memory>
 namespace Gaze {
-	enum class PixelDataFormat {
+	enum class PixelDataFormat : uint8_t {
 		R8,
 		RG8,
 		RGB8,

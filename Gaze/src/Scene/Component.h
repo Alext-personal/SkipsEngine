@@ -1,6 +1,4 @@
 #pragma once
-#include "Render/Mesh.h"
-#include "Resources/AssetManager.h"
 #include <glm/glm.hpp>
 #include <glm/vec3.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -100,24 +98,18 @@ namespace Gaze {
 		glm::mat4 worldMatrix;
 	};
 	struct MeshRenderer {
-		AssetHandle<Mesh> mesh;
-		AssetHandle<Material> material; // vector<AssetHandle<Material>> materials (1 submesh - > 1 material)
+		UUID mesh;
+		UUID material; // vector<UUID<Material>> materials (1 submesh - > 1 material)
 		MeshRenderer() {
-			mesh.id = ReservedUUID::CUBE;
-			material.id = ReservedUUID::DEFAULTMATERIAL;
-			mesh.asset = AssetManager::Get<Mesh>(mesh.id);
-			material.asset = AssetManager::Get<Material>(material.id);
-		}
-		
-		void LoadMesh(const UUID& id) {
-			mesh.id = id;
-			mesh.asset = AssetManager::Get<Mesh>(id);
+			mesh = ReservedUUID::CUBE;
+			material = ReservedUUID::DEFAULTMATERIAL;
 		}
 
 	};
 	struct HierarchyMember {
 		uint32_t parent{};
-		std::vector<uint32_t> children{};
-		HierarchyMember() :parent(0){}
+		uint32_t firstChild{};
+		uint32_t nextSibling{};
+		uint32_t prevSibling{};
 	};
 }
