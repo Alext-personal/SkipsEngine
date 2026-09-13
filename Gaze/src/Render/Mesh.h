@@ -17,7 +17,7 @@ namespace Gaze {
 		};
 		std::vector<VertexBufferData> bufferData{};
 		std::vector<uint32_t> indices{};
-		std::vector<SubMesh> subMeshes{}; //separate by material
+		std::vector<SubMesh> subMeshes{};
 		MeshData() {
 			bufferData.emplace_back();
 		}

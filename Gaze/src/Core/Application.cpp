@@ -12,7 +12,8 @@ namespace Gaze {
 		m_window->SetCallbackFunction(TO_EVENT_FN(OnEvent));
 		m_window->SetVSync(false);
 		Renderer::Init();
-		//AssetManager::Init();
+		m_assetManager.InitializeAssetsFolder();
+		m_assetManager.LoadAssets();
 		m_imguiLayer = new ImguiLayer();
 		PushOverlay(m_imguiLayer);
 		LOG_INFO("App Created");
@@ -38,7 +39,7 @@ namespace Gaze {
 		auto t1 = GetTime();
 		LOG_INFO("Mesh loading took: ${} ", t1 - start);
 		bool wireframe = true; //testing
-		float lastTime = 0.0f;
+		float lastTime = glfwGetTime();
 		double accumulated = 0.0f;
 		int frames = 0;
 		while (m_running) {
@@ -49,11 +50,12 @@ namespace Gaze {
 			lastTime = currentTime;
 			accumulated += timeStep;
 			frames++;
-			if (frames == 5000)
+			if (frames == 15000)
 			{
 				double average = accumulated / frames;
 
 				LOG_INFO("Average Frame Time : ${} ms", average * 1000);
+				LOG_INFO("Average Fps : ${}", 1.0 / average);
 
 				accumulated = 0.0f;
 				frames = 0;
@@ -67,7 +69,7 @@ namespace Gaze {
 			if (Input::IsKeyTapped(KeyCode::Tab))
 				Application::Get().GetWindow().SwitchCursorMode();
 			ent.SetTransform(m_imguiLayer->testTransform);
-			ent2.Translate(glm::vec3{ 0.1f,0.0f,0.0f }*timeStep);
+			ent2.Rotate(glm::vec3{ 15,0,0 } *timeStep);
 			if(Application::Get().GetWindow().IsCursorDisabled())
 				EditorCamera::OnUpdate(timeStep); // temp to be moved to editor app
 			m_activeScene.OnUpdate(timeStep); //m_activescene to be moved to EDITOR APP

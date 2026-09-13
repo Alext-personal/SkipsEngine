@@ -15,7 +15,7 @@ namespace Gaze {
 		static void Init();
 		static void OnWindowResize(uint32_t x, uint32_t y, uint32_t width, uint32_t height);
 		static void BeginFrame();
-		static void Draw(const Transform& transform, const Mesh& mesh, Material& material);
+		static void Draw(const Transform& transform, MeshRenderer& meshRenderer);
 		static void SetUniformBuffer(const CameraUniformPass& pass);
 		static void SetWireFrameMode(bool enabled);
 	private:

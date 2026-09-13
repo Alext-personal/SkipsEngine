@@ -21,9 +21,7 @@ namespace Gaze {
 		//todo else
 		Renderer::SetUniformBuffer(pass); // once per frame
 		for (auto& [transform, meshRenderer] : m_entities.Get<Transform, MeshRenderer>()) {
-			std::shared_ptr<Mesh> mesh = ResourceManager::Get().GetResource<Mesh>(meshRenderer->mesh);
-			std::shared_ptr<Material> material = ResourceManager::Get().GetResource<Material>(meshRenderer->material);
-			Renderer::Draw(*transform, *mesh, *material);
+			Renderer::Draw(*transform, *meshRenderer);
 		}
 	}
 	void Scene::Unload() {

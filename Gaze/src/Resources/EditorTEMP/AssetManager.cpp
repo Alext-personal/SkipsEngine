@@ -2,11 +2,12 @@
 #include "Resources/EditorTEMP/AssetManager.h"
 #include "Resources/EditorTEMP/AssetImporter.h"
 #include "Resources/EditorTEMP/AssetRegistry.h"
+#include "Resources/ResourceManager.h"
 namespace Gaze {
 	inline AssetType GetAssetTypeFromFileExtension(const std::string& extension) {
 		if (extension == ".png" || extension == ".jpg" || extension == ".jpeg" || extension == ".hdr")
 			return AssetType::Texture;
-		if (extension == ".shader")
+		if (extension == ".gshader")
 			return  AssetType::Shader;
 		if (extension == ".fbx" || extension == ".obj" || extension == ".gltf" || extension == ".glb")
 			return  AssetType::Source;
@@ -17,10 +18,10 @@ namespace Gaze {
 		return AssetType::None;
 	}
 	void AssetManager::InitializeAssetsFolder() { // .meta -> memory, if !.meta, import asset, create .meta
-		for (const auto& file : std::filesystem::directory_iterator(m_currentPath))
+		for (const auto& file : std::filesystem::directory_iterator(m_registry.currentPath))
 		{
 			std::string extension = file.path().extension().string();
-			
+			LOG_WARNING("AT ${}, EXTENSION IS ${}", file.path(),extension);
 			MetaData meta;
 			meta.assetType = GetAssetTypeFromFileExtension(extension);
 
@@ -33,6 +34,7 @@ namespace Gaze {
 
 			if (std::filesystem::exists(metapath))
 			{
+				LOG_WARNING("META FOUND, ${}" ,metapath);
 				bool error = false;
 				YAML::Node metafile = YAML::LoadFile(metapath.string());
 				if (meta.assetType != StringToAssetType(metafile["Type"].as<std::string>())) {
@@ -44,44 +46,78 @@ namespace Gaze {
 					error = true;
 				}
 				if (!error) { // load file
+					meta.importSettings = nullptr;
 					meta.source = metafile["Source"].as<std::string>();
 					meta.id = metafile["UUID"].as<uint64_t>();
 					meta.importHash = metafile["ImportHash"].as<uint64_t>();
+					meta.snapshotHash = metafile["SnapshotHash"].as<uint64_t>();
+					if(metafile["Generated Dependencies"])
+						meta.generatedDependencies = metafile["Generated Dependencies"].as<std::vector<AssetDependency>>(); //implement YAML conversion
+					meta.isStandalone = metafile["Standalone"].as<bool>();
+					meta.generatedFrom = metafile["Generated From"].as<uint64_t>();
 					switch (meta.assetType) {
 						case AssetType::Texture:
 							meta.importSettings = std::make_unique<TextureImportSettings>(metafile["ImportSettings"]);
 							break;
-						case AssetType::Source:
-							for (const auto& dependency : metafile["Generated"]) {
-								uint64_t id = dependency.as<uint64_t>();
-								UUID uuid = UUID(id, true);
-								meta.generatedDependencies.push_back(uuid);
-							}
-							break;
 					}
+					LOG_WARNING("META FILE LOADED IN MEMORY WITH ID ${} : ",meta.id.Get());
 					m_registry.storage[meta.id] = meta;
 					continue;
 				}
 			}
+			meta.isStandalone = true;
+			meta.generatedFrom = 0;
 			meta.id = UUID();
-			meta.source = file.path();
+			meta.source = file.path().string();
 			meta.importSettings = nullptr;
-			meta.importHash = 0; //generate it
-
+			meta.importHash = 0; //generate it on actual import
+			meta.snapshotHash = 0;
 			YAML::Node metafile;
 			metafile["Source"] = meta.source.string();
 			metafile["UUID"] = meta.id.Get();
+			metafile["Type"] = AssetTypeToString(meta.assetType);
+			metafile["Generated From"] = 0;
+			metafile["SnapshotHash"] = 0;
 			metafile["ImportHash"] = meta.importHash;
+			metafile["Standalone"] = true;
 			switch (meta.assetType) {
 				case AssetType::Texture:
 					meta.importSettings = std::make_unique<TextureImportSettings>();
 					metafile["ImportSettings"] = meta.importSettings->Serialize();
 					break;
 			}
-			
+			std::ofstream fl(metapath);
+			fl << metafile;
+			continue;
 		}
 	}
 	void AssetManager::LoadAssets() {
-
+		for (auto& [id,asset] : m_registry.storage) {
+			LOG_WARNING("DOING IMPORT SHIT !!!");
+			switch (asset.assetType)
+			{
+			case AssetType::Texture:
+				if (!ResourceManager::Get().IsResourceDataLoaded(id))
+					m_importer.ImportTexture(id, static_cast<TextureImportSettings*>(asset.importSettings.get()));
+				break;
+			case AssetType::Shader:
+				if (!ResourceManager::Get().IsResourceDataLoaded(id))
+					m_importer.ImportShader(id);
+				break;
+			case AssetType::Material:
+				if (!ResourceManager::Get().IsResourceDataLoaded(id))
+					m_importer.ImportMaterial(id);
+				break;
+			case AssetType::Source:
+				m_importer.ImportModel(id);
+				break;
+			case AssetType::Prefab:
+				if(!ResourceManager::Get().IsResourceDataLoaded(id))
+					m_importer.ImportPrefab(id);
+				break;
+			default:
+				break;
+			}
+		}
 	}
 }

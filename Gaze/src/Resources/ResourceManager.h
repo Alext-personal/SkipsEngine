@@ -94,6 +94,7 @@ namespace Gaze {
 				m_resourcesImportData.erase(it);
 		}
 		void LoadResourceData(const UUID& id, const ResourceImportData& data) {
+			LOG_WARNING("LOADED RESOURCE DATA WITH UUID : ${},", id.Get());
 			m_resourcesImportData[id] = data;
 		}
 		void UnloadResourcesData() {

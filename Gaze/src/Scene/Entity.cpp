@@ -152,8 +152,8 @@ namespace Gaze {
 	void Entity::SetMaterialSlot(uint32_t slot, const UUID& materialID) {
 		//materials[slot ] =
 			MeshRenderer& m = GetComponent<MeshRenderer>();
-			ResourceManager::Get().RemoveRef(m.material);
-			m.material = materialID;
+			ResourceManager::Get().RemoveRef(m.materials[slot]);
+			m.materials[slot] = materialID;
 			ResourceManager::Get().AddRef(materialID);
 	}
 }

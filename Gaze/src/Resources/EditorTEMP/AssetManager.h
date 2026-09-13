@@ -9,7 +9,6 @@ namespace Gaze {
 		void InitializeAssetsFolder();
 		void LoadAssets();
 	private:
-		std::filesystem::path m_currentPath{ GAZE_SOURCE_ASSET_ROOT }; // hardcoded for testing purposes
 		AssetRegistry m_registry;
 		AssetImporter m_importer;
 	};

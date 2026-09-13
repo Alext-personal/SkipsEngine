@@ -11,7 +11,9 @@ namespace Gaze {
 		std::filesystem::path ImportShader(const UUID& id);
 		std::filesystem::path ImportMaterial(const UUID& id);
 		std::filesystem::path ImportPrefab(const UUID& id);
-		uint64_t GetImportHash() const;
+		static uint64_t GetContentHash(const std::filesystem::path& path);
+		static uint64_t GetContentHash(void* data,uint32_t size);
+		static uint64_t GetContentHash(uint64_t firstHash, uint64_t secondHash);
 	private:
 		AssetRegistry& m_registry;
 	};

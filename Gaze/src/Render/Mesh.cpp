@@ -15,7 +15,6 @@ namespace Gaze {
 		{
 			m_ebo = std::make_unique<ElementBuffer>(meshdata.indices);
 			m_vao.SetElementBuffer(*m_ebo);
-			LOG_INFO("DID ELEMENT BUFFER SHIT");
 		}
 	}
 }

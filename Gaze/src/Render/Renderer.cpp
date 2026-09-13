@@ -15,22 +15,24 @@ namespace Gaze {
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	}
-	void Renderer::Draw(const Transform& transform, const Mesh& mesh, Material& material) {
-		mesh.GetVAO().Bind();
-		material.Bind();
-		std::shared_ptr<Shader> shader = ResourceManager::Get().GetResource<Shader>(material.shader);
-		shader->SetUniformMatrix4("modelMatrix", transform.GetMatrix());
-		shader->Bind();
-		if (!mesh.HasEBO()) {
-			glDrawArrays(GL_TRIANGLES, 0, mesh.GetVertexCount());
+	void Renderer::Draw(const Transform& transform, MeshRenderer& meshRenderer) {
+		std::shared_ptr<Mesh> mesh = ResourceManager::Get().GetResource<Mesh>(meshRenderer.mesh);
+		mesh->GetVAO().Bind();
+		if (!mesh->HasEBO()) {
+			glDrawArrays(GL_TRIANGLES, 0, mesh->GetVertexCount());
 		}
 		else {
-			if (!mesh.GetSubMeshes().empty())
-				for (const auto& submesh : mesh.GetSubMeshes()) {
+			if (!mesh->GetSubMeshes().empty())
+				for (const auto& submesh : mesh->GetSubMeshes()) {
+					std::shared_ptr<Material> material = ResourceManager::Get().GetResource<Material>(meshRenderer.materials[submesh.materialIndex]);
+					material->Bind();
+					std::shared_ptr<Shader> shader = ResourceManager::Get().GetResource<Shader>(material->shader);
+					shader->SetUniformMatrix4("modelMatrix", transform.GetMatrix());
+					shader->Bind();
 					glDrawElements(GL_TRIANGLES, submesh.indexCount, GL_UNSIGNED_INT, (void*)(submesh.indexOffset * sizeof(uint32_t)));
 				}
 			else
-				glDrawElements(GL_TRIANGLES, mesh.GetIndexCount(), GL_UNSIGNED_INT, nullptr);
+				glDrawElements(GL_TRIANGLES, mesh->GetIndexCount(), GL_UNSIGNED_INT, nullptr);
 		}
 
 	}

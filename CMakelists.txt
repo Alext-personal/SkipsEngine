@@ -19,7 +19,7 @@ find_package(imgui CONFIG REQUIRED)
 find_package(assimp CONFIG REQUIRED)
 find_package(yaml-cpp CONFIG REQUIRED)
 find_package(Stb REQUIRED)
-
+find_package(xxHash CONFIG REQUIRED NO_SYSTEM_ENVIRONMENT_PATH)
 
 target_link_libraries(engine PRIVATE
     glfw
@@ -29,6 +29,7 @@ target_link_libraries(engine PRIVATE
     opengl32
     assimp::assimp
     yaml-cpp::yaml-cpp
+    xxHash::xxhash
 )
 target_compile_definitions(engine PRIVATE 
     GLFW_INCLUDE_NONE

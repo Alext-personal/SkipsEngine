@@ -99,10 +99,10 @@ namespace Gaze {
 	};
 	struct MeshRenderer {
 		UUID mesh;
-		UUID material; // vector<UUID<Material>> materials (1 submesh - > 1 material)
+		std::array<UUID,16>materials; // vector<UUID<Material>> materials (1 submesh - > 1 material)
 		MeshRenderer() {
 			mesh = ReservedUUID::CUBE;
-			material = ReservedUUID::DEFAULTMATERIAL;
+			materials[0] = ReservedUUID::DEFAULTMATERIAL;
 		}
 
 	};

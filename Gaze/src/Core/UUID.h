@@ -4,9 +4,10 @@ namespace Gaze {
 	class UUID {
 	public:
 		UUID();
-		UUID(uint64_t,bool copy = false);
+		UUID(uint64_t,bool copy = true);
 		uint64_t Get() const { return m_id; }
 		bool operator==(const UUID& id) const { return m_id == id.m_id; }
+		UUID& operator=(const uint64_t id){ m_id = id; return *this; }
 		friend std::ostream& operator<<(std::ostream& os,const UUID& id ){
 			os << id.m_id;
 			return os;
@@ -17,13 +18,13 @@ namespace Gaze {
 		uint64_t m_id;
 	};
 	namespace ReservedUUID {
-		inline const UUID NONE(0);
-		inline const UUID TRIANGLE(1);
-		inline const UUID QUAD(2);
-		inline const UUID CUBE(3);
-		inline const UUID DEFAULTSHADER(10);
-		inline const UUID DEFAULTTEXTURE(20);
-		inline const UUID DEFAULTMATERIAL(30);
+		inline const UUID NONE(0,false);
+		inline const UUID TRIANGLE(1,false);
+		inline const UUID QUAD(2,false);
+		inline const UUID CUBE(3,false);
+		inline const UUID DEFAULTSHADER(10,false);
+		inline const UUID DEFAULTTEXTURE(20,false);
+		inline const UUID DEFAULTMATERIAL(30,false);
 	}
 }
 namespace std {

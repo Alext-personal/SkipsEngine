@@ -8,6 +8,7 @@
 #include "Events/WindowEvents.h"
 #include "Imgui/ImguiLayer.h"
 #include "Resources/ResourceManager.h"
+#include "Resources/EditorTEMP/AssetManager.h"
 #include <memory>
 namespace Gaze {
 	class Application {
@@ -31,6 +32,7 @@ namespace Gaze {
 		std::unique_ptr<Window> m_window;
 		Input m_input;
 		ResourceManager m_resourceManager;
+		AssetManager m_assetManager;
 		LayerStack m_layerStack;
 		ImguiLayer* m_imguiLayer;
 		bool m_running = true;

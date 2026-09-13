@@ -1,0 +1,13 @@
+Material:
+  Shader: 10
+  Tint:
+    - 1.0
+    - 1.0
+    - 1.0
+    - 1.0
+  Metallic: 0.0
+  Roughness: 1.0
+  Textures:
+    Albedo: 13770094136189360340
+    Normals: 0
+    Metalness: 0

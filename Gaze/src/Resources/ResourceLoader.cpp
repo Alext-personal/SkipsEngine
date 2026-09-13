@@ -132,14 +132,20 @@ namespace Gaze{
 			LOG_ERROR("${}  -file failed to open : ${} ", filepath, e.what());
 			return Material::GetFallbackMaterial();
 		}
-		if (!file["Shader"] || !file["Texture"] || !file["Tint"])
+		if (!file["Material"])
+		{
+			LOG_ERROR("${} INVALID MATERIAL FILE FORMAT, SHADER OR ALBEDO MISSING", filepath);
+			return Material::GetFallbackMaterial();
+		}
+		file = file["Material"];
+		if (!file["Shader"] || !file["Textures"] || !file["Tint"])
 		{
 			LOG_ERROR("${} INVALID MATERIAL FILE FORMAT, SHADER OR ALBEDO MISSING", filepath);
 			return Material::GetFallbackMaterial();
 		}
 		MaterialData materialData;
 		materialData.shader = UUID(file["Shader"].as<uint64_t>(), true);
-		materialData.albedoTexture = UUID(file["Texture"].as<uint64_t>(), true);
+		materialData.albedoTexture = UUID(file["Textures"]["Albedo"].as<uint64_t>(), true);
 		materialData.tint = file["Tint"].as<glm::vec4>();
 		return materialData;
 	}
