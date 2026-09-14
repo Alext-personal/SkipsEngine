@@ -25,7 +25,7 @@ namespace Gaze {
 	const MaterialData& Material::GetDefaultMaterial() {
 		static const MaterialData defaultMat = [] {
 			MaterialData data;
-			data.albedoTexture = 10671007401415697701;
+			data.albedoTexture = ReservedUUID::DEFAULTTEXTURE;
 			data.shader = ReservedUUID::DEFAULTSHADER;
 			data.tint = { 1,1,1,1 };
 			return data;

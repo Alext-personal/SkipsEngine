@@ -505,6 +505,8 @@ namespace Gaze {
 		std::vector<UUID> materialIndexToID(scene->mNumMaterials);
 		UUID prefabID = 0;
 		LoadSourceMeta(loadedModel, loadedMaterials, loadedTextures,prefabID,m_registry.storage[id]);
+		if (prefabID == 0)
+			prefabID = UUID();
 		ExtractNodes(scene, scene->mRootNode, loadedModel,dirtyMeta);
 		ExtractMaterialIDs(scene, loadedMaterials,materialIndexToID,dirtyMeta);
 		ExtractTextureIDs(m_registry.storage[id].source, scene, loadedTextures, loadedMaterials,dirtyMeta);
@@ -827,7 +829,7 @@ namespace Gaze {
 		root["Prefab"] = nodes[rootUUID];
 		YAML::Emitter emitter;
 		emitter << root;
-		std::filesystem::path prefabPath = (m_registry.currentPath / id.ToString()).lexically_normal();
+		std::filesystem::path prefabPath = (m_registry.currentPath / prefabID.ToString()).lexically_normal();
 		prefabPath += ".gprefab";
 		if (m_registry.Has(prefabID))
 		{
@@ -861,8 +863,6 @@ namespace Gaze {
 		}
 		prefabFile << root;
 		prefabFile.close();
-		if (prefabID == 0 || !m_registry.Has(prefabID))
-			prefabID = UUID();
 		MetaData meta;
 
 		meta.source = prefabPath;
