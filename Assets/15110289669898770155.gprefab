@@ -1,0 +1,56 @@
+Prefab:
+  Entity:
+    UUID: 11385859804202640508
+    NodePath: RootNode
+    Transform:
+      Position:
+        -
+          - 0
+          - 0
+          - 0
+      Rotation:
+        -
+          - 0
+          - -0
+          - 0
+      Scale:
+        -
+          - 1
+          - 1
+          - 1
+    HierarchyMember:
+      Parent: 0
+      PrevSibling: 0
+      NextSibling: 0
+      FirstChild: 14316914723268050097
+    Children:
+      - Entity:
+          UUID: 14316914723268050097
+          NodePath: RootNode\antique_katana_01
+          Transform:
+            Position:
+              -
+                - 0
+                - 0
+                - 0
+            Rotation:
+              -
+                - -90.00001
+                - 0
+                - 0
+            Scale:
+              -
+                - 100
+                - 100
+                - 100
+          MeshRenderer:
+            Mesh: 14316914723268050097
+            Materials:
+              - 11174775903696090805
+          HierarchyMember:
+            Parent: 11385859804202640508
+            PrevSibling: 0
+            NextSibling: 0
+            FirstChild: 0
+          Children:
+            []

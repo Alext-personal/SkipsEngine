@@ -9,6 +9,7 @@ namespace Gaze {
 		void InitializeAssetsFolder();
 		void LoadAssets();
 	private:
+		std::unordered_map<UUID, MetaData> m_priorityImports;
 		AssetRegistry m_registry;
 		AssetImporter m_importer;
 	};

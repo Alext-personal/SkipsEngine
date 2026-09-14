@@ -79,7 +79,6 @@ namespace YAML {
 				return false;
 			if (!node["NodePath"] || !node["UUID"] || !node["Type"])
 				return false;
-			Gaze::LOG_ERROR("SHIT STILL HERE WTF ");
 			rhs.nodePath = std::filesystem::path(node["NodePath"].as<std::string>());
 			rhs.id = node["UUID"].as<uint64_t>();
 			rhs.type = Gaze::StringToAssetType(node["Type"].as<std::string>());

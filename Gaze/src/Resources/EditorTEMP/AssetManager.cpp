@@ -41,8 +41,8 @@ namespace Gaze {
 					LOG_ERROR("${} Meta file type mismatch (source and meta have different types)", metapath);
 					error = true;
 				}
-				if(file.path().string() != metafile["Source"].as<std::string>()){
-					LOG_ERROR("${} Meta file type mismatch (meta source is not  source asset path)", metapath);
+				if(file.path() != std::filesystem::path(metafile["Source"].as<std::string>())){
+					LOG_ERROR("${} Meta file type mismatch (meta source is not  source asset path) : ${}   ${}", metapath,file.path().generic_string(),metafile["Source"].as<std::string>());
 					error = true;
 				}
 				if (!error) { // load file
@@ -62,13 +62,15 @@ namespace Gaze {
 					}
 					LOG_WARNING("META FILE LOADED IN MEMORY WITH ID ${} : ",meta.id.Get());
 					m_registry.storage[meta.id] = meta;
+					if(meta.assetType == AssetType::Source)
+						m_priorityImports[meta.id] = meta;
 					continue;
 				}
 			}
 			meta.isStandalone = true;
 			meta.generatedFrom = 0;
 			meta.id = UUID();
-			meta.source = file.path().string();
+			meta.source = file.path().lexically_normal();
 			meta.importSettings = nullptr;
 			meta.importHash = 0; //generate it on actual import
 			meta.snapshotHash = 0;
@@ -86,14 +88,20 @@ namespace Gaze {
 					metafile["ImportSettings"] = meta.importSettings->Serialize();
 					break;
 			}
+			m_registry.storage[meta.id] = meta;
+			if (meta.assetType == AssetType::Source)
+				m_priorityImports[meta.id] = meta;
 			std::ofstream fl(metapath);
 			fl << metafile;
+			fl.close();
 			continue;
 		}
 	}
 	void AssetManager::LoadAssets() {
+		for (auto& [id,asset]:m_priorityImports) {
+			m_importer.ImportModel(id);
+		}
 		for (auto& [id,asset] : m_registry.storage) {
-			LOG_WARNING("DOING IMPORT SHIT !!!");
 			switch (asset.assetType)
 			{
 			case AssetType::Texture:
@@ -109,8 +117,7 @@ namespace Gaze {
 					m_importer.ImportMaterial(id);
 				break;
 			case AssetType::Source:
-				m_importer.ImportModel(id);
-				break;
+				continue;
 			case AssetType::Prefab:
 				if(!ResourceManager::Get().IsResourceDataLoaded(id))
 					m_importer.ImportPrefab(id);

@@ -1,0 +1,89 @@
+Source: F:/SkipsEngine/Assets/Squirrel 0000000000001.obj
+UUID: 16999867991516766339
+Type: Source
+Generated From: 0
+SnapshotHash: 0
+ImportHash: 9031019762087905979
+Standalone: true
+Generated Dependencies:
+  - NodePath: Squirrel 0000000000001.obj
+    UUID: 13489229637056271449
+    Type: Mesh
+  - NodePath: Squirrel 0000000000001.obj\default
+    UUID: 10537717280801588367
+    Type: Mesh
+  - NodePath: Squirrel 0000000000001.obj\Tongue:pCube1 group1
+    UUID: 10885663291172649245
+    Type: Mesh
+  - NodePath: Squirrel 0000000000001.obj\default
+    UUID: 10537717280801588367
+    Type: Mesh
+  - NodePath: Squirrel 0000000000001.obj\group1 eyes_lid1:nurbsToPoly1
+    UUID: 12622637925395657416
+    Type: Mesh
+  - NodePath: Squirrel 0000000000001.obj\default
+    UUID: 10537717280801588367
+    Type: Mesh
+  - NodePath: Squirrel 0000000000001.obj\group1 eyes_lid1:blue_eyes:pSphere1
+    UUID: 9866709278538954896
+    Type: Mesh
+  - NodePath: Squirrel 0000000000001.obj\default
+    UUID: 10537717280801588367
+    Type: Mesh
+  - NodePath: Squirrel 0000000000001.obj\group1 eyes_lid1:blue_eyes:pSphere2
+    UUID: 11518659804376764164
+    Type: Mesh
+  - NodePath: Squirrel 0000000000001.obj\default
+    UUID: 10537717280801588367
+    Type: Mesh
+  - NodePath: Squirrel 0000000000001.obj\group1 eyes_lid1:nurbsToPoly2
+    UUID: 11411080937754543505
+    Type: Mesh
+  - NodePath: Squirrel 0000000000001.obj\default
+    UUID: 10537717280801588367
+    Type: Mesh
+  - NodePath: Squirrel 0000000000001.obj\group1 r_teeth:Hare_0000000000001_0001:pCube7
+    UUID: 13644457052306187647
+    Type: Mesh
+  - NodePath: Squirrel 0000000000001.obj\default
+    UUID: 10537717280801588367
+    Type: Mesh
+  - NodePath: Squirrel 0000000000001.obj\group1 r_teeth:Hare_0000000000001_0001:pCube2
+    UUID: 16368782005349947113
+    Type: Mesh
+  - NodePath: Squirrel 0000000000001.obj\default
+    UUID: 10537717280801588367
+    Type: Mesh
+  - NodePath: Squirrel 0000000000001.obj\group1 Squirrel_0000000000001
+    UUID: 16693428871750180978
+    Type: Mesh
+  - NodePath: Squirrel_0000000000001_Texture.png
+    UUID: 15900121705066512873
+    Type: Texture
+  - NodePath: Squirrel_0000000000001_Texture.png
+    UUID: 10671007401415697701
+    Type: Texture
+  - NodePath: DefaultMaterial
+    UUID: 10916135337866134131
+    Type: Material
+  - NodePath: eyes_lid1:blue_eyes:lambert10SG
+    UUID: 13236250830991399054
+    Type: Material
+  - NodePath: eyes_lid1:blue_eyes:lambert11SG
+    UUID: 13298359091004370885
+    Type: Material
+  - NodePath: eyes_lid1:blue_eyes:lambert12SG
+    UUID: 9709096136462805301
+    Type: Material
+  - NodePath: lambert18SG
+    UUID: 17457016799438529810
+    Type: Material
+  - NodePath: lambert3SG
+    UUID: 16792345330766762286
+    Type: Material
+  - NodePath: lambert17SG
+    UUID: 17422217695278312714
+    Type: Material
+  - NodePath: lambert19SG
+    UUID: 17703887468701374574
+    Type: Material

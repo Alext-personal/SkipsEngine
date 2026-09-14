@@ -22,10 +22,19 @@ namespace Gaze {
 			}();
 		return fallback;
 	}
+	const MaterialData& Material::GetDefaultMaterial() {
+		static const MaterialData defaultMat = [] {
+			MaterialData data;
+			data.albedoTexture = 10671007401415697701;
+			data.shader = ReservedUUID::DEFAULTSHADER;
+			data.tint = { 1,1,1,1 };
+			return data;
+			}();
+		return defaultMat;
+	}
 
 	void Material::Bind() {
 		m_ubo.Bind(1);
-		if(albedoTexture != ReservedUUID::NONE)
-			ResourceManager::Get().GetResource<Texture>(albedoTexture)->Bind(TextureSlots::Albedo);
+		ResourceManager::Get().GetResource<Texture>(albedoTexture)->Bind(TextureSlots::Albedo);
 	}
 }

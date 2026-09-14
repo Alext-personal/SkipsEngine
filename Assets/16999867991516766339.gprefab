@@ -1,0 +1,300 @@
+Prefab:
+  Entity:
+    UUID: 14725954800874995614
+    NodePath: Squirrel 0000000000001.obj
+    Transform:
+      Position:
+        -
+          - 0
+          - 0
+          - 0
+      Rotation:
+        -
+          - 0
+          - -0
+          - 0
+      Scale:
+        -
+          - 1
+          - 1
+          - 1
+    MeshRenderer:
+      Mesh: 13489229637056271449
+    HierarchyMember:
+      Parent: 0
+      PrevSibling: 0
+      NextSibling: 0
+      FirstChild: 12285488655397275740
+    Children:
+      - Entity:
+          UUID: 12285488655397275740
+          NodePath: Squirrel 0000000000001.obj\group1 r_teeth:Hare_0000000000001_0001:pCube7
+          Transform:
+            Position:
+              -
+                - 0
+                - 0
+                - 0
+            Rotation:
+              -
+                - 0
+                - -0
+                - 0
+            Scale:
+              -
+                - 1
+                - 1
+                - 1
+          MeshRenderer:
+            Mesh: 13644457052306187647
+            Materials:
+              - 17457016799438529810
+          HierarchyMember:
+            Parent: 14725954800874995614
+            PrevSibling: 0
+            NextSibling: 12753320950602921381
+            FirstChild: 0
+          Children:
+            []
+      - Entity:
+          UUID: 12753320950602921381
+          NodePath: Squirrel 0000000000001.obj\group1 eyes_lid1:blue_eyes:pSphere2
+          Transform:
+            Position:
+              -
+                - 0
+                - 0
+                - 0
+            Rotation:
+              -
+                - 0
+                - -0
+                - 0
+            Scale:
+              -
+                - 1
+                - 1
+                - 1
+          MeshRenderer:
+            Mesh: 11518659804376764164
+            Materials:
+              - 13236250830991399054
+              - 13298359091004370885
+              - 9709096136462805301
+          HierarchyMember:
+            Parent: 14725954800874995614
+            PrevSibling: 12285488655397275740
+            NextSibling: 15057914087939911870
+            FirstChild: 0
+          Children:
+            []
+      - Entity:
+          UUID: 15057914087939911870
+          NodePath: Squirrel 0000000000001.obj\default
+          Transform:
+            Position:
+              -
+                - 0
+                - 0
+                - 0
+            Rotation:
+              -
+                - 0
+                - -0
+                - 0
+            Scale:
+              -
+                - 1
+                - 1
+                - 1
+          MeshRenderer:
+            Mesh: 10537717280801588367
+          HierarchyMember:
+            Parent: 14725954800874995614
+            PrevSibling: 12753320950602921381
+            NextSibling: 14852479743929576541
+            FirstChild: 0
+          Children:
+            []
+      - Entity:
+          UUID: 14852479743929576541
+          NodePath: Squirrel 0000000000001.obj\Tongue:pCube1 group1
+          Transform:
+            Position:
+              -
+                - 0
+                - 0
+                - 0
+            Rotation:
+              -
+                - 0
+                - -0
+                - 0
+            Scale:
+              -
+                - 1
+                - 1
+                - 1
+          MeshRenderer:
+            Mesh: 10885663291172649245
+            Materials:
+              - 17703887468701374574
+          HierarchyMember:
+            Parent: 14725954800874995614
+            PrevSibling: 15057914087939911870
+            NextSibling: 15422497104872252834
+            FirstChild: 0
+          Children:
+            []
+      - Entity:
+          UUID: 15422497104872252834
+          NodePath: Squirrel 0000000000001.obj\group1 eyes_lid1:nurbsToPoly1
+          Transform:
+            Position:
+              -
+                - 0
+                - 0
+                - 0
+            Rotation:
+              -
+                - 0
+                - -0
+                - 0
+            Scale:
+              -
+                - 1
+                - 1
+                - 1
+          MeshRenderer:
+            Mesh: 12622637925395657416
+            Materials:
+              - 17422217695278312714
+          HierarchyMember:
+            Parent: 14725954800874995614
+            PrevSibling: 14852479743929576541
+            NextSibling: 9509716622000228163
+            FirstChild: 0
+          Children:
+            []
+      - Entity:
+          UUID: 9509716622000228163
+          NodePath: Squirrel 0000000000001.obj\group1 eyes_lid1:blue_eyes:pSphere1
+          Transform:
+            Position:
+              -
+                - 0
+                - 0
+                - 0
+            Rotation:
+              -
+                - 0
+                - -0
+                - 0
+            Scale:
+              -
+                - 1
+                - 1
+                - 1
+          MeshRenderer:
+            Mesh: 9866709278538954896
+            Materials:
+              - 13236250830991399054
+              - 13298359091004370885
+              - 9709096136462805301
+          HierarchyMember:
+            Parent: 14725954800874995614
+            PrevSibling: 15422497104872252834
+            NextSibling: 14960984533816728431
+            FirstChild: 0
+          Children:
+            []
+      - Entity:
+          UUID: 14960984533816728431
+          NodePath: Squirrel 0000000000001.obj\group1 eyes_lid1:nurbsToPoly2
+          Transform:
+            Position:
+              -
+                - 0
+                - 0
+                - 0
+            Rotation:
+              -
+                - 0
+                - -0
+                - 0
+            Scale:
+              -
+                - 1
+                - 1
+                - 1
+          MeshRenderer:
+            Mesh: 11411080937754543505
+            Materials:
+              - 17422217695278312714
+          HierarchyMember:
+            Parent: 14725954800874995614
+            PrevSibling: 9509716622000228163
+            NextSibling: 11663853807934738755
+            FirstChild: 0
+          Children:
+            []
+      - Entity:
+          UUID: 11663853807934738755
+          NodePath: Squirrel 0000000000001.obj\group1 r_teeth:Hare_0000000000001_0001:pCube2
+          Transform:
+            Position:
+              -
+                - 0
+                - 0
+                - 0
+            Rotation:
+              -
+                - 0
+                - -0
+                - 0
+            Scale:
+              -
+                - 1
+                - 1
+                - 1
+          MeshRenderer:
+            Mesh: 16368782005349947113
+            Materials:
+              - 17457016799438529810
+          HierarchyMember:
+            Parent: 14725954800874995614
+            PrevSibling: 14960984533816728431
+            NextSibling: 13329345629402552360
+            FirstChild: 0
+          Children:
+            []
+      - Entity:
+          UUID: 13329345629402552360
+          NodePath: Squirrel 0000000000001.obj\group1 Squirrel_0000000000001
+          Transform:
+            Position:
+              -
+                - 0
+                - 0
+                - 0
+            Rotation:
+              -
+                - 0
+                - -0
+                - 0
+            Scale:
+              -
+                - 1
+                - 1
+                - 1
+          MeshRenderer:
+            Mesh: 16693428871750180978
+            Materials:
+              - 17422217695278312714
+          HierarchyMember:
+            Parent: 14725954800874995614
+            PrevSibling: 11663853807934738755
+            NextSibling: 0
+            FirstChild: 0
+          Children:
+            []

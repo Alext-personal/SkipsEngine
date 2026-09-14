@@ -75,8 +75,10 @@ namespace Gaze {
 		glCreateTextures(GL_TEXTURE_2D,1, &m_textureID);
 		glTextureParameteri(m_textureID, GL_TEXTURE_WRAP_S, GL_REPEAT);
 		glTextureParameteri(m_textureID, GL_TEXTURE_WRAP_T, GL_REPEAT);
-		glTextureParameteri(m_textureID, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-		glTextureParameteri(m_textureID, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		//glTextureParameteri(m_textureID, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+		//glTextureParameteri(m_textureID, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTextureParameteri(m_textureID, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTextureParameteri(m_textureID, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		TextureData newData = data;
 		if (data.data.empty()) {
 			LOG_ERROR("FAILED TO LOAD TEXTURE, reverting to fallback");
@@ -110,6 +112,22 @@ namespace Gaze {
 			return data;
 			}();
 		return fallback;
+	}
+	const TextureData& Texture::GetDefaultTexture() {
+		static const TextureData defaultTex = [] {
+			TextureData data;
+			std::vector<uint8_t> fallbackPixels = {
+				255, 255, 255, 255   // white
+			};
+			data.data = fallbackPixels;
+			data.format = PixelDataFormat::RGBA8;
+			data.width = 1;
+			data.height = 1;
+			data.mipCount = 1;
+			data.mips.push_back({ 1,1,0, });
+			return data;
+			}();
+		return defaultTex;
 	}
 	Texture::~Texture() {
 		glDeleteTextures(1, &m_textureID);

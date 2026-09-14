@@ -46,6 +46,9 @@ namespace Gaze {
 	}
 	template <>
 	std::shared_ptr<Texture> ResourceManager::LoadResource(const UUID& id) {
+		if (id == ReservedUUID::DEFAULTTEXTURE) {
+			return std::make_shared<Texture>(Texture::GetDefaultTexture());
+		}
 		if (id == ReservedUUID::NONE || !HasData(id))
 		{
 			LOG_ERROR("Resource with UUID : ${} failed to load, No Data  ", id);
@@ -68,6 +71,8 @@ namespace Gaze {
 	}
 	template <>
 	std::shared_ptr<Material> ResourceManager::LoadResource(const UUID& id) {
+		if (id == ReservedUUID::DEFAULTMATERIAL)
+			return std::make_shared<Material>(Material::GetDefaultMaterial());
 		if (id == ReservedUUID::NONE || !HasData(id))
 		{
 			LOG_ERROR("Resource with UUID : ${} failed to load,  No Data  ", id);

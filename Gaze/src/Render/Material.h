@@ -23,6 +23,7 @@ namespace Gaze {
 	
 
 		static const MaterialData& GetFallbackMaterial();
+		static const MaterialData& GetDefaultMaterial();
 
 		void Bind();
 	private: // think about changing, idk how this should work yet, material - > ubo, or idk TODO later
