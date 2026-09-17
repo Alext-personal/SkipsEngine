@@ -1,28 +1,15 @@
 #pragma once
-#include "Scene/Scene.h"
 #include "Core/UUID.h"
+#include "Scene/Scene.h"
 namespace Gaze {
 	class Entity { // wrapper over ecs entity for ease of use
 	public:
-		Entity(Scene& scene,const UUID& persistentID = ReservedUUID::NONE) {
-			m_scene = &scene;
-			m_entityID = m_scene->GetRegistry().CreateEntity(persistentID);
-			m_persistentID = m_scene->GetRegistry().GetUUID(m_entityID);
-			if (persistentID == ReservedUUID::NONE) {
-				AddComponent<Transform>(); // every entity has a transform so far
-				AddComponent<HierarchyMember>(); // every entity is apart of the hierarchy
-			}
-			//it gets loaded by scene if it has an uuid
-		}
-		Entity(Scene& scene,uint32_t entityID) { // get wrapper around entity
-			//maybe check if exists, if not return null entity ?
-			m_scene = &scene;
-			m_entityID = entityID;
-			m_persistentID = m_scene->GetRegistry().GetUUID(entityID);
-		}
-		~Entity() {
-			m_scene = nullptr;
-		}
+		Entity(Scene& scene, const UUID& persistentID = ReservedUUID::NONE);
+		Entity(Scene& scene, uint32_t entityID);
+		Entity(const Entity& ent) = default;
+		Entity() = default;
+		Entity& operator=(const Entity& ent) = default;
+		~Entity() = default;
 		void Destroy() {
 			GetParent().RemoveChild(*this);
 			DestroyInternal();
@@ -45,6 +32,7 @@ namespace Gaze {
 		}
 
 		UUID& GetUUID() { return m_persistentID; }
+		uint32_t GetNativeID(){ return m_entityID; }
 		Entity GetParent();
 		std::vector<Entity> GetChildren();
 		void SetParent(Entity& parent);
@@ -72,7 +60,7 @@ namespace Gaze {
 		void SetMaterialSlot(uint32_t slot, const UUID& materialID);
 
 	private:
-		uint32_t m_entityID{};
+		uint32_t m_entityID;
 		UUID m_persistentID;
 		Scene* m_scene = nullptr;
 		void DestroyInternal() {

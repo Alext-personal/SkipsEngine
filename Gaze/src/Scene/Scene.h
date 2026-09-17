@@ -3,14 +3,20 @@
 #include "Scene/EntitySystems.h"
 #include "Render/Camera.h"
 namespace Gaze {
+	struct Prefab;
+	class Entity;
 	class Scene {
 	public:
 		Scene();
+		void Initialize();
 		void OnUpdate(float dt);
 		void OnRender();
 		void Unload();
 		EntityRegistry& GetRegistry() { return m_entities; }
 		TransformSystem* GetTransformSystem() { return static_cast<TransformSystem*>(m_systems[0].get()); }
+
+		Entity Instantiate(const UUID& prefabID);
+		void ResolveInstances(const UUID& prefabID);
 	private:
 		EntityRegistry m_entities{};
 		std::unique_ptr<Camera> m_activeCamera;

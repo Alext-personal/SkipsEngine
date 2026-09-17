@@ -1,5 +1,5 @@
 Source: F:\SkipsEngine\Assets\antique_katana_01_1k.fbx
-UUID: 18024755503367508152
+UUID: 17591184092948507564
 Type: Source
 Generated From: 0
 SnapshotHash: 0
@@ -7,23 +7,23 @@ ImportHash: 3403140897958560264
 Standalone: true
 Generated Dependencies:
   - NodePath: RootNode\antique_katana_01
-    UUID: 13285577513274928877
+    UUID: 11415069096027299323
     Type: Mesh
   - NodePath: textures/antique_katana_01_metal_1k.exr
-    UUID: 15940882655420766228
+    UUID: 9346512747877283711
     Type: Texture
   - NodePath: textures/antique_katana_01_diff_1k.jpg
-    UUID: 18166204997585266786
+    UUID: 12338707493211562829
     Type: Texture
   - NodePath: textures/antique_katana_01_nor_gl_1k.exr
-    UUID: 17245219162113978082
+    UUID: 16496908533527786421
     Type: Texture
   - NodePath: textures/antique_katana_01_rough_1k.jpg
-    UUID: 11765626705520354809
+    UUID: 12972916252027419239
     Type: Texture
   - NodePath: antique_katana_01
-    UUID: 11543898450206944557
+    UUID: 15334936148120946945
     Type: Material
-  - NodePath: F:\SkipsEngine\Assets\17354341268965292549.gprefab
-    UUID: 17354341268965292549
+  - NodePath: F:\SkipsEngine\Assets\antique_katana_01_1k.gprefab
+    UUID: 15339299711051123309
     Type: Prefab

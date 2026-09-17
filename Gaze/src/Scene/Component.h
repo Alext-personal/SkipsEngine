@@ -6,7 +6,7 @@
 #include <glm/gtx/matrix_decompose.hpp>
 namespace Gaze {
 	enum class ComponentType {
-		Transform,MeshRenderer,HierarchyMember
+		Transform, MeshRenderer, HierarchyMember, Instantiated
 	};
 	inline static std::string ComponentTypeToString(ComponentType type) {
 		switch (type) {
@@ -16,6 +16,8 @@ namespace Gaze {
 				return "MeshRenderer";
 			case ComponentType::HierarchyMember:
 				return "HierarchyMember";
+			case ComponentType::Instantiated:
+				return "Instantiated";
 		}
 	}
 	//modify only through Entity (Entity.SetTransform .. etc ) , modyfying directly doesn't update children transforms : Entity.GetComponent<Transform>() this doesn't mark dirty
@@ -28,6 +30,8 @@ namespace Gaze {
 			scale = glm::vec3(1.0f);
 			worldMatrix = glm::mat4(1.0f);
 		}
+		Transform(const Transform& tr) = default;
+		Transform& operator=(const Transform& tr) = default;
 
 		void Rotate(glm::vec3 eulerAngles) {
 			glm::quat rotationquat(glm::radians(eulerAngles));
@@ -111,5 +115,10 @@ namespace Gaze {
 		uint32_t firstChild{};
 		uint32_t nextSibling{};
 		uint32_t prevSibling{};
+	};
+	struct Instantiated {
+		UUID prefabID;
+		UUID nodeID;
+		UUID instanceID;
 	};
 }

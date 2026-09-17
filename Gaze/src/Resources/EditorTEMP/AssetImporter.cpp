@@ -84,6 +84,7 @@ namespace Gaze {
 		}
 
 		YAML::Node tex;
+		tex["Albedo"] = ReservedUUID::DEFAULTTEXTURE.Get();
 		for (auto& [slot, texture] : data.textures) {
 			std::string slotString = aiTextureTypeToString(slot);
 			if (slotString == "Diffuse" || slotString == "BaseColor")
@@ -115,15 +116,16 @@ namespace Gaze {
 		return oldSnapshot;
 	}
 	inline bool ModifyMetaImportHash(MetaData& meta) {
+		std::filesystem::path metaPath = meta.source;
+		metaPath += ".meta";
+		if (!std::filesystem::exists(metaPath) && meta.isStandalone == false)
+			return true;
 		uint64_t hash = AssetImporter::GetContentHash(meta.source);
 		if (meta.importSettings != nullptr)
 			hash = AssetImporter::GetContentHash(hash, meta.importSettings->GetHash());
 		meta.importHash = hash;
-		if (meta.isStandalone == false)
-			return true;
+		
 		YAML::Node metaFile;
-		std::filesystem::path metaPath = meta.source;
-		metaPath += ".meta";
 		try {
 			metaFile = YAML::LoadFile(metaPath.string());
 		}
@@ -410,20 +412,12 @@ namespace Gaze {
 					}
 					else {
 						std::filesystem::path path{ sourceStr };
-						if (path.is_absolute())
-						{
-							std::filesystem::path original = path; 
-							std::error_code ec;
-							std::filesystem::path rel = std::filesystem::relative(original,relativepath.parent_path(), ec);
-							if (ec || rel.empty()) {
-								LOG_ERROR("${} could not be made relative to model directory", original);
-								continue;
-							}
-							path = rel;
-						}
+						if (!std::filesystem::exists(relativepath.parent_path() / path.parent_path()))
+							path = path.filename();
 						path = path.lexically_normal();
 						std::string pathStr = path.generic_string();
 						if (out.find(pathStr) == out.end()) {
+
 							out[pathStr].id = UUID();
 							dirty = true;
 						}
@@ -514,7 +508,7 @@ namespace Gaze {
 			if (value.meshID == 0)
 				continue;
 			if (value.mesh.subMeshes.empty()) {
-				ResourceManager::Get().UnloadResourceData(value.meshID);
+				ResourceManager::Get().ScheduleUnloadResourceData(value.meshID);
 				std::filesystem::path removedPath = (GetCurrentPath() / "Library" / "Client" / "Meshes" / value.meshID.ToString()).lexically_normal();
 				removedPath += ".gmesh";
 				if(std::filesystem::exists(removedPath))
@@ -535,13 +529,13 @@ namespace Gaze {
 			}
 			generated.push_back({ value.nodePath,value.id,AssetType::Mesh});
 			std::filesystem::path cookedMeshPath = CookMesh(value.mesh, value.meshID);
-			ResourceManager::Get().LoadResourceData(value.meshID, { cookedMeshPath,AssetType::Mesh }); // make LoadResourceData unload every resource of that type so it can refresh
+			ResourceManager::Get().ScheduleLoadResourceData(value.meshID, { cookedMeshPath,AssetType::Mesh }); // make ScheduleLoadResourceData unload every resource of that type so it can refresh
 		}
 		for (auto& [key, value] : loadedTextures) {
 			if (value.textureSlot == -10) {//expired / replaced texture
 				if (m_registry.storage[value.id].isStandalone == true)
 					continue;
-				ResourceManager::Get().UnloadResourceData(value.id);
+				ResourceManager::Get().ScheduleUnloadResourceData(value.id);
 				std::filesystem::path removedPath = (GetCurrentPath() / "Library" / "Client" / "Textures" / value.id.ToString()).lexically_normal();
 				removedPath += ".gtex";
 				if (std::filesystem::exists(removedPath))
@@ -601,6 +595,7 @@ namespace Gaze {
 				meta.importSettings = std::make_unique<TextureImportSettings>();
 				meta.importHash = 0; //generate it on actual import
 				meta.assetType = AssetType::Texture;
+				meta.snapshotHash = 0;
 				if (value.textureSlot != -1) {
 					std::string fileExtension = scene->mTextures[value.textureSlot]->achFormatHint;
 					std::string filename = value.id.ToString();
@@ -679,6 +674,7 @@ namespace Gaze {
 					metafile["Source"] = meta.source.string();
 					metafile["UUID"] = meta.id.Get();
 					metafile["ImportHash"] = meta.importHash;
+					metafile["SnapshotHash"] = meta.snapshotHash;
 					metafile["Standalone"] = meta.isStandalone;
 					metafile["ImportSettings"] = meta.importSettings->Serialize();
 					metafile["Generated From"] = id.Get();
@@ -701,7 +697,7 @@ namespace Gaze {
 			if (value.shaderType.empty()) {//expired / replaced mat
 				if (m_registry.storage[value.id].isStandalone == true)
 					continue;
-				ResourceManager::Get().UnloadResourceData(value.id);
+				ResourceManager::Get().ScheduleUnloadResourceData(value.id);
 				std::filesystem::path removedPath = (GetCurrentPath() / "Library" / "Client" / "Materials" / value.id.ToString()).lexically_normal();
 				removedPath += ".gmat";
 				if (std::filesystem::exists(removedPath))
@@ -783,9 +779,9 @@ namespace Gaze {
 			value.transform.Decompose(scale, rotation, position);
 			glm::quat glmQuat(rotation.w, rotation.x, rotation.y, rotation.z);
 			glm::vec3 glmRot = glm::degrees(glm::eulerAngles(glmQuat));
-			transform["Position"].push_back(std::vector<float>{position.x, position.y, position.z});
-			transform["Rotation"].push_back(std::vector<float>{glmRot.x, glmRot.y, glmRot.z});
-			transform["Scale"].push_back(std::vector<float>{scale.x, scale.y, scale.z});
+			transform["Position"] = std::vector<float>{position.x, position.y, position.z};
+			transform["Rotation"] = std::vector<float>{glmRot.x, glmRot.y, glmRot.z};
+			transform["Scale"] = std::vector<float>{scale.x, scale.y, scale.z};
 			node["Transform"] = transform;
 			if (value.meshID != 0) {
 				YAML::Node meshRenderer;
@@ -829,7 +825,7 @@ namespace Gaze {
 		root["Prefab"] = nodes[rootUUID];
 		YAML::Emitter emitter;
 		emitter << root;
-		std::filesystem::path prefabPath = (m_registry.currentPath / prefabID.ToString()).lexically_normal();
+		std::filesystem::path prefabPath = (m_registry.currentPath /m_registry.storage[id].source.stem()).lexically_normal();
 		prefabPath += ".gprefab";
 		if (m_registry.Has(prefabID))
 		{
@@ -997,7 +993,7 @@ namespace Gaze {
 		file.close();
 		if (!ModifyMetaImportHash(m_registry.storage[id]))
 			return std::filesystem::path();
-		ResourceManager::Get().LoadResourceData(id, { outputPath,AssetType::Texture });
+		ResourceManager::Get().ScheduleLoadResourceData(id, { outputPath,AssetType::Texture });
 		return outputPath;
 	}
 	std::filesystem::path AssetImporter::ImportShader(const UUID& id)
@@ -1073,7 +1069,7 @@ namespace Gaze {
 		file.close();
 		if (!ModifyMetaImportHash(m_registry.storage[id]))
 			return std::filesystem::path();
-		ResourceManager::Get().LoadResourceData(id, { outputPath,AssetType::Shader });
+		ResourceManager::Get().ScheduleLoadResourceData(id, { outputPath,AssetType::Shader });
 		return outputPath;
 	}
 	std::filesystem::path AssetImporter::ImportMaterial(const UUID& id)
@@ -1116,7 +1112,7 @@ namespace Gaze {
 		std::filesystem::copy(filepath, outputPath,std::filesystem::copy_options::overwrite_existing);
 		if (!ModifyMetaImportHash(m_registry.storage[id]))
 			return std::filesystem::path();
-		ResourceManager::Get().LoadResourceData(id, { outputPath,AssetType::Material });
+		ResourceManager::Get().ScheduleLoadResourceData(id, { outputPath,AssetType::Material });
 		return outputPath;
 	}
 	std::filesystem::path AssetImporter::ImportPrefab(const UUID& id)
@@ -1174,7 +1170,7 @@ namespace Gaze {
 		std::filesystem::copy(filepath, outputPath, std::filesystem::copy_options::overwrite_existing);
 		if (!ModifyMetaImportHash(m_registry.storage[id]))
 			return std::filesystem::path();
-		ResourceManager::Get().LoadResourceData(id, { outputPath,AssetType::Prefab });
+		ResourceManager::Get().ScheduleLoadResourceData(id, { outputPath,AssetType::Prefab });
 		return outputPath;
 	}
 	uint64_t AssetImporter::GetContentHash(const std::filesystem::path& path) {

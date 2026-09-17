@@ -2,11 +2,24 @@
 #include "Core/UUID.h"
 #include "Resources/Asset.h"
 #include <unordered_map>
+#include <queue>
 #include <memory>
 namespace Gaze {
+	enum class TaskType {
+		Load,Unload,ClearResourcesData,ClearResources
+	};
+	enum class ResourceImportState {
+		Pending,Valid
+	};
 	struct ResourceImportData {
 		std::filesystem::path filepath;
 		AssetType type;
+		ResourceImportState state = ResourceImportState::Pending;
+	};
+	struct Task {
+		UUID id;
+		std::unique_ptr<ResourceImportData> data;
+		TaskType type;
 	};
 	struct IResourceStorage{
 		AssetType type;
@@ -14,6 +27,8 @@ namespace Gaze {
 		virtual ~IResourceStorage() = default;
 		virtual void AddRef(const UUID& id) = 0;
 		virtual void RemoveRef(const UUID& id) = 0;
+		virtual void Clear(const UUID& id) = 0;
+		virtual bool Has(const UUID& id) = 0;
 	};
 	template <typename T>
 	struct ref_ptr {
@@ -50,6 +65,22 @@ namespace Gaze {
 				
 			}
 		}
+		void Clear(const UUID& id) override {
+			auto it = storage.find(id);
+			if (it != storage.end()) {
+				if (it->second.refcount == 0)
+					return;
+				it->second.refcount = 0;
+				it->second.ptr = nullptr;
+
+			}
+		}
+		bool Has(const UUID& id) override {
+			auto it = storage.find(id);
+			if (it != storage.end() && it->second.refcount != 0)
+				return true;
+			return false;
+		}
 	};
 	inline uint8_t GetLastResourceTypeID() {
 		static uint8_t globalResourceTypeID = 0;
@@ -77,7 +108,25 @@ namespace Gaze {
 				return returnedAsset;
 			else
 			{
-				std::shared_ptr<T> loadedAsset = LoadResource<T>(id);
+				std::shared_ptr<T> loadedAsset;
+				if (m_resourcesImportData.find(id) == m_resourcesImportData.end()) {
+					if (id.GetFlag() == 0) {
+						if(id == ReservedUUID::DEFAULTTEXTURE)
+							LOG_ERROR("LOADED DEFAULT TEXTURE");
+						loadedAsset = LoadResource<T>(id);
+					}
+					else
+					{
+						LOG_ERROR("RESOURCE DATA NOT FOUND WITH ID ${}", id);
+						loadedAsset = LoadResource<T>(0);
+					}
+				}
+				else {
+					if (m_resourcesImportData[id].state == ResourceImportState::Pending)
+						loadedAsset = LoadResource<T>(0);
+					else
+						loadedAsset = LoadResource<T>(id);
+				}
 				storage.Add(id,loadedAsset);
 				return loadedAsset;
 			}
@@ -88,20 +137,23 @@ namespace Gaze {
 				return true;
 			return false;
 		}
-		void UnloadResourceData(const UUID& id) {
+		void ScheduleUnloadResourceData(const UUID& id) {
 			auto it = m_resourcesImportData.find(id);
-			if (it != m_resourcesImportData.end())
-				m_resourcesImportData.erase(it);
+			if (it != m_resourcesImportData.end()) {
+				m_resourcesImportData[id].state = ResourceImportState::Pending;
+				m_scheduled.push({ id,nullptr,TaskType::Unload });
+			}
 		}
-		void LoadResourceData(const UUID& id, const ResourceImportData& data) {
-			LOG_WARNING("LOADED RESOURCE DATA WITH UUID : ${},", id.Get());
-			m_resourcesImportData[id] = data;
+		void ScheduleLoadResourceData(const UUID& id, const ResourceImportData& data) {
+			LOG_WARNING("SCHEDULED RESOURCE DATA WITH UUID : ${},", id.Get());
+			m_resourcesImportData[id].state = ResourceImportState::Pending;
+			m_scheduled.push({ id,std::make_unique<ResourceImportData>(data),TaskType::Load });
 		}
-		void UnloadResourcesData() {
-			m_resourcesImportData.clear();
+		void ScheduleUnloadResourcesData() {
+			m_scheduled.push({ 0,nullptr,TaskType::ClearResourcesData });
 		}
-		void UnloadResources(){
-			m_resources.clear();
+		void ScheduleUnloadResources(){
+			m_scheduled.push({ 0,nullptr,TaskType::ClearResources });
 		}
 		void AddRef(const UUID& id) {
 			for (auto& storage : m_resources)
@@ -111,11 +163,16 @@ namespace Gaze {
 			for (auto& storage : m_resources)
 				storage->RemoveRef(id);
 		}
+		void Initialize();
+		void OnFrameStart();
+		void RegisterPrefabCallback(std::function<void(UUID id)> callback) { m_prefabLoadedCallback = callback; }
 
 	private:
 		inline static ResourceManager* s_instance = nullptr;
 		std::vector<std::unique_ptr<IResourceStorage>> m_resources;
 		std::unordered_map<UUID, ResourceImportData> m_resourcesImportData;
+		std::queue<Task>m_scheduled;
+		std::function<void(UUID id)> m_prefabLoadedCallback;
 	private:
 		template <typename T>
 		ResourceStorage<T>& GetStorage() {

@@ -8,6 +8,7 @@ namespace Gaze {
 		uint64_t Get() const { return m_id; }
 		bool operator==(const UUID& id) const { return m_id == id.m_id; }
 		UUID& operator=(const uint64_t id){ m_id = id; return *this; }
+		UUID& operator=(const UUID& id) = default;
 		friend std::ostream& operator<<(std::ostream& os,const UUID& id ){
 			os << id.m_id;
 			return os;

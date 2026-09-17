@@ -22,7 +22,7 @@ namespace Gaze {
 		void SetTextureSlots();
 		bool TrySetUniformInt1(const std::string& name, uint32_t value);
 
-		static const std::vector<ShaderData>& GetFallbackShader();
+		static const std::vector<ShaderData> GetFallbackShader();
 
 		void Bind() const;
 		uint32_t GetID() const { return m_shaderID; }

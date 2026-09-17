@@ -94,40 +94,34 @@ namespace Gaze {
 	void Texture::Bind(uint32_t slot) {
 		glBindTextureUnit(slot, m_textureID); // TEMP WHICH SAMPLER2D UNIFORM DOES TEXTURE GO IN (0  = FIRST, AND SO ON )
 	}
-	const TextureData& Texture::GetFallbackTexture() {
-		static const TextureData fallback = [] {
-			TextureData data;
-			std::vector<uint8_t> fallbackPixels =  {
-				255, 0, 255, 255,   // pink
-				0, 0,   0, 255,   // black
-				0, 0,   0, 255,   // black
-				255, 0, 255, 255 // pink
-			};
-			data.data = fallbackPixels;
-			data.format = PixelDataFormat::RGBA8;
-			data.width = 2;
-			data.height = 2;
-			data.mipCount = 1;
-			data.mips.push_back({ 2,2,0, });
-			return data;
-			}();
-		return fallback;
+	const TextureData Texture::GetFallbackTexture() {
+		TextureData data;
+		std::vector<uint8_t> fallbackPixels =  {
+			255, 0, 255, 255,   // pink
+			0, 0,   0, 255,   // black
+			0, 0,   0, 255,   // black
+			255, 0, 255, 255 // pink
+		};
+		data.data = fallbackPixels;
+		data.format = PixelDataFormat::RGBA8;
+		data.width = 2;
+		data.height = 2;
+		data.mipCount = 1;
+		data.mips.push_back({ 2,2,0, });
+		return data;
 	}
-	const TextureData& Texture::GetDefaultTexture() {
-		static const TextureData defaultTex = [] {
-			TextureData data;
-			std::vector<uint8_t> fallbackPixels = {
-				255, 255, 255, 255   // white
-			};
-			data.data = fallbackPixels;
-			data.format = PixelDataFormat::RGBA8;
-			data.width = 1;
-			data.height = 1;
-			data.mipCount = 1;
-			data.mips.push_back({ 1,1,0, });
-			return data;
-			}();
-		return defaultTex;
+	const TextureData Texture::GetDefaultTexture() {
+		TextureData data;
+		std::vector<uint8_t> fallbackPixels = {
+			255, 255, 255, 255   // white
+		};
+		data.data = fallbackPixels;
+		data.format = PixelDataFormat::RGBA8;
+		data.width = 1;
+		data.height = 1;
+		data.mipCount = 1;
+		data.mips.push_back({ 1,1,0, });
+		return data;
 	}
 	Texture::~Texture() {
 		glDeleteTextures(1, &m_textureID);

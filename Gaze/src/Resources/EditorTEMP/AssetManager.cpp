@@ -18,15 +18,15 @@ namespace Gaze {
 		return AssetType::None;
 	}
 	void AssetManager::InitializeAssetsFolder() { // .meta -> memory, if !.meta, import asset, create .meta
-		for (const auto& file : std::filesystem::directory_iterator(m_registry.currentPath))
+		for (const auto& file : std::filesystem::recursive_directory_iterator(m_registry.currentPath))
 		{
+			if (file.is_directory())
+				continue;
 			std::string extension = file.path().extension().string();
-			LOG_WARNING("AT ${}, EXTENSION IS ${}", file.path(),extension);
 			MetaData meta;
 			meta.assetType = GetAssetTypeFromFileExtension(extension);
 
 			if (meta.assetType == AssetType::None) {
-				LOG_WARNING("${} FileType not supported", file.path());
 				continue;
 			}
 			std::filesystem::path metapath = file.path();
@@ -34,7 +34,6 @@ namespace Gaze {
 
 			if (std::filesystem::exists(metapath))
 			{
-				LOG_WARNING("META FOUND, ${}" ,metapath);
 				bool error = false;
 				YAML::Node metafile = YAML::LoadFile(metapath.string());
 				if (meta.assetType != StringToAssetType(metafile["Type"].as<std::string>())) {
@@ -50,7 +49,7 @@ namespace Gaze {
 					meta.source = metafile["Source"].as<std::string>();
 					meta.id = metafile["UUID"].as<uint64_t>();
 					meta.importHash = metafile["ImportHash"].as<uint64_t>();
-					meta.snapshotHash = metafile["SnapshotHash"].as<uint64_t>();
+						meta.snapshotHash = metafile["SnapshotHash"].as<uint64_t>();
 					if(metafile["Generated Dependencies"])
 						meta.generatedDependencies = metafile["Generated Dependencies"].as<std::vector<AssetDependency>>(); //implement YAML conversion
 					meta.isStandalone = metafile["Standalone"].as<bool>();
@@ -60,7 +59,6 @@ namespace Gaze {
 							meta.importSettings = std::make_unique<TextureImportSettings>(metafile["ImportSettings"]);
 							break;
 					}
-					LOG_WARNING("META FILE LOADED IN MEMORY WITH ID ${} : ",meta.id.Get());
 					m_registry.storage[meta.id] = meta;
 					if(meta.assetType == AssetType::Source)
 						m_priorityImports[meta.id] = meta;
@@ -99,32 +97,45 @@ namespace Gaze {
 	}
 	void AssetManager::LoadAssets() {
 		for (auto& [id,asset]:m_priorityImports) {
-			m_importer.ImportModel(id);
+			if(m_registry.storage[id].importHash != AssetImporter::GetContentHash(m_registry.storage[id].source))
+				m_importer.ImportModel(id);
+
 		}
 		for (auto& [id,asset] : m_registry.storage) {
+			if (asset.isStandalone == false && asset.assetType != AssetType::Prefab)
+				continue;
 			switch (asset.assetType)
 			{
 			case AssetType::Texture:
-				if (!ResourceManager::Get().IsResourceDataLoaded(id))
+				if (!ResourceManager::Get().IsResourceDataLoaded(id) || m_registry.storage[id].importHash != AssetImporter::GetContentHash(m_registry.storage[id].source))
 					m_importer.ImportTexture(id, static_cast<TextureImportSettings*>(asset.importSettings.get()));
 				break;
 			case AssetType::Shader:
-				if (!ResourceManager::Get().IsResourceDataLoaded(id))
+				if (!ResourceManager::Get().IsResourceDataLoaded(id) || m_registry.storage[id].importHash != AssetImporter::GetContentHash(m_registry.storage[id].source))
 					m_importer.ImportShader(id);
 				break;
 			case AssetType::Material:
-				if (!ResourceManager::Get().IsResourceDataLoaded(id))
+				if (!ResourceManager::Get().IsResourceDataLoaded(id) || m_registry.storage[id].importHash != AssetImporter::GetContentHash(m_registry.storage[id].source))
 					m_importer.ImportMaterial(id);
 				break;
 			case AssetType::Source:
 				continue;
 			case AssetType::Prefab:
-				if(!ResourceManager::Get().IsResourceDataLoaded(id))
+				if (!ResourceManager::Get().IsResourceDataLoaded(id) || m_registry.storage[id].importHash != AssetImporter::GetContentHash(m_registry.storage[id].source))
+				{
 					m_importer.ImportPrefab(id);
+				}
 				break;
 			default:
 				break;
 			}
 		}
+		for (auto& [id, asset] : m_priorityImports) {
+			for (auto& dep : asset.generatedDependencies) {
+				if (!m_registry.Has(dep.id) && dep.type == AssetType::Prefab)
+					m_importer.ImportModel(id);
+			}
+		}
 	}
+
 }

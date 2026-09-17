@@ -32,8 +32,8 @@ namespace Gaze {
 	public:
 		Texture(const TextureData& data = {});
 		~Texture();
-		static const TextureData& GetFallbackTexture();
-		static const TextureData& GetDefaultTexture();
+		static const TextureData GetFallbackTexture();
+		static const TextureData GetDefaultTexture();
 		void Bind(uint32_t slot);
 	private:
 		uint32_t m_textureID;

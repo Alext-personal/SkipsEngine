@@ -115,8 +115,86 @@ namespace Gaze{
 		file.read(reinterpret_cast<char*>(returnedData.data.data()), header.dataSize);
 		return returnedData;
 	}
+	inline void ExtractPrefabRecursive(YAML::Node node, Prefab& out) {
+
+		YAML::Node entity = node["Entity"];
+		if (!entity || !entity["NodePath"] || !entity["UUID"])
+			return;
+		UUID nodeID = entity["UUID"].as<uint64_t>();
+		LOG_ERROR("[PREFAB] AT NODEID : ${} :", nodeID);
+		Transform tr;
+		std::vector<float> pos, rot, scl;
+		pos = entity["Transform"]["Position"].as<std::vector<float>>();
+		rot = entity["Transform"]["Rotation"].as<std::vector<float>>();
+		scl = entity["Transform"]["Scale"].as<std::vector<float>>();
+		tr.SetPosition(glm::vec3(pos[0], pos[1], pos[2]));
+		tr.SetRotation(glm::vec3(rot[0], rot[1], rot[2]));
+		tr.SetScale(glm::vec3(scl[0], scl[1], scl[2]));
+		EntityData outdata;
+		outdata.transform = tr;
+		UUID parentID = entity["HierarchyMember"]["Parent"].as<uint64_t>();
+		outdata.parentID = parentID;
+		if (entity["MeshRenderer"]) {
+			UUID meshID = entity["MeshRenderer"]["Mesh"].as<uint64_t>();
+			outdata.meshID = meshID;
+			std::vector<UUID> materialIDs;
+			for (auto mat : entity["MeshRenderer"]["Materials"]) {
+				UUID matID = mat.as<uint64_t>();
+				materialIDs.push_back(matID);
+			}
+			outdata.materialIDs = materialIDs;
+		}
+		out.data[nodeID] = outdata;
+		for (auto child : entity["Children"])
+			ExtractPrefabRecursive(child, out);
+	}
 	Prefab ResourceLoader::LoadPrefab(const std::filesystem::path& filepath) {
-		return Prefab();
+		if (!std::filesystem::exists(filepath) || filepath.extension() != ".gprefab")
+		{
+			LOG_ERROR("${} :INVALID  file : not .gprefab | file corrupted", filepath);
+			return Prefab::GetFallbackPrefab();
+		}
+		YAML::Node file;
+		try {
+			file = YAML::LoadFile(filepath.string());
+		}
+		catch (const YAML::Exception& e) {
+			LOG_ERROR("${}  -file failed to open : ${} ", filepath, e.what());
+			return Prefab::GetFallbackPrefab();
+		}
+		if(!file["Prefab"]) {
+			LOG_ERROR("${} INVALID PREFAB FILE FORMAT", filepath);
+			return Prefab::GetFallbackPrefab();
+		}
+		file = file["Prefab"];
+		Prefab returned;
+
+		ExtractPrefabRecursive(file, returned);
+		for (auto& [nodeID, prefabNode] : returned.data) {
+			LOG_ERROR(
+				"PrefabNode: nodeID=${}, meshID=${}, parentID=${}, materialCount=${}",
+				nodeID,
+				prefabNode.meshID,
+				prefabNode.parentID,
+				prefabNode.materialIDs.size()
+			);
+			LOG_ERROR(
+				"Transform: position=(${}, ${}, ${}), rotation=(${}, ${}, ${}), scale=(${}, ${}, ${})",
+				prefabNode.transform.GetPosition().x,
+				prefabNode.transform.GetPosition().y,
+				prefabNode.transform.GetPosition().z,
+				prefabNode.transform.GetRotationEuler().x,
+				prefabNode.transform.GetRotationEuler().y,
+				prefabNode.transform.GetRotationEuler().z,
+				prefabNode.transform.GetScale().x,
+				prefabNode.transform.GetScale().y,
+				prefabNode.transform.GetScale().z
+			);
+			for (const auto& materialID : prefabNode.materialIDs) {
+				LOG_ERROR("  MaterialID=${}", materialID);
+			}
+		}
+		return returned;
 	}
 	MaterialData ResourceLoader::LoadMaterial(const std::filesystem::path& filepath) {
 		if (!std::filesystem::exists(filepath) || filepath.extension() != ".gmat")
@@ -134,7 +212,7 @@ namespace Gaze{
 		}
 		if (!file["Material"])
 		{
-			LOG_ERROR("${} INVALID MATERIAL FILE FORMAT, SHADER OR ALBEDO MISSING", filepath);
+			LOG_ERROR("${} INVALID MATERIAL FILE FORMAT", filepath);
 			return Material::GetFallbackMaterial();
 		}
 		file = file["Material"];

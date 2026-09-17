@@ -2,6 +2,23 @@
 #include "Scene/Entity.h"
 #include "Resources/ResourceManager.h"
 namespace Gaze {
+	Entity::Entity(Scene& scene,const UUID& persistentID) {
+		m_scene = &scene;
+		m_entityID = m_scene->GetRegistry().CreateEntity(persistentID);
+		m_persistentID = m_scene->GetRegistry().GetUUID(m_entityID);
+		if (persistentID == ReservedUUID::NONE) {
+			AddComponent<Transform>(); // every entity has a transform so far
+			AddComponent<HierarchyMember>(); // every entity is apart of the hierarchy
+		}
+		
+		//it gets loaded by scene if it has an uuid
+	}
+	Entity::Entity(Scene& scene,uint32_t entityID) { // get wrapper around entity
+		//maybe check if exists, if not return null entity ?
+		m_scene = &scene;
+		m_entityID = entityID;
+		m_persistentID = m_scene->GetRegistry().GetUUID(entityID);
+	}
 	Entity Entity::GetParent() {
 		if (GetComponent<HierarchyMember>().parent == 0)
 			return *this;

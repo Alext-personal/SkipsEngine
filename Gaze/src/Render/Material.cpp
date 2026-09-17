@@ -12,25 +12,19 @@ namespace Gaze {
 		m_ubo.SetData(&ndata, sizeof(MaterialBufferData), 0);
 	}
 
-	const MaterialData& Material::GetFallbackMaterial() {
-		static const MaterialData fallback = [] {
-			MaterialData data;
-			data.albedoTexture = ReservedUUID::NONE;
-			data.shader = ReservedUUID::NONE;
-			data.tint = { 1,1,1,1 };
-			return data;
-			}();
-		return fallback;
+	const MaterialData Material::GetFallbackMaterial() {
+		MaterialData data;
+		data.albedoTexture = ReservedUUID::NONE;
+		data.shader = ReservedUUID::NONE;
+		data.tint = { 1,1,1,1 };
+		return data;
 	}
-	const MaterialData& Material::GetDefaultMaterial() {
-		static const MaterialData defaultMat = [] {
-			MaterialData data;
-			data.albedoTexture = ReservedUUID::DEFAULTTEXTURE;
-			data.shader = ReservedUUID::DEFAULTSHADER;
-			data.tint = { 1,1,1,1 };
-			return data;
-			}();
-		return defaultMat;
+	const MaterialData Material::GetDefaultMaterial() {
+		MaterialData data;
+		data.albedoTexture = ReservedUUID::DEFAULTTEXTURE;
+		data.shader = ReservedUUID::DEFAULTSHADER;
+		data.tint = { 1,1,1,1 };
+		return data;
 	}
 
 	void Material::Bind() {

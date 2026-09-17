@@ -126,6 +126,16 @@ namespace Gaze {
 			return returnedComponents;
 		}
 		template <typename T>
+		std::vector<uint32_t> View() {
+			std::vector<uint32_t> entities;
+			auto& storage = GetComponentStorage<T>();
+			for (uint32_t index = 0; index < storage.components.size(); ++index) {
+				uint32_t entity = storage.denseEntities[index];
+				entities.push_back(entity);
+			}
+			return entities;
+		}
+		template <typename T>
 		void RemoveComponent(const uint32_t entity) {
 			auto& storage = GetComponentStorage<T>();
 			storage.RemoveComponent(entity);
@@ -150,11 +160,13 @@ namespace Gaze {
 		std::tuple<
 			ComponentRegistry<Transform>,
 			ComponentRegistry<MeshRenderer>,
-			ComponentRegistry<HierarchyMember>
+			ComponentRegistry<HierarchyMember>,
+			ComponentRegistry<Instantiated>
 				  > m_storages{
 			ComponentRegistry<Transform>{ComponentType::Transform},
 			ComponentRegistry<MeshRenderer>{ComponentType::MeshRenderer},
-			ComponentRegistry<HierarchyMember>{ComponentType::HierarchyMember}
+			ComponentRegistry<HierarchyMember>{ComponentType::HierarchyMember},
+			ComponentRegistry<Instantiated>{ComponentType::Instantiated }
 		};
 	private:
 		template <typename T>

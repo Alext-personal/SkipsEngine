@@ -13,7 +13,7 @@ namespace Gaze {
 		glDeleteProgram(m_shaderID);
 	}
 	void Shader::SetUniformMatrix4(const std::string& name, const glm::mat4& matrix) {
-		glProgramUniformMatrix4fv(m_shaderID,glGetUniformLocation(m_shaderID, name.c_str()), 1, 0, glm::value_ptr(matrix));
+		glProgramUniformMatrix4fv(m_shaderID,glGetUniformLocation(m_shaderID, name.c_str()), 1	, 0, glm::value_ptr(matrix));
 	}
 	void Shader::SetTextureSlots() {
 		TrySetUniformInt1("AlbedoTexture", TextureSlots::Albedo);
@@ -27,37 +27,34 @@ namespace Gaze {
 	
 	}
 
-	const std::vector<ShaderData>& Shader::GetFallbackShader() {
-		static const std::vector<ShaderData> fallback = [] {
-			std::vector<ShaderData> data;
-			ShaderData vertex;
-			ShaderData fragment;
-			vertex.type = ShaderType::Vertex;
-			vertex.src = R"(#version 460 core
-			layout(location = 0) in vec3 position;
-			uniform mat4 modelMatrix;
-			layout(std140, binding = 0) uniform Matrices {
-				mat4 projection;
-				mat4 view;
-			};
-			void main() 
-			{ 
-				gl_Position = projection * view * modelMatrix * vec4(position,1.0f);
-			}
-			)";
-			fragment.type = ShaderType::Fragment;
-			fragment.src = R"(#version 460 core
-			out vec4 color;
-			void main()
-			{
-				color = vec4(1.0,0.0,1.0,1.0);
-			}
-			)";
-			data.push_back(vertex);
-			data.push_back(fragment);
-			return data;
-			}();
-		return fallback;
+	const std::vector<ShaderData> Shader::GetFallbackShader() {
+		std::vector<ShaderData> data;
+		ShaderData vertex;
+		ShaderData fragment;
+		vertex.type = ShaderType::Vertex;
+		vertex.src = R"(#version 460 core
+		layout(location = 0) in vec3 position;
+		uniform mat4 modelMatrix;
+		layout(std140, binding = 0) uniform Matrices {
+			mat4 projection;
+			mat4 view;
+		};
+		void main() 
+		{ 
+			gl_Position = projection * view * modelMatrix * vec4(position,1.0f);
+		}
+		)";
+		fragment.type = ShaderType::Fragment;
+		fragment.src = R"(#version 460 core
+		out vec4 color;
+		void main()
+		{
+			color = vec4(1.0,0.0,1.0,1.0);
+		}
+		)";
+		data.push_back(vertex);
+		data.push_back(fragment);
+		return data;
 	}
 
 	void Shader::Bind() const {

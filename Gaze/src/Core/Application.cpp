@@ -12,6 +12,8 @@ namespace Gaze {
 		m_window->SetCallbackFunction(TO_EVENT_FN(OnEvent));
 		m_window->SetVSync(false);
 		Renderer::Init();
+		m_resourceManager.Initialize();
+		m_activeScene.Initialize();
 		m_assetManager.InitializeAssetsFolder();
 		m_assetManager.LoadAssets();
 		m_imguiLayer = new ImguiLayer();
@@ -26,15 +28,16 @@ namespace Gaze {
 	}
 	void Application::Run() {
 		LOG_INFO("App Started");
-		Entity ent(m_activeScene); // temp
-		ent.AddComponent<MeshRenderer>();
-		LOG_WARNING("entity 1 's parent is ${}", ent.GetParent().GetUUID());
-		Entity ent2(m_activeScene);
-		ent2.AddComponent<MeshRenderer>();
-		ent2.SetPosition({ 2,0,0 });
-		LOG_WARNING("entity 2 's parent is ${}", ent2.GetParent().GetUUID());
-		ent2.SetParent(ent);
-		LOG_WARNING("entity 2 's parent is set to  ${}", ent2.GetParent().GetUUID());
+		Entity ent = m_activeScene.Instantiate(13939449188406044608);
+		//Entity ent(m_activeScene); // temp
+		//ent.AddComponent<MeshRenderer>();
+		//LOG_WARNING("entity 1 's parent is ${}", ent.GetParent().GetUUID());
+		//Entity ent2(m_activeScene);
+		//ent2.AddComponent<MeshRenderer>();
+		//ent2.SetPosition({ 2,0,0 });
+		//LOG_WARNING("entity 2 's parent is ${}", ent2.GetParent().GetUUID());
+		//ent2.SetParent(ent);
+		//LOG_WARNING("entity 2 's parent is set to  ${}", ent2.GetParent().GetUUID());
 		auto start = GetTime();
 		auto t1 = GetTime();
 		LOG_INFO("Mesh loading took: ${} ", t1 - start);
@@ -44,6 +47,7 @@ namespace Gaze {
 		int frames = 0;
 		while (m_running) {
 			m_window->PollEvents();
+			m_resourceManager.OnFrameStart();
 			Renderer::BeginFrame();
 			float currentTime = glfwGetTime();
 			float timeStep = currentTime - lastTime;
@@ -68,8 +72,8 @@ namespace Gaze {
 			}
 			if (Input::IsKeyTapped(KeyCode::Tab))
 				Application::Get().GetWindow().SwitchCursorMode();
-			ent.SetTransform(m_imguiLayer->testTransform);
-			ent2.Rotate(glm::vec3{ 15,0,0 } *timeStep);
+			//ent.SetTransform(m_imguiLayer->testTransform);
+			//ent2.Rotate(glm::vec3{ 15,0,0 } *timeStep);
 			if(Application::Get().GetWindow().IsCursorDisabled())
 				EditorCamera::OnUpdate(timeStep); // temp to be moved to editor app
 			m_activeScene.OnUpdate(timeStep); //m_activescene to be moved to EDITOR APP
