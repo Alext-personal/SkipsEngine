@@ -29,7 +29,7 @@ namespace Gaze {
 	}
 	void Application::Run() {
 		LOG_INFO("App Started");
-		Entity ent = m_activeScene.Instantiate(10516349005428682034);
+		Entity ent = m_activeScene.Instantiate(11825589953740235702);
 		auto start = GetTime();
 		auto t1 = GetTime();
 		LOG_INFO("Mesh loading took: ${} ", t1 - start);
