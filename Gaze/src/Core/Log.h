@@ -21,20 +21,28 @@ namespace Gaze {
 			m_Log("WARNING", location, args...);
 		}
 		template <typename... Args>
-		static void LogInfo(const Args&... args) {
+		static void LogInfo(const std::source_location& location,const Args&... args) {
 			std::cout << Green << "[INFO] " << White;
 			Log_Time(std::cout);
-			std::string message = ParseArguments(args...);
+			std::string message = ParseArguments(location,args...);
 			std::cout << message << "\n";
+		}
+		static void LogFallback(const std::string& message,const std::source_location& location) {
+			std::cerr << Purple << "[FILE] : " << White << location.file_name() << " ";
+			std::cerr << Purple << "[LINE] : " << White << location.line() << "\n";
+			std::cout << Purple << "[LOGGER ERROR] " << White;
+			Log_Time(std::cout);
+			std::cout << message << "\n";
+			
 		}
 		template <typename... Args>
 		static void ASSERT(const std::string& type, bool condition, const std::source_location& location, const Args&... args) {
-			if (condition) {
+			if (!condition) {
 				m_Log("CRITICAL", location, args...);
 				if (type == "ENGINE")
 					std::abort();
 				if (type == "CLIENT")
-					throw std::runtime_error(ParseArguments(args...));
+					throw std::runtime_error(ParseArguments(location,args...));
 			}
 		}
 	private:
@@ -43,6 +51,7 @@ namespace Gaze {
 		inline static const char* Yellow{ "\033[33m" };
 		inline static const char* Green{ "\033[32m" };
 		inline static const char* DarkRed{ "\033[38;5;88m" };
+		inline static const char* Purple{ "\033[95m" };
 		template <typename... Args>
 		static void m_Log(const std::string& type, const std::source_location& location, const Args&... args) {
 			const char* colour = Green;
@@ -56,11 +65,11 @@ namespace Gaze {
 			std::cerr << colour << "[LINE] : " << White << location.line() << "\n";
 			std::cerr << colour << "[" << type << "] : " << White;
 			Log_Time(std::cerr);
-			std::string message = ParseArguments(args...);
+			std::string message = ParseArguments(location,args...);
 			std::cerr << message << "\n";
 		}
 		template <typename... Args>
-		static std::string ParseArguments(const Args&... args) {
+		static std::string ParseArguments(const std::source_location& location, const Args&... args) {
 			std::string returnedString;
 			bool isFirst = true;
 			auto argsTuble = std::forward_as_tuple(args...);
@@ -77,7 +86,9 @@ namespace Gaze {
 					size_t pos = returnedString.find("${}", searchPosition);
 
 					if (pos == std::string::npos)
-						throw std::runtime_error("INVALID LOGGER FORMAT");
+					{
+						LogFallback("INVALID LOGGER FORMAT", location);
+					}
 
 					std::string value = ToString(arg);
 
@@ -104,7 +115,7 @@ namespace Gaze {
 #define LOG_WARNING(...) \
 	Log::LogWarning(std::source_location::current(), __VA_ARGS__)
 #define LOG_INFO(...)\
-	Log::LogInfo(__VA_ARGS__)
+	Log::LogInfo(std::source_location::current(),__VA_ARGS__)
 #define ENGINE_ASSERT(condition,...)\
 	Log::ASSERT("ENGINE",condition,std::source_location::current(),__VA_ARGS__)
 #define CLIENT_ASSERT(condition,...)\

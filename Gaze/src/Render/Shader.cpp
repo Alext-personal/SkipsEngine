@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "Render/Shader.h"
+#include <glad/glad.h>
 namespace Gaze {
 	Shader::Shader(const std::vector<ShaderData>& shaders) {
 		m_shaderID = glCreateProgram();
@@ -85,9 +86,10 @@ namespace Gaze {
 				{
 					int logLength = 0;
 					glGetShaderiv(ID, GL_INFO_LOG_LENGTH, &logLength);
-					char log[1024];
+					char log[4096];
 					glGetShaderInfoLog(ID, logLength, &logLength, log);
-					LOG_ERROR("${} Shader failed to compile \nFilepath: ${} \nLog: ${} ", debugTypeName, log);
+					LOG_ERROR("${} Shader failed to compile \nLog: ${} ", debugTypeName, log);
+					return;
 				}
 			}
 			shadersToDelete.push_back(ID);
@@ -107,6 +109,7 @@ namespace Gaze {
 				glGetProgramInfoLog(m_shaderID, logLength, &logLength, log);
 
 				LOG_ERROR("Program failed to link :\nLog: ${}", log);
+				return;
 			}
 		}
 		for (uint32_t id : shadersToDelete) {

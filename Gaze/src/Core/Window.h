@@ -1,7 +1,7 @@
 #pragma once
 #include <functional>
 #include <string>
-class GLFWwindow;
+struct GLFWwindow;
 namespace Gaze {
 	class Event;
 	class Window {

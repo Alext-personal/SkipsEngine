@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "Render/Buffer.h"
+#include <glad/glad.h>
 namespace Gaze {
 	VertexBuffer::VertexBuffer(const std::vector<float>& data) {
 		glCreateBuffers(1, &m_ID);
@@ -10,7 +11,7 @@ namespace Gaze {
 	}
 	ElementBuffer::ElementBuffer(const std::vector<uint32_t>& data) {
 		glCreateBuffers(1, &m_ID);
-		glNamedBufferData(m_ID, data.size() * sizeof(float), data.data(), GL_STATIC_DRAW);
+		glNamedBufferData(m_ID, data.size() * sizeof(uint32_t), data.data(), GL_STATIC_DRAW);
 	}
 	ElementBuffer::~ElementBuffer() {
 		glDeleteBuffers(1, &m_ID);

@@ -48,7 +48,20 @@ namespace Gaze {
 			importHash = other.importHash;
 			assetType = other.assetType;
 			generatedDependencies = other.generatedDependencies;
+			snapshotHash = other.snapshotHash;
 			return *this;
+		}
+		MetaData(MetaData&& other) {
+			if (other.importSettings != nullptr)
+				importSettings = std::move(other.importSettings);
+			source = other.source;
+			id = other.id;
+			generatedFrom = other.generatedFrom;
+			isStandalone = other.isStandalone;
+			importHash = other.importHash;
+			assetType = other.assetType;
+			generatedDependencies = other.generatedDependencies;
+			snapshotHash = other.snapshotHash;
 		}
 		MetaData() = default;
 	};

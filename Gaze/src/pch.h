@@ -16,8 +16,6 @@
 #include <filesystem>
 #include <random>
 
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
 
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/glm.hpp>
@@ -26,14 +24,6 @@
 #include <glm/vec3.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/quaternion.hpp>
-
-#include <imgui.h>
-#include <imgui_impl_opengl3.h>
-#include <imgui_impl_glfw.h>
-
-#include <assimp/Importer.hpp>   
-#include <assimp/scene.h>           
-#include <assimp/postprocess.h> 
 
 #include <yaml-cpp/yaml.h>
 

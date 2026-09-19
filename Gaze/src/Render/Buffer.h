@@ -17,6 +17,7 @@ namespace Gaze {
 		case AttributeDataType::Int4: return 4 * 4;
 
 		case AttributeDataType::Bool: return 1;
+		case AttributeDataType::None: return 0;
 		}
 	}
 	static std::string AttributeDataTypeToString(AttributeDataType type) {
@@ -107,6 +108,8 @@ namespace Gaze {
 	class VertexBuffer {
 	public:
 		VertexBuffer(const std::vector<float>& data);
+		VertexBuffer(const VertexBuffer& other) = delete;
+		VertexBuffer& operator= (const VertexBuffer& other) = delete;
 		~VertexBuffer();
 		uint32_t GetID() const { return m_ID; }
 	private:
@@ -115,6 +118,8 @@ namespace Gaze {
 	class ElementBuffer {
 	public:
 		ElementBuffer(const std::vector<uint32_t>& data);
+		ElementBuffer(const ElementBuffer& other) = delete;
+		ElementBuffer& operator= (const ElementBuffer& other) = delete;
 		~ElementBuffer();
 		uint32_t GetID() const { return m_ID; }
 	private:
@@ -123,6 +128,8 @@ namespace Gaze {
 	class UniformBuffer {
 	public:
 		UniformBuffer(uint32_t size, uint32_t binding);
+		UniformBuffer(const UniformBuffer& other) = delete;
+		UniformBuffer& operator= (const UniformBuffer& other) = delete;
 		~UniformBuffer();
 		void SetData(const void* data, uint32_t size, uint32_t offset);
 		void Bind(uint32_t binding);

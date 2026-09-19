@@ -94,7 +94,7 @@ namespace Gaze {
 	class ResourceManager {
 	public:
 		static ResourceManager& Get() {
-			ENGINE_ASSERT(s_instance == nullptr, "NO RESOURCE MANAGER INSTANCE");
+			ENGINE_ASSERT(s_instance != nullptr, "NO RESOURCE MANAGER INSTANCE");
 			return *s_instance;
 		}
 		ResourceManager();
@@ -112,7 +112,7 @@ namespace Gaze {
 				if (m_resourcesImportData.find(id) == m_resourcesImportData.end()) {
 					if (id.GetFlag() == 0) {
 						if(id == ReservedUUID::DEFAULTTEXTURE)
-							LOG_ERROR("LOADED DEFAULT TEXTURE");
+							LOG_INFO("LOADED DEFAULT TEXTURE");
 						loadedAsset = LoadResource<T>(id);
 					}
 					else
@@ -145,7 +145,7 @@ namespace Gaze {
 			}
 		}
 		void ScheduleLoadResourceData(const UUID& id, const ResourceImportData& data) {
-			LOG_WARNING("SCHEDULED RESOURCE DATA WITH UUID : ${},", id.Get());
+			LOG_INFO("SCHEDULED RESOURCE DATA WITH UUID : ${},", id.Get());
 			m_resourcesImportData[id].state = ResourceImportState::Pending;
 			m_scheduled.push({ id,std::make_unique<ResourceImportData>(data),TaskType::Load });
 		}

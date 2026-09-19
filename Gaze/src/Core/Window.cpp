@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "Core/Window.h"
+#include "GLFW/glfw3.h"
 namespace Gaze {
 	Window::Window(unsigned int width, unsigned int height, const char* name) {
 		if (!glfwInit()) {
@@ -26,19 +27,19 @@ namespace Gaze {
 		//callbacks
 
 		glfwSetWindowCloseCallback(m_window, [](GLFWwindow* window) {
-			WindowData data = *(WindowData*)glfwGetWindowUserPointer(window);
+			WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
 			WindowCloseEvent event;
 			data.EventCallback(event);
 			});
 		glfwSetWindowSizeCallback(m_window, [](GLFWwindow* window, int width, int height) {
-			WindowData data = *(WindowData*)glfwGetWindowUserPointer(window);
+			WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
 			WindowResizeEvent event(width, height);
 			data.width = width;
 			data.height = height;
 			data.EventCallback(event);
 			});
 		glfwSetKeyCallback(m_window, [](GLFWwindow* window, int key, int scancode, int action, int mods) {
-			WindowData data = *(WindowData*)glfwGetWindowUserPointer(window);
+			WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
 			KeyCode _key = static_cast<KeyCode>(key);
 			switch (action)
 			{
@@ -63,12 +64,12 @@ namespace Gaze {
 			}
 			});
 		glfwSetCursorPosCallback(m_window, [](GLFWwindow* window, double xpos, double ypos) {
-			WindowData data = *(WindowData*)glfwGetWindowUserPointer(window);
+			WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
 			MouseMoveEvent event(xpos, ypos);
 			data.EventCallback(event);
 			});
 		glfwSetMouseButtonCallback(m_window, [](GLFWwindow* window, int button, int action, int mods) {
-			WindowData data = *(WindowData*)glfwGetWindowUserPointer(window);
+			WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
 			MouseCode _button = static_cast<MouseCode>(button);
 			switch (action)
 			{
@@ -87,7 +88,7 @@ namespace Gaze {
 			}
 			});
 		glfwSetScrollCallback(m_window, [](GLFWwindow* window, double xoffset, double yoffset) {
-			WindowData data = *(WindowData*)glfwGetWindowUserPointer(window);
+			WindowData& data = *(WindowData*)glfwGetWindowUserPointer(window);
 			MouseScrollEvent event(xoffset, yoffset);
 			data.EventCallback(event);
 			});

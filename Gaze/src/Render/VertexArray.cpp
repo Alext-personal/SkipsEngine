@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "Render/VertexArray.h"
+#include <glad/glad.h>
 namespace Gaze {
 	static GLenum AttributeDataTypeToGLenum(AttributeDataType type) {
 		switch (type) {

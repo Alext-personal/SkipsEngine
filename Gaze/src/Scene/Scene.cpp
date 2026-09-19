@@ -33,7 +33,6 @@ namespace Gaze {
 		ResourceManager::Get().ScheduleUnloadResources();
 	}
 	inline Entity SpawnPrefabNode(Scene& scene, const UUID& prefabID, const UUID instanceID, const UUID& nodeID) {
-		LOG_ERROR("Fetched PREFAB");
 		const Prefab& prefab = *ResourceManager::Get().GetResource<Prefab>(prefabID);
 		Entity ent(scene);
 		Instantiated& inst = ent.AddComponent<Instantiated>();
@@ -90,7 +89,7 @@ namespace Gaze {
 	}
 	void Scene::ResolveInstances(const UUID& prefabID)
 	{
-		LOG_ERROR("RESOLVING INSTANCES, GOT HERE CALLED!! RESOLVING FOR PREFAB WITH ID ${}", prefabID);
+		LOG_INFO("RESOLVING PREFAB INSTANCES . RESOLVING FOR PREFAB WITH ID ${}", prefabID);
 		std::shared_ptr<Prefab> prefab = ResourceManager::Get().GetResource<Prefab>(prefabID);
 		if (!prefab)
 			return;

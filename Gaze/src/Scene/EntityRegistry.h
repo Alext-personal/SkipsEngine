@@ -20,7 +20,7 @@ namespace Gaze {
 			denseEntities.reserve(5000);
 		}
 		void RemoveComponent(const uint32_t entity) override {
-			if (sparse[entity] == NO_COMPONENT || entity >= sparse.size())
+			if (entity >= sparse.size() || sparse[entity] == NO_COMPONENT )
 				return;
 			const uint32_t index = sparse[entity];
 			denseEntities[index] = denseEntities.back();
@@ -114,12 +114,16 @@ namespace Gaze {
 			if (TSize <= QSize) // search the smallest container, and pick the ones that also have T
 				for (uint32_t index = 0; index < TSize; ++index) {
 					uint32_t entity = TStorage.denseEntities[index];
+					if (entity >= QStorage.sparse.size())
+						continue;
 					if (QStorage.sparse[entity] != NO_COMPONENT)
 						returnedComponents.emplace_back(&TStorage.components[index], &QStorage.components[QStorage.sparse[entity]]);
 				}
 			else
 				for (uint32_t index = 0; index < QSize; ++index) {
 					uint32_t entity = QStorage.denseEntities[index];
+					if (entity >= TStorage.sparse.size())
+						continue;
 					if (TStorage.sparse[entity] != NO_COMPONENT)
 						returnedComponents.emplace_back(&TStorage.components[TStorage.sparse[entity]], &QStorage.components[index]);
 				}

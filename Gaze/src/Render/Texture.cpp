@@ -1,7 +1,8 @@
 #include "pch.h"
 #include "Texture.h"
+#include <glad/glad.h>
 namespace Gaze {
-	inline GLenum PixelDataFormatToGlFormat(PixelDataFormat pixel)
+	static GLenum PixelDataFormatToGlFormat(PixelDataFormat pixel)
 	{
 		switch (pixel)
 		{
@@ -21,7 +22,7 @@ namespace Gaze {
 
 		return GL_RGBA;
 	}
-	inline GLenum PixelDataFormatToSizedGlFormat(PixelDataFormat format) {
+	static GLenum PixelDataFormatToSizedGlFormat(PixelDataFormat format) {
 		switch (format) {
 			case PixelDataFormat::R8:      return GL_R8;
 			case PixelDataFormat::R16:     return GL_R16;
@@ -37,7 +38,7 @@ namespace Gaze {
 			case PixelDataFormat::RGBA32F: return GL_RGBA32F;
 		}
 	}
-	inline GLenum PixelDataFormatToGlType(PixelDataFormat pixel)
+	static GLenum PixelDataFormatToGlType(PixelDataFormat pixel)
 	{	
 		switch (pixel)
 		{

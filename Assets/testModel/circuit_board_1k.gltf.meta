@@ -1,5 +1,5 @@
 Source: F:\SkipsEngine\Assets\testModel\circuit_board_1k.gltf
-UUID: 14374022305517527365
+UUID: 13309170036288791520
 Type: Source
 Generated From: 0
 SnapshotHash: 0
@@ -7,26 +7,26 @@ ImportHash: 355959307082049502
 Standalone: true
 Generated Dependencies:
   - NodePath: circuit_board
-    UUID: 18411731468410441649
+    UUID: 15479904653702857277
     Type: Mesh
   - NodePath: circuit_board_diff_1k.jpg
-    UUID: 10953105092479348121
+    UUID: 12671809768483519225
     Type: Texture
   - NodePath: circuit_board_arm_1k.jpg
-    UUID: 17856664598733095965
+    UUID: 10175358222725237267
     Type: Texture
   - NodePath: circuit_board_nor_gl_1k.jpg
-    UUID: 16557320772158676050
+    UUID: 12436593279222698289
     Type: Texture
   - NodePath: circuit_board
-    UUID: 14252923893315288944
+    UUID: 9710632747317901945
     Type: Material
   - NodePath: circuit_board_alpha
-    UUID: 17023598999235705163
+    UUID: 13427449862624503724
     Type: Material
   - NodePath: Material_2
-    UUID: 18370554551494784434
+    UUID: 12123561011946729765
     Type: Material
   - NodePath: F:\SkipsEngine\Assets\circuit_board_1k.gprefab
-    UUID: 13939449188406044608
+    UUID: 10516349005428682034
     Type: Prefab

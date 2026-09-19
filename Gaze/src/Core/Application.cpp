@@ -4,10 +4,11 @@
 #include "Render/EditorCamera.h" //temp
 #include "Scene/Entity.h" // temp
 #include "Resources/EditorTEMP/AssetManager.h"
+#include <GLFW/glfw3.h>
 namespace Gaze {
 	Application::Application() : m_window(std::make_unique<Window>(1920, 1080, "Skips-Engine")), m_activeScene{}
 	{
-		ENGINE_ASSERT(s_instance != nullptr,"Duplicate Application Instance");
+		ENGINE_ASSERT(s_instance == nullptr,"Duplicate Application Instance");
 		s_instance = this;
 		m_window->SetCallbackFunction(TO_EVENT_FN(OnEvent));
 		m_window->SetVSync(false);
@@ -28,16 +29,7 @@ namespace Gaze {
 	}
 	void Application::Run() {
 		LOG_INFO("App Started");
-		Entity ent = m_activeScene.Instantiate(13939449188406044608);
-		//Entity ent(m_activeScene); // temp
-		//ent.AddComponent<MeshRenderer>();
-		//LOG_WARNING("entity 1 's parent is ${}", ent.GetParent().GetUUID());
-		//Entity ent2(m_activeScene);
-		//ent2.AddComponent<MeshRenderer>();
-		//ent2.SetPosition({ 2,0,0 });
-		//LOG_WARNING("entity 2 's parent is ${}", ent2.GetParent().GetUUID());
-		//ent2.SetParent(ent);
-		//LOG_WARNING("entity 2 's parent is set to  ${}", ent2.GetParent().GetUUID());
+		Entity ent = m_activeScene.Instantiate(10516349005428682034);
 		auto start = GetTime();
 		auto t1 = GetTime();
 		LOG_INFO("Mesh loading took: ${} ", t1 - start);

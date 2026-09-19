@@ -4,10 +4,12 @@
 #include "Render/VertexArray.h"
 #include "Render/Material.h"
 #include "Resources/ResourceManager.h"
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
 namespace Gaze {
 	void Renderer::Init() {
 		if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
-			ENGINE_ASSERT(1, "Error at glad initialisation");
+			ENGINE_ASSERT(0, "Error at glad initialisation");
 		s_uniformBuffer = std::make_unique<UniformBuffer>(sizeof(CameraUniformPass), 0);
 	}
 	void Renderer::BeginFrame() {
@@ -17,6 +19,11 @@ namespace Gaze {
 	}
 	void Renderer::Draw(const Transform& transform, MeshRenderer& meshRenderer) {
 		std::shared_ptr<Mesh> mesh = ResourceManager::Get().GetResource<Mesh>(meshRenderer.mesh);
+		if (mesh == nullptr)
+		{
+			LOG_ERROR(0, "TRIED TO RENDER NULL MESH, SKIPPING DRAW CALL");
+			return;
+		}
 		mesh->GetVAO().Bind();
 		if (!mesh->HasEBO()) {
 			glDrawArrays(GL_TRIANGLES, 0, mesh->GetVertexCount());
@@ -25,6 +32,11 @@ namespace Gaze {
 			if (!mesh->GetSubMeshes().empty())
 				for (const auto& submesh : mesh->GetSubMeshes()) {
 					std::shared_ptr<Material> material = ResourceManager::Get().GetResource<Material>(meshRenderer.materials[submesh.materialIndex]);
+					if (material == nullptr)
+					{
+						LOG_ERROR("Tried to bind nullptr material, skipping submesh");
+						continue;
+					}
 					material->Bind();
 					std::shared_ptr<Shader> shader = ResourceManager::Get().GetResource<Shader>(material->shader);
 					shader->SetUniformMatrix4("modelMatrix", transform.GetMatrix());

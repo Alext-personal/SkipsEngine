@@ -6,12 +6,15 @@
 #include "Render/Mesh.h"
 #include "Core/Helpers.h"
 #include <xxhash.h>
+#include <assimp/Importer.hpp>   
+#include <assimp/scene.h>           
+#include <assimp/postprocess.h> 
 #define STB_IMAGE_RESIZE_IMPLEMENTATION
 #include <stb_image_resize2.h>
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 namespace Gaze {
-	inline static std::vector<aiTextureType> TextureTypes
+	inline static const std::vector<aiTextureType> TextureTypes
 	{ aiTextureType_BASE_COLOR,aiTextureType_DIFFUSE,aiTextureType_METALNESS,
 		aiTextureType_DIFFUSE_ROUGHNESS,aiTextureType_NORMALS,aiTextureType_OPACITY,
 		aiTextureType_SPECULAR,aiTextureType_SHININESS
@@ -34,10 +37,10 @@ namespace Gaze {
 	};
 	struct TextureNodeData {
 		UUID id;
-		std::filesystem::path relativePath ="SHITASSFUCKYOU";
+		std::filesystem::path relativePath;
 		int textureSlot = -10; // -10 = material isn't in use anymore
 	};
-	inline YAML::Node BuildMaterialFile(const aiScene* scene, const MaterialNodeData& data) {
+	static YAML::Node BuildMaterialFile(const aiScene* scene, const MaterialNodeData& data) {
 		YAML::Node root;
 		YAML::Node materialNode;
 
@@ -62,7 +65,7 @@ namespace Gaze {
 		tint.push_back(baseColor.a);
 		materialNode["Tint"] = tint;
 
-		// shader-specific params
+		// shader specific params
 		if (data.shaderType == "Pbr") {
 			float metallic = 0.0f, roughness = 1.0f;
 			mat->Get(AI_MATKEY_METALLIC_FACTOR, metallic);
@@ -96,7 +99,7 @@ namespace Gaze {
 		root["Material"] = materialNode;
 		return root;
 	}
-	inline uint64_t SaveSnapshot(void* snapshot, uint32_t size,uint64_t oldSnapshot,std::string name) {
+	static uint64_t SaveSnapshot(void* snapshot, uint32_t size,uint64_t oldSnapshot,std::string name) {
 		uint64_t newSnapshotHash = AssetImporter::GetContentHash(snapshot, size);
 		if (newSnapshotHash != oldSnapshot) {
 			std::filesystem::path snapshotPath = (GetCurrentPath() / "Library" / "Snapshots" / name).lexically_normal();
@@ -115,7 +118,7 @@ namespace Gaze {
 		}
 		return oldSnapshot;
 	}
-	inline bool ModifyMetaImportHash(MetaData& meta) {
+	static bool ModifyMetaImportHash(MetaData& meta) {
 		std::filesystem::path metaPath = meta.source;
 		metaPath += ".meta";
 		if (!std::filesystem::exists(metaPath) && meta.isStandalone == false)
@@ -150,7 +153,7 @@ namespace Gaze {
 		file.close();
 		return true;
 	}
-	inline void ExtractPrefabNodeIDs(const YAML::Node& node, std::unordered_map<std::filesystem::path, NodeData>& outMesh) {
+	static void ExtractPrefabNodeIDs(const YAML::Node& node, std::unordered_map<std::filesystem::path, NodeData>& outMesh) {
 		YAML::Node entity = node["Entity"];
 		if (!entity || !entity["NodePath"] || !entity["UUID"])
 			return;
@@ -159,7 +162,7 @@ namespace Gaze {
 			ExtractPrefabNodeIDs(child, outMesh);
 	}
 
-	inline void ExtractPrefabNodeIDs(const std::filesystem::path& filepath, std::unordered_map<std::filesystem::path, NodeData>& outMesh) {
+	static void ExtractPrefabNodeIDs(const std::filesystem::path& filepath, std::unordered_map<std::filesystem::path, NodeData>& outMesh) {
 		if (!std::filesystem::exists(filepath))
 			return;
 		YAML::Node file;
@@ -179,7 +182,7 @@ namespace Gaze {
 		ExtractPrefabNodeIDs(prefab, outMesh);
 		
 	}
-	inline void LoadSourceMeta(std::unordered_map<std::filesystem::path, NodeData>& outMesh,std::unordered_map<std::string,MaterialNodeData>& outMat
+	static void LoadSourceMeta(std::unordered_map<std::filesystem::path, NodeData>& outMesh,std::unordered_map<std::string,MaterialNodeData>& outMat
 		,std::unordered_map<std::string,TextureNodeData>& outTex,UUID& prefabID,const MetaData& data) {
 		for (auto& dependency : data.generatedDependencies) {
 			MaterialNodeData matNode;
@@ -210,7 +213,7 @@ namespace Gaze {
 			
 		}
 	}
-	inline void GetNodePath(const aiNode* node,std::filesystem::path& out) {
+	static void GetNodePath(const aiNode* node,std::filesystem::path& out) {
 		if (node == nullptr)
 			return;
 		if (node->mParent == nullptr) {
@@ -222,7 +225,7 @@ namespace Gaze {
 			out = out / node->mName.C_Str();
 		}
 	}
-	inline void ExtractNodes(const aiScene* scene,const aiNode* node,std::unordered_map<std::filesystem::path,NodeData>& out,bool& dirty) {
+	static void ExtractNodes(const aiScene* scene,const aiNode* node,std::unordered_map<std::filesystem::path,NodeData>& out,bool& dirty) {
 		std::filesystem::path nodePath{};
 		GetNodePath(node,nodePath);
 		NodeData loadedNode;
@@ -323,7 +326,7 @@ namespace Gaze {
 			ExtractNodes(scene, child, out,dirty);
 		}
 	}
-	inline void ExtractMaterialIDs(const aiScene* scene, std::unordered_map<std::string,MaterialNodeData>& out,std::vector<UUID>& indexes,bool& dirty) {
+	static void ExtractMaterialIDs(const aiScene* scene, std::unordered_map<std::string,MaterialNodeData>& out,std::vector<UUID>& indexes,bool& dirty) {
 		std::unordered_map<std::filesystem::path, uint32_t> count;
 		for (uint32_t index = 0; index < scene->mNumMaterials; ++index) {
 			aiMaterial* mat = scene->mMaterials[index];
@@ -380,7 +383,7 @@ namespace Gaze {
 			
 		}
 	}
-	inline void ExtractTextureIDs(std::filesystem::path relativepath,const aiScene* scene, std::unordered_map<std::string, TextureNodeData>& out,std::unordered_map<std::string,MaterialNodeData>& out2,bool& dirty) {
+	static void ExtractTextureIDs(std::filesystem::path relativepath,const aiScene* scene, std::unordered_map<std::string, TextureNodeData>& out,std::unordered_map<std::string,MaterialNodeData>& out2,bool& dirty) {
 		for (uint32_t index = 0; index < scene->mNumMaterials; ++index) {
 			aiMaterial* mat = scene->mMaterials[index];
 			std::string materialName = mat->GetName().C_Str();
@@ -429,7 +432,7 @@ namespace Gaze {
 			}
 		} 
 	}
-	inline std::filesystem::path CookMesh(const MeshData& mesh,const UUID& uuid) {
+	static std::filesystem::path CookMesh(const MeshData& mesh,const UUID& uuid) {
 		std::filesystem::path filepath = (GetCurrentPath() / "Library" / "Client" / "Meshes" / uuid.ToString()).lexically_normal();
 		filepath += ".gmesh";
 		std::filesystem::create_directories(filepath.parent_path());
@@ -510,6 +513,7 @@ namespace Gaze {
 			if (value.mesh.subMeshes.empty()) {
 				ResourceManager::Get().ScheduleUnloadResourceData(value.meshID);
 				std::filesystem::path removedPath = (GetCurrentPath() / "Library" / "Client" / "Meshes" / value.meshID.ToString()).lexically_normal();
+				dirtyMeta = true;
 				removedPath += ".gmesh";
 				if(std::filesystem::exists(removedPath))
 					std::filesystem::remove(removedPath);
@@ -533,6 +537,7 @@ namespace Gaze {
 		}
 		for (auto& [key, value] : loadedTextures) {
 			if (value.textureSlot == -10) {//expired / replaced texture
+				dirtyMeta = true;
 				if (m_registry.storage[value.id].isStandalone == true)
 					continue;
 				ResourceManager::Get().ScheduleUnloadResourceData(value.id);
@@ -695,6 +700,7 @@ namespace Gaze {
 		}
 		for (auto& [key, value] : loadedMaterials) {
 			if (value.shaderType.empty()) {//expired / replaced mat
+				dirtyMeta = true;
 				if (m_registry.storage[value.id].isStandalone == true)
 					continue;
 				ResourceManager::Get().ScheduleUnloadResourceData(value.id);

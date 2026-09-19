@@ -12,7 +12,7 @@
 #include "Resources/ResourceLoader.h"
 namespace Gaze {
 	ResourceManager::ResourceManager() {
-		ENGINE_ASSERT(s_instance != nullptr, "DUPLICATE RESOURCE MANAGER INSTANCE");
+		ENGINE_ASSERT(s_instance == nullptr, "DUPLICATE RESOURCE MANAGER INSTANCE");
 		s_instance = this;
 		m_resources.resize(5);
 		m_resources[GetResourceTypeID<Mesh>()] = std::make_unique<ResourceStorage<Mesh>>(AssetType::Mesh);
@@ -99,7 +99,6 @@ namespace Gaze {
 			LOG_ERROR("Resource with UUID : ${} failed to load, No Data  ", id);
 			return std::make_shared<Prefab>(Prefab::GetFallbackPrefab());
 		}
-		LOG_ERROR("GOT HERE PREFAB LOADER");
 		Prefab loadedPrefab = ResourceLoader::LoadPrefab(m_resourcesImportData[id].filepath);
 		std::shared_ptr<Prefab> loadedAsset = std::make_shared<Prefab>(loadedPrefab);
 
@@ -152,7 +151,7 @@ namespace Gaze {
 				}
 				break;
 			case TaskType::Unload:
-				if (auto it = m_resourcesImportData.find(task.id) != m_resourcesImportData.end())
+				if (auto it = m_resourcesImportData.find(task.id); it != m_resourcesImportData.end())
 					m_resourcesImportData.erase(it);
 				for (auto& storage : m_resources)
 					storage->Clear(task.id);

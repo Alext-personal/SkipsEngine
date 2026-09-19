@@ -15,8 +15,10 @@ namespace Gaze {
     inline std::string DumpFileToString(const std::filesystem::path& filepath) {
         std::stringstream ss;
         std::ifstream file(filepath);
-        if (!file)
+        if (!file) {
             LOG_ERROR("Failed to open file: ${} ", filepath);
+            return "";
+        }
         ss << file.rdbuf();
         return ss.str();
     }

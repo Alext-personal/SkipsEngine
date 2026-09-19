@@ -27,6 +27,7 @@ namespace Gaze {
 		case AssetType::Source:
 			return "Source";
 		}
+		ENGINE_ASSERT(type == AssetType::None, "NO ASSET TYPE");
 	}
 	inline AssetType StringToAssetType(const std::string& str) {
 		if (str == "Material")
@@ -41,7 +42,7 @@ namespace Gaze {
 			return AssetType::Prefab;
 		if (str == "Source")
 			return AssetType::Source;
-		ENGINE_ASSERT(1,"INVALID STRING ASSETTYPE");
+		ENGINE_ASSERT(0,"INVALID STRING ASSETTYPE");
 	}
 	template <typename T>
 	struct AssetHandle {

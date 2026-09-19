@@ -40,6 +40,12 @@ namespace Gaze{
 			return Primitives::LoadPrimitiveByType(PrimitiveType::Cube);
 		}
 		std::ifstream file(filepath, std::ios::binary);
+		if (!file.is_open())
+		{
+			LOG_ERROR("${} : could not open file", filepath);
+			return Primitives::LoadPrimitiveByType(PrimitiveType::Cube);
+
+		}
 		MeshFileHeader header;
 		MeshData returnedData;
 		file.read(reinterpret_cast<char*>(&header), sizeof(header));
@@ -121,7 +127,6 @@ namespace Gaze{
 		if (!entity || !entity["NodePath"] || !entity["UUID"])
 			return;
 		UUID nodeID = entity["UUID"].as<uint64_t>();
-		LOG_ERROR("[PREFAB] AT NODEID : ${} :", nodeID);
 		Transform tr;
 		std::vector<float> pos, rot, scl;
 		pos = entity["Transform"]["Position"].as<std::vector<float>>();
@@ -170,30 +175,6 @@ namespace Gaze{
 		Prefab returned;
 
 		ExtractPrefabRecursive(file, returned);
-		for (auto& [nodeID, prefabNode] : returned.data) {
-			LOG_ERROR(
-				"PrefabNode: nodeID=${}, meshID=${}, parentID=${}, materialCount=${}",
-				nodeID,
-				prefabNode.meshID,
-				prefabNode.parentID,
-				prefabNode.materialIDs.size()
-			);
-			LOG_ERROR(
-				"Transform: position=(${}, ${}, ${}), rotation=(${}, ${}, ${}), scale=(${}, ${}, ${})",
-				prefabNode.transform.GetPosition().x,
-				prefabNode.transform.GetPosition().y,
-				prefabNode.transform.GetPosition().z,
-				prefabNode.transform.GetRotationEuler().x,
-				prefabNode.transform.GetRotationEuler().y,
-				prefabNode.transform.GetRotationEuler().z,
-				prefabNode.transform.GetScale().x,
-				prefabNode.transform.GetScale().y,
-				prefabNode.transform.GetScale().z
-			);
-			for (const auto& materialID : prefabNode.materialIDs) {
-				LOG_ERROR("  MaterialID=${}", materialID);
-			}
-		}
 		return returned;
 	}
 	MaterialData ResourceLoader::LoadMaterial(const std::filesystem::path& filepath) {

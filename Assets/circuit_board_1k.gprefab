@@ -1,6 +1,6 @@
 Prefab:
   Entity:
-    UUID: 18411731468410441649
+    UUID: 15479904653702857277
     NodePath: circuit_board
     Transform:
       Position:
@@ -16,10 +16,10 @@ Prefab:
         - 1
         - 1
     MeshRenderer:
-      Mesh: 16607783987920592896
+      Mesh: 16606759141873609857
       Materials:
-        - 14252923893315288944
-        - 17023598999235705163
+        - 9710632747317901945
+        - 13427449862624503724
     HierarchyMember:
       Parent: 0
       PrevSibling: 0
