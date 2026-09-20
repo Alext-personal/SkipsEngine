@@ -4,95 +4,120 @@
 #include "Resources/EditorTEMP/AssetRegistry.h"
 #include "Resources/ResourceManager.h"
 namespace Gaze {
-	inline AssetType GetAssetTypeFromFileExtension(const std::string& extension) {
-		if (extension == ".png" || extension == ".jpg" || extension == ".jpeg" || extension == ".hdr")
-			return AssetType::Texture;
-		if (extension == ".gshader")
-			return  AssetType::Shader;
-		if (extension == ".fbx" || extension == ".obj" || extension == ".gltf" || extension == ".glb")
-			return  AssetType::Source;
-		if (extension == ".gprefab")
-			return AssetType::Prefab;
-		if (extension == ".gmat")
-			return AssetType::Material;
-		return AssetType::None;
+	namespace {
+		AssetType GetAssetTypeFromFileExtension(const std::string& extension) {
+			if (extension == ".png" || extension == ".jpg" || extension == ".jpeg" || extension == ".hdr")
+				return AssetType::Texture;
+			if (extension == ".gshader")
+				return  AssetType::Shader;
+			if (extension == ".fbx" || extension == ".obj" || extension == ".gltf" || extension == ".glb")
+				return  AssetType::Source;
+			if (extension == ".gprefab")
+				return AssetType::Prefab;
+			if (extension == ".gmat")
+				return AssetType::Material;
+			return AssetType::None;
+		}
+		bool LoadMetaFile(const std::filesystem::path& filepath,MetaData& out) {
+			if (std::filesystem::exists(filepath))
+			{
+				YAML::Node metafile;
+				try {
+					metafile = YAML::LoadFile(filepath.string());
+				}
+				catch (const YAML::Exception& e) {
+					LOG_ERROR("YAML FILE FAILED TO OPEN :${},  ${}", filepath, e.what());
+					return false;
+				}
+				out.assetType = StringToAssetType(metafile["Type"].as<std::string>());
+				out.importSettings = nullptr;
+				out.source = metafile["Source"].as<std::string>();
+				out.id = metafile["UUID"].as<uint64_t>();
+				out.importHash = metafile["ImportHash"].as<uint64_t>();
+				out.snapshotHash = metafile["SnapshotHash"].as<uint64_t>();
+				if (metafile["Generated Dependencies"])
+					out.generatedDependencies = metafile["Generated Dependencies"].as<std::vector<AssetDependency>>(); 
+				out.isStandalone = metafile["Standalone"].as<bool>();
+				out.generatedFrom = metafile["Generated From"].as<uint64_t>();
+				switch (out.assetType) {
+				case AssetType::Texture:
+					out.importSettings = std::make_unique<TextureImportSettings>(metafile["ImportSettings"]);
+					break;
+				}
+				return true;
+			}
+			return false;
+		}
+		void CreateMetaData(const std::filesystem::path& srcPath, MetaData& out) {
+
+			out.isStandalone = true;
+			out.generatedFrom = 0;
+			out.id = UUID();
+			out.source = srcPath.lexically_normal();
+			out.importSettings = nullptr;
+			out.importHash = 0; //generate it on actual import
+			out.snapshotHash = 0;
+			switch (out.assetType) {
+			case AssetType::Texture:
+				out.importSettings = std::make_unique<TextureImportSettings>();
+				break;
+			}
+		}
+		bool WriteMetaYAML(const MetaData& in,YAML::Node& out) {
+			out["Source"] = in.source.string();
+			out["UUID"] = in.id.Get();
+			out["Type"] = AssetTypeToString(in.assetType);
+			out["Generated From"] = 0;
+			out["SnapshotHash"] = 0;
+			out["ImportHash"] = in.importHash;
+			out["Standalone"] = true;
+			switch (in.assetType) {
+			case AssetType::Texture:
+				out["ImportSettings"] = in.importSettings->Serialize();
+				break;
+			}
+		}
+		
+	}
+	void AssetManager::ProcessFile(const std::filesystem::path& filepath) {
+		std::string extension = filepath.extension().string();
+		AssetType typeFromExtension = GetAssetTypeFromFileExtension(extension);
+		if (typeFromExtension == AssetType::None)
+			return;
+
+		std::filesystem::path metapath = filepath;
+		metapath += ".meta";
+
+		MetaData meta;
+		bool success = LoadMetaFile(metapath, meta);
+		if (success) {
+			if (typeFromExtension != meta.assetType)
+			{
+				LOG_WARNING("META FILE ASSET TYPE DIFFERS FROM FILE ASSET TYPE ${}   ${}", metapath, filepath);
+				return;
+			}
+		}
+		else
+		{
+			meta.assetType = typeFromExtension;
+			CreateMetaData(filepath, meta);
+
+			YAML::Node metafile;
+			WriteMetaYAML(meta, metafile);
+			std::ofstream fl(metapath);
+			fl << metafile;
+			fl.close();
+		}
+		m_registry.storage[meta.id] = meta;
+		if (meta.assetType == AssetType::Source)
+			m_priorityImports[meta.id] = meta;
 	}
 	void AssetManager::InitializeAssetsFolder() { // .meta -> memory, if !.meta, import asset, create .meta
 		for (const auto& file : std::filesystem::recursive_directory_iterator(m_registry.currentPath))
 		{
 			if (file.is_directory())
 				continue;
-			std::string extension = file.path().extension().string();
-			MetaData meta;
-			meta.assetType = GetAssetTypeFromFileExtension(extension);
-
-			if (meta.assetType == AssetType::None) {
-				continue;
-			}
-			std::filesystem::path metapath = file.path();
-			metapath += ".meta";
-
-			if (std::filesystem::exists(metapath))
-			{
-				bool error = false;
-				YAML::Node metafile = YAML::LoadFile(metapath.string());
-				if (meta.assetType != StringToAssetType(metafile["Type"].as<std::string>())) {
-					LOG_ERROR("${} Meta file type mismatch (source and meta have different types)", metapath);
-					error = true;
-				}
-				if(file.path() != std::filesystem::path(metafile["Source"].as<std::string>())){
-					LOG_ERROR("${} Meta file type mismatch (meta source is not  source asset path) : ${}   ${}", metapath,file.path().generic_string(),metafile["Source"].as<std::string>());
-					error = true;
-				}
-				if (!error) { // load file
-					meta.importSettings = nullptr;
-					meta.source = metafile["Source"].as<std::string>();
-					meta.id = metafile["UUID"].as<uint64_t>();
-					meta.importHash = metafile["ImportHash"].as<uint64_t>();
-						meta.snapshotHash = metafile["SnapshotHash"].as<uint64_t>();
-					if(metafile["Generated Dependencies"])
-						meta.generatedDependencies = metafile["Generated Dependencies"].as<std::vector<AssetDependency>>(); //implement YAML conversion
-					meta.isStandalone = metafile["Standalone"].as<bool>();
-					meta.generatedFrom = metafile["Generated From"].as<uint64_t>();
-					switch (meta.assetType) {
-						case AssetType::Texture:
-							meta.importSettings = std::make_unique<TextureImportSettings>(metafile["ImportSettings"]);
-							break;
-					}
-					m_registry.storage[meta.id] = meta;
-					if(meta.assetType == AssetType::Source)
-						m_priorityImports[meta.id] = meta;
-					continue;
-				}
-			}
-			meta.isStandalone = true;
-			meta.generatedFrom = 0;
-			meta.id = UUID();
-			meta.source = file.path().lexically_normal();
-			meta.importSettings = nullptr;
-			meta.importHash = 0; //generate it on actual import
-			meta.snapshotHash = 0;
-			YAML::Node metafile;
-			metafile["Source"] = meta.source.string();
-			metafile["UUID"] = meta.id.Get();
-			metafile["Type"] = AssetTypeToString(meta.assetType);
-			metafile["Generated From"] = 0;
-			metafile["SnapshotHash"] = 0;
-			metafile["ImportHash"] = meta.importHash;
-			metafile["Standalone"] = true;
-			switch (meta.assetType) {
-				case AssetType::Texture:
-					meta.importSettings = std::make_unique<TextureImportSettings>();
-					metafile["ImportSettings"] = meta.importSettings->Serialize();
-					break;
-			}
-			m_registry.storage[meta.id] = meta;
-			if (meta.assetType == AssetType::Source)
-				m_priorityImports[meta.id] = meta;
-			std::ofstream fl(metapath);
-			fl << metafile;
-			fl.close();
-			continue;
+			ProcessFile(file.path());
 		}
 	}
 	void AssetManager::LoadAssets() {
