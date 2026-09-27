@@ -1,9 +1,9 @@
-Source: F:/SkipsEngine/Assets/text.png
+Source: F:/SkipsEngine/Assets\text.png
 UUID: 14686143120639176805
 Type: Texture
 Generated From: 0
 SnapshotHash: 0
-ImportHash: 13270663704954780582
+ImportHash: 11040286036542295905
 Standalone: true
 ImportSettings:
   MipCount: 1

@@ -135,12 +135,14 @@ namespace Gaze {
 		}
 	}
 	void ResourceManager::OnFrameStart() {
-		while(!m_scheduled.empty()) {
-			auto& task = m_scheduled.front();
+		std::queue<Task> copy = m_scheduled; //for the future when i do multithreading
+		uint32_t count = copy.size();
+		while(!copy.empty()) {
+			auto& task = copy.front();
 			switch (task.type)
 			{
 			case TaskType::Load:
-				m_resourcesImportData[task.id] = *task.data;
+				m_resourcesImportData[task.id] = task.data;
 				m_resourcesImportData[task.id].state = ResourceImportState::Valid;
 				for (auto& storage : m_resources) {
 					if (storage->Has(task.id)) {
@@ -164,7 +166,12 @@ namespace Gaze {
 				m_resources.clear();
 				break;
 			}
+			copy.pop();
+		}
+		while (count > 0)
+		{
 			m_scheduled.pop();
+			count--;
 		}
 	}
 }

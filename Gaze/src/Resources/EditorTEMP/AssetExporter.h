@@ -1,6 +1,0 @@
-
-namespace Gaze {
-	class AssetExporter {
-
-	};
-}

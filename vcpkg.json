@@ -15,6 +15,7 @@
     "assimp",
     "yaml-cpp",
     "stb",
-    "xxhash"
+    "xxhash",
+    "efsw"
   ]
 }

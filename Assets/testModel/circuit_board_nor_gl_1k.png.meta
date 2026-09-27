@@ -1,9 +1,9 @@
-Source: F:\SkipsEngine\Assets\testModel\circuit_board_nor_gl_1k.png
+Source: F:/SkipsEngine/Assets\testModel\circuit_board_nor_gl_1k.png
 UUID: 12436593279222698289
-ImportHash: 14510389571108172823
+Type: Texture
+Generated From: 13309170036288791520
 SnapshotHash: 0
+ImportHash: 14510389571108172823
 Standalone: true
 ImportSettings:
   MipCount: 1
-Generated From: 13309170036288791520
-Type: Texture

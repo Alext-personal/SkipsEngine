@@ -21,6 +21,8 @@ namespace Gaze {
 	}
 
 	void EditorCamera::OnWindowResize(uint32_t width, uint32_t height) {
+		if (width == 0 || height == 0)
+			return;
 		m_camera.SetViewportSize(width, height);
 	}
 }

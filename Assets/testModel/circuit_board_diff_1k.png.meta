@@ -1,9 +1,9 @@
-Source: F:\SkipsEngine\Assets\testModel\circuit_board_diff_1k.png
+Source: F:/SkipsEngine/Assets\testModel\circuit_board_diff_1k.png
 UUID: 12671809768483519225
-ImportHash: 9089542924649932355
+Type: Texture
+Generated From: 13309170036288791520
 SnapshotHash: 0
+ImportHash: 9089542924649932355
 Standalone: true
 ImportSettings:
   MipCount: 1
-Generated From: 13309170036288791520
-Type: Texture

@@ -18,8 +18,9 @@ namespace Gaze {
 	};
 	struct Task {
 		UUID id;
-		std::unique_ptr<ResourceImportData> data;
+		ResourceImportData data;
 		TaskType type;
+		
 	};
 	struct IResourceStorage{
 		AssetType type;
@@ -141,19 +142,19 @@ namespace Gaze {
 			auto it = m_resourcesImportData.find(id);
 			if (it != m_resourcesImportData.end()) {
 				m_resourcesImportData[id].state = ResourceImportState::Pending;
-				m_scheduled.push({ id,nullptr,TaskType::Unload });
+				m_scheduled.push({ id,m_resourcesImportData[id],TaskType::Unload });
 			}
 		}
 		void ScheduleLoadResourceData(const UUID& id, const ResourceImportData& data) {
 			LOG_INFO("SCHEDULED RESOURCE DATA WITH UUID : ${},", id.Get());
 			m_resourcesImportData[id].state = ResourceImportState::Pending;
-			m_scheduled.push({ id,std::make_unique<ResourceImportData>(data),TaskType::Load });
+			m_scheduled.push({ id,m_resourcesImportData[id],TaskType::Load});
 		}
 		void ScheduleUnloadResourcesData() {
-			m_scheduled.push({ 0,nullptr,TaskType::ClearResourcesData });
+			m_scheduled.push({ 0,ResourceImportData(),TaskType::ClearResourcesData});
 		}
 		void ScheduleUnloadResources(){
-			m_scheduled.push({ 0,nullptr,TaskType::ClearResources });
+			m_scheduled.push({ 0,ResourceImportData(),TaskType::ClearResources });
 		}
 		void AddRef(const UUID& id) {
 			for (auto& storage : m_resources)

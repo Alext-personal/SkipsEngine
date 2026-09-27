@@ -29,7 +29,8 @@ namespace Gaze {
 	}
 	void Application::Run() {
 		LOG_INFO("App Started");
-		Entity ent = m_activeScene.Instantiate(11825589953740235702);
+		Entity ent(m_activeScene);
+		ent.AddComponent<MeshRenderer>().materials[0] = 12843538320619033948;
 		auto start = GetTime();
 		auto t1 = GetTime();
 		LOG_INFO("Mesh loading took: ${} ", t1 - start);
@@ -40,6 +41,7 @@ namespace Gaze {
 		while (m_running) {
 			m_window->PollEvents();
 			m_resourceManager.OnFrameStart();
+			m_assetManager.ProcessQueue();
 			Renderer::BeginFrame();
 			float currentTime = glfwGetTime();
 			float timeStep = currentTime - lastTime;

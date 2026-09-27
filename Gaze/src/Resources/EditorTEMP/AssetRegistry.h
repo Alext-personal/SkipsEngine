@@ -1,5 +1,6 @@
 #pragma once
 #include "Resources/Asset.h"
+#include <mutex>
 namespace Gaze {
 	class YAML::Emitter;
 	class YAML::Node;
@@ -65,8 +66,19 @@ namespace Gaze {
 		}
 		MetaData() = default;
 	};
+	enum class AssetFileState {
+		Created,Deleted,Modified,Moved
+	};
+	struct AssetFileData { 
+		AssetFileState state;
+		std::filesystem::path path;
+		std::filesystem::path oldPath; 
+	};
 	struct AssetRegistry {
 		std::unordered_map<UUID, MetaData> storage;
+		std::unordered_map<std::filesystem::path, UUID> lookup;
+		std::queue<AssetFileData> importQueue;
+		std::mutex importQueueMutex;
 		std::filesystem::path currentPath{ GAZE_SOURCE_ASSET_ROOT }; // hardcoded for testing purposes
 		bool Has(const UUID& id) {
 			auto it = storage.find(id);
@@ -74,6 +86,19 @@ namespace Gaze {
 				return true;
 			return false;
 		}
+		UUID Get(const std::filesystem::path& path) {
+			auto it = lookup.find(path);
+			if (it == lookup.end()) {
+				LOG_WARNING("REGISTRY PATH NOT REGISTERED : ${}", path);
+				return ReservedUUID::NONE;
+			}
+			return it->second;
+		}
+		void Add(const UUID& id, const MetaData& data) {
+			storage[id] = data;
+			lookup[data.source] = id;
+		}
+		void SetAssetPath(const std::filesystem::path& path) { currentPath = path; }
 	};
 }
 namespace YAML {

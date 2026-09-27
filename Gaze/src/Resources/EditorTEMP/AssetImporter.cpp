@@ -990,7 +990,7 @@ namespace Gaze {
 
 				if (!isTemp)
 					WriteTextureMetaFile(meta, m_modelID);
-				m_registry.storage[meta.id] = meta;
+				m_registry.Add(meta.id, meta);
 				m_callbacks.importTexture(meta.id, static_cast<TextureImportSettings*>(meta.importSettings.get()));
 				if (isTemp)
 					RemoveFileIfExists(meta.source);
@@ -1083,7 +1083,7 @@ namespace Gaze {
 				YAML::Emitter emitter;
 				emitter << mat;
 				meta.snapshotHash = SaveEmitterSnapshot(emitter, 0, material.id.ToString());
-				m_registry.storage[material.id] = meta;
+				m_registry.Add(material.id, meta);
 				m_callbacks.importMaterial(material.id);
 				RemoveFileIfExists(meta.source);
 			}
@@ -1160,7 +1160,7 @@ namespace Gaze {
 
 				WritePrefabMetaFile(meta);
 				m_generated.push_back({ meta.source,meta.id,AssetType::Prefab });
-				m_registry.storage[prefabID] = meta;
+				m_registry.Add(prefabID, meta);
 				return true;
 			}
 
